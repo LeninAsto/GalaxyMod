@@ -1,5 +1,18 @@
 package gameplay;
 
+import modcharts.M_cona;
+import modcharts.M_cyber;
+import modcharts.M_destiny;
+import modcharts.M_familanna;
+import modcharts.M_galaxy;
+import modcharts.M_game;
+import modcharts.M_kastimagina;
+import modcharts.M_newton;
+import modcharts.M_peace;
+import modcharts.M_underworld;
+
+import modcharts.ModchartMath;
+
 import backend.data.Song.SwagSong;
 import Std;
 import flixel.FlxCamera;
@@ -16,362 +29,288 @@ using StringTools;
 
 class PlayMoving
 {
-	public static var sy:Float = 50;
-	public static var xlist:Array<Float> = [50, 162, 274, 386];
-	public static var oxlist(default, null):Array<Float> = [50, 162, 274, 386];
-	public static var pxlist:Array<Float> = [690, 802, 914, 1026];
-	public static var poxlist(default, null):Array<Float> = [690, 802, 914, 1026];
-	public static var nlist:Array<Float> = [50, 162, 274, 386];
-	public static var pnlist:Array<Float> = [690, 802, 914, 1026];
-	public static var ylist:Array<Float> = [50, 50, 50, 50];
-	public static var pylist:Array<Float> = [50, 50, 50, 50];
-	public static var ns:String = "";
+	public static var receptorBaselineY:Float = 50;
+	public static var opponentReceptorX:Array<Float> = [50, 162, 274, 386];
+	public static var defaultOpponentReceptorX(default, null):Array<Float> = [50, 162, 274, 386];
+	public static var playerReceptorX:Array<Float> = [690, 802, 914, 1026];
+	public static var defaultPlayerReceptorX(default, null):Array<Float> = [690, 802, 914, 1026];
+	public static var nextOpponentReceptorX:Array<Float> = [50, 162, 274, 386];
+	public static var nextPlayerReceptorX:Array<Float> = [690, 802, 914, 1026];
+	public static var receptorY:Array<Float> = [50, 50, 50, 50];
+	public static var playerReceptorY:Array<Float> = [50, 50, 50, 50];
+	public static var noteAnimationSuffix:String = "";
 	public static var stage:Array<Int> = [0, 0];
 
 	public static function reset()
 	{
 		if (FlxG.save.data.downscroll)
 		{
-			sy = 550;
-			ylist = [550, 550, 550, 550];
-			pylist = [550, 550, 550, 550];
+			receptorBaselineY = 550;
+			receptorY = [550, 550, 550, 550];
+			playerReceptorY = [550, 550, 550, 550];
 		}
 		else
 		{
-			sy = 50;
-			ylist = [50, 50, 50, 50];
-			pylist = [50, 50, 50, 50];
+			receptorBaselineY = 50;
+			receptorY = [50, 50, 50, 50];
+			playerReceptorY = [50, 50, 50, 50];
 		}
-		xlist = [50, 162, 274, 386];
-		pxlist = [690, 802, 914, 1026];
-		nlist = [50, 162, 274, 386];
-		pnlist = [690, 802, 914, 1026];
-		ns = "";
+		opponentReceptorX = [50, 162, 274, 386];
+		playerReceptorX = [690, 802, 914, 1026];
+		nextOpponentReceptorX = [50, 162, 274, 386];
+		nextPlayerReceptorX = [690, 802, 914, 1026];
+		noteAnimationSuffix = "";
 		stage = [Std.int(Capabilities.screenResolutionX), Std.int(Capabilities.screenResolutionY)];
 
 		Note.refresh();
 		NoteStrum.refresh();
 		NoteSplash.refresh();
 
-		modcharts.M_game.reset();
-		modcharts.M_familanna.reset();
-		modcharts.M_newton.reset();
-		modcharts.M_destiny.reset();
-		modcharts.M_peace.reset();
+		M_game.reset();
+		M_familanna.reset();
+		M_newton.reset();
+		M_destiny.reset();
+		M_peace.reset();
 	}
 
 	// trace(Lib.current.stage.stageWidth);
 
-	public static function pos(daNote:Note, strumLine:FlxSprite)
+	public static function updateNotePosition(note:Note, strumLine:FlxSprite)
 	{
-		if (PlayState.SONG.song.toLowerCase() == "galaxy" && PlayState.storyDifficulty != 0)
+		switch (PlayState.SONG.song.toLowerCase())
 		{
-			modcharts.M_galaxy.pos(daNote, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "game" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_game.pos(daNote, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "kastimagina" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_kastimagina.pos(daNote, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "cona" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_cona.pos(daNote, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "underworld" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_underworld.pos(daNote, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "cyber" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_cyber.pos(daNote, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "familanna")
-		{
-			modcharts.M_familanna.pos(daNote, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "newton" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_newton.pos(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "destiny" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_destiny.pos(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "peace" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_peace.pos(daNote);
-		}
-		else
-		{
-			if (FlxG.save.data.downscroll)
-				daNote.y = (strumLine.y + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-			else
-				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+			case "galaxy" if (PlayState.storyDifficulty != 0):
+				M_galaxy.updateNotePosition(note, strumLine);
+			case "game" if (PlayState.storyDifficulty != 0):
+				M_game.updateNotePosition(note, strumLine);
+			case "kastimagina" if (PlayState.storyDifficulty != 0):
+				M_kastimagina.updateNotePosition(note, strumLine);
+			case "cona" if (PlayState.storyDifficulty != 0):
+				M_cona.updateNotePosition(note, strumLine);
+			case "underworld" if (PlayState.storyDifficulty != 0):
+				M_underworld.updateNotePosition(note, strumLine);
+			case "cyber" if (PlayState.storyDifficulty != 0):
+				M_cyber.updateNotePosition(note, strumLine);
+			case "familanna":
+				M_familanna.updateNotePosition(note, strumLine);
+			case "newton" if (PlayState.storyDifficulty != 0):
+				M_newton.updateNotePosition(note);
+			case "destiny" if (PlayState.storyDifficulty != 0):
+				M_destiny.updateNotePosition(note);
+			case "peace" if (PlayState.storyDifficulty != 0):
+				M_peace.updateNotePosition(note);
+			default:
+				if (FlxG.save.data.downscroll)
+					note.y = (strumLine.y + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
+				else
+					note.y = (strumLine.y - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 		}
 	}
 
-	public static function spos(dastrum:NoteStrum, strumLine:FlxSprite)
+	public static function updateReceptorPosition(receptor:NoteStrum, strumLine:FlxSprite)
 	{
-		if (PlayState.SONG.song.toLowerCase() == "game" && PlayState.storyDifficulty != 0)
+		switch (PlayState.SONG.song.toLowerCase())
 		{
-			modcharts.M_game.spos(dastrum, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "kastimagina" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_kastimagina.spos(dastrum, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "cona" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_cona.spos(dastrum, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "underworld" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_underworld.spos(dastrum, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "cyber" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_cyber.spos(dastrum, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "familanna")
-		{
-			modcharts.M_familanna.spos(dastrum, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "newton" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_newton.spos(dastrum);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "destiny" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_destiny.spos(dastrum);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "peace" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_peace.spos(dastrum);
+			case "game" if (PlayState.storyDifficulty != 0):
+				M_game.updateReceptorPosition(receptor, strumLine);
+			case "kastimagina" if (PlayState.storyDifficulty != 0):
+				M_kastimagina.updateReceptorPosition(receptor, strumLine);
+			case "cona" if (PlayState.storyDifficulty != 0):
+				M_cona.updateReceptorPosition(receptor, strumLine);
+			case "underworld" if (PlayState.storyDifficulty != 0):
+				M_underworld.updateReceptorPosition(receptor, strumLine);
+			case "cyber" if (PlayState.storyDifficulty != 0):
+				M_cyber.updateReceptorPosition(receptor, strumLine);
+			case "familanna":
+				M_familanna.updateReceptorPosition(receptor, strumLine);
+			case "newton" if (PlayState.storyDifficulty != 0):
+				M_newton.updateReceptorPosition(receptor);
+			case "destiny" if (PlayState.storyDifficulty != 0):
+				M_destiny.updateReceptorPosition(receptor);
+			case "peace" if (PlayState.storyDifficulty != 0):
+				M_peace.updateReceptorPosition(receptor);
 		}
 	}
 
-	public static function pspos(dastrum:NoteStrum, strumLine:FlxSprite)
+	public static function updatePlayerReceptorPosition(receptor:NoteStrum, strumLine:FlxSprite)
 	{
-		if (PlayState.SONG.song.toLowerCase() == "underworld" && PlayState.storyDifficulty != 0)
+		switch (PlayState.SONG.song.toLowerCase())
 		{
-			modcharts.M_underworld.pspos(dastrum, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "familanna")
-		{
-			modcharts.M_familanna.pspos(dastrum, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "newton" && PlayState.storyDifficulty != 0)
-		{
-			modcharts.M_newton.pspos(dastrum);
+			case "underworld" if (PlayState.storyDifficulty != 0):
+				M_underworld.updatePlayerReceptorPosition(receptor, strumLine);
+			case "familanna":
+				M_familanna.updatePlayerReceptorPosition(receptor, strumLine);
+			case "newton" if (PlayState.storyDifficulty != 0):
+				M_newton.updatePlayerReceptorPosition(receptor);
 		}
 	}
 
-	public static function ongood(daNote:Note):Void
+	public static function onGoodNoteHit(note:Note):Void
 	{
 		if (PlayState.SONG.song.toLowerCase() == "familanna")
 		{
-			modcharts.M_familanna.ongood(daNote);
+			M_familanna.onGoodNoteHit(note);
 		}
 		if (PlayState.SONG.song.toLowerCase() == "destiny" && PlayState.storyDifficulty != 0)
 		{
-			modcharts.M_destiny.ongood(daNote);
+			M_destiny.onGoodNoteHit(note);
 		}
 		if (PlayState.SONG.song.toLowerCase() == "peace")
 		{
-			modcharts.M_peace.ongood(daNote);
+			M_peace.onGoodNoteHit(note);
 		}
 	}
 
-	public static function shape(daNote:Note, strumLine:FlxSprite, camHUD:FlxCamera):Void
+	public static function applyNoteShape(note:Note, strumLine:FlxSprite, camHUD:FlxCamera):Void
 	{
 		if (PlayState.SONG.song.toLowerCase() == "newton" && PlayState.storyDifficulty != 0)
 		{
-			if (modcharts.M_newton.shape(daNote, camHUD))
+			if (M_newton.applyNoteShape(note, camHUD))
 				return;
 		}
-		if (daNote.isSustainNote && daNote.rendermode == 0)
+		if (note.isSustainNote && note.rendermode == 0)
 		{
-			if (ups(daNote, strumLine) == 1)
+			if (updateSustainDirection(note, strumLine) == 1)
 			{
-				if (daNote.animation.curAnim.name.endsWith('end'))
-					daNote.y += daNote.height;
+				if (note.animation.curAnim.name.endsWith('end'))
+					note.y += note.height;
 			}
-			daNote.clipRect = null;
+			note.clipRect = null;
 		}
 		// i am so fucking sorry for this if condition
-		if (daNote.isSustainNote
-			&& ((ups(daNote, strumLine) == 1
-				&& daNote.y - daNote.offset.y * daNote.scale.y + daNote.height >= stry(daNote, strumLine) + Note.swagWidth / 2)
-				|| (ups(daNote, strumLine) == 2 && daNote.y + daNote.offset.y <= stry(daNote, strumLine) + Note.swagWidth / 2)
-				|| (ups(daNote, strumLine) == 0 && daNote.x + daNote.offset.x <= stry(daNote, strumLine) + Note.swagWidth / 2)
-				|| (ups(daNote, strumLine) == 3
-					&& daNote.x - daNote.offset.x * daNote.scale.y + daNote.height >= stry(daNote, strumLine) + Note.swagWidth / 2))
-			&& (!daNote.mustPress || (daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit))))
+		if (note.isSustainNote
+			&& ((updateSustainDirection(note, strumLine) == 1
+				&& note.y - note.offset.y * note.scale.y + note.height >= getSustainClipPosition(note, strumLine) + Note.swagWidth / 2)
+				|| (updateSustainDirection(note, strumLine) == 2 && note.y + note.offset.y <= getSustainClipPosition(note, strumLine) + Note.swagWidth / 2)
+				|| (updateSustainDirection(note, strumLine) == 0 && note.x + note.offset.x <= getSustainClipPosition(note, strumLine) + Note.swagWidth / 2)
+				|| (updateSustainDirection(note, strumLine) == 3
+					&& note.x - note.offset.x * note.scale.y + note.height >= getSustainClipPosition(note, strumLine) + Note.swagWidth / 2))
+			&& (!note.mustPress || (note.wasGoodHit || (note.prevNote.wasGoodHit && !note.canBeHit))))
 		{
-			var swagRect = new FlxRect(0, stry(daNote, strumLine) + Note.swagWidth / 2 - daNote.y, daNote.width * 2, daNote.height * 2);
-			switch (ups(daNote, strumLine))
+			var sustainClipRect = new FlxRect(0, getSustainClipPosition(note, strumLine) + Note.swagWidth / 2 - note.y, note.width * 2, note.height * 2);
+			switch (updateSustainDirection(note, strumLine))
 			{
 				case 0:
-					swagRect.y = stry(daNote, strumLine) + Note.swagWidth / 2 - daNote.x;
-					swagRect.x /= daNote.scale.y;
-					swagRect.height -= swagRect.y;
+					sustainClipRect.y = getSustainClipPosition(note, strumLine) + Note.swagWidth / 2 - note.x;
+					sustainClipRect.x /= note.scale.y;
+					sustainClipRect.height -= sustainClipRect.y;
 				case 1:
-					swagRect.height = (stry(daNote, strumLine) + Note.swagWidth / 2 - daNote.y) / daNote.scale.y;
-					swagRect.y = daNote.frameHeight - swagRect.height;
+					sustainClipRect.height = (getSustainClipPosition(note, strumLine) + Note.swagWidth / 2 - note.y) / note.scale.y;
+					sustainClipRect.y = note.frameHeight - sustainClipRect.height;
 				case 2:
-					swagRect.y /= daNote.scale.y;
-					swagRect.height -= swagRect.y;
+					sustainClipRect.y /= note.scale.y;
+					sustainClipRect.height -= sustainClipRect.y;
 				case 3:
-					swagRect.height = (stry(daNote, strumLine) + Note.swagWidth / 2 - daNote.x) / daNote.scale.y;
-					swagRect.y = daNote.frameWidth - swagRect.height;
+					sustainClipRect.height = (getSustainClipPosition(note, strumLine) + Note.swagWidth / 2 - note.x) / note.scale.y;
+					sustainClipRect.y = note.frameWidth - sustainClipRect.height;
 			}
-			daNote.clipRect = swagRect;
+			note.clipRect = sustainClipRect;
 		}
 	}
 
-	inline static public function show(daNote:Note):Bool
+	inline static public function shouldHideNote(note:Note):Bool
 	{
-		if (Conductor.songPosition > daNote.strumTime)
+		if (Conductor.songPosition > note.strumTime)
 			return false;
-		if (PlayState.SONG.song.toLowerCase() == "game" && PlayState.storyDifficulty != 0)
+		switch (PlayState.SONG.song.toLowerCase())
 		{
-			return modcharts.M_game.show(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "kastimagina" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_kastimagina.show(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "underworld" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_underworld.show(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "cyber" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_cyber.show(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "familanna")
-		{
-			return modcharts.M_familanna.show(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "newton" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_newton.show(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "destiny" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_destiny.show(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "peace" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_peace.show(daNote);
-		}
-		else
-		{
-			if (FlxG.save.data.downscroll)
-				return daNote.y < -daNote.height;
-			else
-				return daNote.y > FlxG.height;
+			case "game" if (PlayState.storyDifficulty != 0):
+				return M_game.shouldHideNote(note);
+			case "kastimagina" if (PlayState.storyDifficulty != 0):
+				return M_kastimagina.shouldHideNote(note);
+			case "underworld" if (PlayState.storyDifficulty != 0):
+				return M_underworld.shouldHideNote(note);
+			case "cyber" if (PlayState.storyDifficulty != 0):
+				return M_cyber.shouldHideNote(note);
+			case "familanna":
+				return M_familanna.shouldHideNote(note);
+			case "newton" if (PlayState.storyDifficulty != 0):
+				return M_newton.shouldHideNote(note);
+			case "destiny" if (PlayState.storyDifficulty != 0):
+				return M_destiny.shouldHideNote(note);
+			case "peace" if (PlayState.storyDifficulty != 0):
+				return M_peace.shouldHideNote(note);
+			default:
+				if (FlxG.save.data.downscroll)
+					return note.y < -note.height;
+				else
+					return note.y > FlxG.height;
 		}
 	}
 
-	inline static public function kill(daNote:Note):Bool
+	inline static public function shouldRemoveNote(note:Note):Bool
 	{
-		if (!daNote.tooLate || !daNote.mustPress)
+		if (!note.tooLate || !note.mustPress)
 			return false;
-		if (PlayState.SONG.song.toLowerCase() == "game" && PlayState.storyDifficulty != 0)
+		switch (PlayState.SONG.song.toLowerCase())
 		{
-			return modcharts.M_game.kill(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "kastimagina" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_kastimagina.kill(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "cona" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_cona.kill(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "underworld" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_underworld.kill(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "cyber" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_cyber.kill(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "familanna")
-		{
-			return modcharts.M_familanna.kill(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "newton" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_newton.kill(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "destiny" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_destiny.kill(daNote);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "peace" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_peace.kill(daNote);
-		}
-		else
-		{
-			if (FlxG.save.data.downscroll)
-				return daNote.y > FlxG.height;
-			else
-				return daNote.y < -daNote.height;
+			case "game" if (PlayState.storyDifficulty != 0):
+				return M_game.shouldRemoveNote(note);
+			case "kastimagina" if (PlayState.storyDifficulty != 0):
+				return M_kastimagina.shouldRemoveNote(note);
+			case "cona" if (PlayState.storyDifficulty != 0):
+				return M_cona.shouldRemoveNote(note);
+			case "underworld" if (PlayState.storyDifficulty != 0):
+				return M_underworld.shouldRemoveNote(note);
+			case "cyber" if (PlayState.storyDifficulty != 0):
+				return M_cyber.shouldRemoveNote(note);
+			case "familanna":
+				return M_familanna.shouldRemoveNote(note);
+			case "newton" if (PlayState.storyDifficulty != 0):
+				return M_newton.shouldRemoveNote(note);
+			case "destiny" if (PlayState.storyDifficulty != 0):
+				return M_destiny.shouldRemoveNote(note);
+			case "peace" if (PlayState.storyDifficulty != 0):
+				return M_peace.shouldRemoveNote(note);
+			default:
+				if (FlxG.save.data.downscroll)
+					return note.y > FlxG.height;
+				else
+					return note.y < -note.height;
 		}
 	}
 
-	inline static public function ups(daNote:Note, strumLine:FlxSprite)
+	inline static public function updateSustainDirection(note:Note, strumLine:FlxSprite)
 	{
-		if (PlayState.SONG.song.toLowerCase() == "game" && PlayState.storyDifficulty != 0)
+		switch (PlayState.SONG.song.toLowerCase())
 		{
-			return modcharts.M_game.ups(daNote, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "cona" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_cona.ups(daNote, strumLine);
-		}
-		else if (PlayState.SONG.song.toLowerCase() == "underworld" && PlayState.storyDifficulty != 0)
-		{
-			return modcharts.M_underworld.ups(daNote, strumLine);
-		}
-		else
-		{
-			if (FlxG.save.data.downscroll)
-			{
-				daNote.angle = 180;
-				return 1;
-			}
-			else
-			{
-				daNote.angle = 0;
-				return 2;
-			}
+			case "game" if (PlayState.storyDifficulty != 0):
+				return M_game.updateSustainDirection(note, strumLine);
+			case "cona" if (PlayState.storyDifficulty != 0):
+				return M_cona.updateSustainDirection(note, strumLine);
+			case "underworld" if (PlayState.storyDifficulty != 0):
+				return M_underworld.updateSustainDirection(note, strumLine);
+			default:
+				if (FlxG.save.data.downscroll)
+				{
+					note.angle = 180;
+					return 1;
+				}
+				else
+				{
+					note.angle = 0;
+					return 2;
+				}
 		}
 	}
 
-	inline static public function stry(daNote:Note, strumLine:FlxSprite)
+	inline static public function getSustainClipPosition(note:Note, strumLine:FlxSprite)
 	{
 		if (PlayState.SONG.song.toLowerCase() == "game" && PlayState.storyDifficulty != 0)
 		{
-			return modcharts.M_game.stry(daNote, strumLine);
+			return M_game.getSustainClipPosition(note, strumLine);
 		}
 		if (PlayState.SONG.song.toLowerCase() == "kastimagina" && PlayState.storyDifficulty != 0)
 		{
-			return modcharts.M_kastimagina.stry(daNote, strumLine);
+			return M_kastimagina.getSustainClipPosition(note, strumLine);
 		}
 		if (PlayState.SONG.song.toLowerCase() == "cona" && PlayState.storyDifficulty != 0)
 		{
-			return modcharts.M_cona.stry(daNote, strumLine);
+			return M_cona.getSustainClipPosition(note, strumLine);
 		}
 		if (PlayState.SONG.song.toLowerCase() == "underworld" && PlayState.storyDifficulty != 0)
 		{
-			return modcharts.M_underworld.stry(daNote, strumLine);
+			return M_underworld.getSustainClipPosition(note, strumLine);
 		}
 		else
 		{
@@ -379,35 +318,35 @@ class PlayMoving
 		}
 	}
 
-	public static function clone(daNote:Note)
+	public static function cloneNote(note:Note)
 	{
 		if (PlayState.SONG.song.toLowerCase() == "peace" && PlayState.storyDifficulty != 0)
 		{
-			modcharts.M_peace.clone(daNote);
+			M_peace.cloneNote(note);
 		}
 	}
 
-	public static function special(state:PlayState)
+	public static function updateSpecialReceptors(state:PlayState)
 	{
 		if (PlayState.SONG.song.toLowerCase() == "destiny" && PlayState.storyDifficulty != 0)
 		{
-			modcharts.M_destiny.special(state);
+			M_destiny.updateSpecialReceptors(state);
 		}
 		if (PlayState.SONG.song.toLowerCase() == "peace" && PlayState.storyDifficulty != 0)
 		{
-			modcharts.M_peace.special(state);
+			M_peace.updateSpecialReceptors(state);
 		}
 	}
 
-	public static function beatHit(state:PlayState, curBeat:Int)
+	public static function onBeatHit(state:PlayState, curBeat:Int)
 	{
 		if (PlayState.SONG.song.toLowerCase() == "destiny" && PlayState.storyDifficulty != 0)
 		{
-			modcharts.M_destiny.beatHit(state, curBeat);
+			M_destiny.onBeatHit(state, curBeat);
 		}
 		if (PlayState.SONG.song.toLowerCase() == "peace")
 		{
-			modcharts.M_peace.beatHit(curBeat);
+			M_peace.onBeatHit(curBeat);
 		}
 	}
 

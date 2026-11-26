@@ -137,6 +137,15 @@ class StoryMenuState extends MusicBeatState
 				"她是個超出我們知識範圍的外星人，我們在意外中遇到了她，我們還會再見面嗎?"
 			];
 		}
+		else if (Language.isSpanish())
+		{
+			intros = [
+				"El tutorial está aquí, como siempre.",
+				"Kastimagina es una ingeniera y políglota taiwanesa de 14 años. De repente llevó a Boyfriend y Girlfriend a un viaje espacial. ¿Cuál será su propósito?",
+				"Los chicos que le confiesan su amor pronto se gradúan al otro mundo. Causa daño masivo a los ángeles. (Ataque de área)\n¿Por qué está aquí?",
+				"Es una alienígena que escapa a nuestro conocimiento. Nos encontramos por accidente. ¿Volveremos a vernos?"
+			];
+		}
 		transIn = FlxTransitionableState.defaultTransIn;
 		transOut = FlxTransitionableState.defaultTransOut;
 
@@ -543,7 +552,7 @@ class StoryMenuState extends MusicBeatState
 			if (FlxG.save.data.lang == 1)
 				txtTracklist.text = "曲目\n";
 			else
-				txtTracklist.text = "Tracks\n";
+				txtTracklist.text = Language.translate("Tracks") + "\n";
 
 			var stringThing:Array<String> = weekData[curWeek];
 
@@ -570,7 +579,7 @@ class StoryMenuState extends MusicBeatState
 			}
 			else
 			{
-				scoreText.text = "WEEK SCORE\n" + intendedScore + "\n";
+				scoreText.text = Language.translate("WEEK SCORE") + "\n" + intendedScore + "\n";
 			}
 
 			txtWeekTitle.text = weekNames[curWeek].toUpperCase();

@@ -36,6 +36,9 @@ class OptionsMenu extends MusicBeatState
 	var currentSelectedCat:OptionCategory;
 
 	var holdt:Array<Float> = [0, 0];
+	var displayedLanguage:Dynamic;
+	var selectorLeft:Alphabet;
+	var selectorRight:Alphabet;
 
 	override function load()
 	{
@@ -67,6 +70,7 @@ class OptionsMenu extends MusicBeatState
 	{
 		// clean();
 		instance = this;
+		displayedLanguage = FlxG.save.data.lang;
 		var menuBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menuDesat"));
 
 		menuBG.color = 0xFFea71fd;
@@ -83,14 +87,19 @@ class OptionsMenu extends MusicBeatState
 
 		for (i in 0...options.length)
 		{
-			var controlLabel:Alphabet = new Alphabet(50, (100 * i) + (FlxG.height * 0.48), options[i].getName(), true, false, true);
+			var controlLabel:Alphabet = new Alphabet(50, (100 * i) + (FlxG.height * 0.48), Language.translate(options[i].getName()), true, false, true);
 			controlLabel.isOption = true;
+			controlLabel.diagonalOption = true;
 			controlLabel.targetY = i;
 			controlLabel.x = (FlxG.width - controlLabel.sumwidth) / 2;
 			grpControls.add(controlLabel);
 			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
 		}
 
+		selectorLeft = new Alphabet(0, 0, '>', true);
+		selectorRight = new Alphabet(0, 0, '<', true);
+		add(selectorLeft);
+		add(selectorRight);
 		changeSelection();
 
 		super.create();
@@ -101,6 +110,19 @@ class OptionsMenu extends MusicBeatState
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
+		selectorLeft.visible = selectorRight.visible = !isCat && grpControls.length > 0;
+		if (selectorLeft.visible)
+		{
+			var selected = grpControls.members[curSelected];
+			selectorLeft.x = selected.x - selectorLeft.sumwidth - 20;
+			selectorRight.x = selected.x + selected.sumwidth + 20;
+			selectorLeft.y = selectorRight.y = selected.y;
+		}
+        if (displayedLanguage != FlxG.save.data.lang)
+        {
+            displayedLanguage = FlxG.save.data.lang;
+            refreshLanguageLabels();
+        }
 
 		if (acceptInput)
 		{
@@ -117,8 +139,9 @@ class OptionsMenu extends MusicBeatState
 				grpChildren.clear();
 				for (i in 0...options.length)
 				{
-					var controlLabel:Alphabet = new Alphabet(50, (100 * i) + (FlxG.height * 0.48), options[i].getName(), true, false);
+					var controlLabel:Alphabet = new Alphabet(50, (100 * i) + (FlxG.height * 0.48), Language.translate(options[i].getName()), true, false);
 					controlLabel.isOption = true;
+					controlLabel.diagonalOption = true;
 					controlLabel.targetY = i;
 					controlLabel.x = (FlxG.width - controlLabel.sumwidth) / 2;
 					grpControls.add(controlLabel);
@@ -361,6 +384,34 @@ class OptionsMenu extends MusicBeatState
 		var welcome = new Welcome();
 		add(welcome);
 	}
+
+    function refreshLanguageLabels():Void
+    {
+        for (i in 0...grpControls.length)
+        {
+            var label = grpControls.members[i];
+            if (label == null) continue;
+            if (isCat)
+            {
+                var option = currentSelectedCat.getOptions()[i];
+                label.reType(option.getDisplay());
+                var values = option.getDisplay2();
+                var childX = label.x + label.sumwidth + 60;
+                for (j in 0...label.children.length)
+                {
+                    var child = label.children[j];
+                    if (j < values.length) child.reType(values[j]);
+                    child.x = childX;
+                    childX += child.sumwidth + 60;
+                }
+            }
+            else
+            {
+                label.reType(Language.translate(options[i].getName()));
+                label.x = (FlxG.width - label.sumwidth) / 2;
+            }
+        }
+    }
 
 	function changeSelection(change:Int = 0)
 	{

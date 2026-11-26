@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Flixel actualized to version 6.2
 - Flixel addons actualized to version 4.0.2
 - Some libraries have been updated to their latest versions.
+- Workflows added and refactor variables and functions.
+- Language Spanish added.
 
 ## [3.0.1] - 2022-10-20
 ### Fixed

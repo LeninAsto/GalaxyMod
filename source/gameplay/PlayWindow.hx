@@ -1,5 +1,7 @@
 package gameplay;
 
+import modcharts.M_cyber;
+
 import backend.data.Song.SwagSong;
 import Std;
 import flixel.FlxCamera;
@@ -26,7 +28,7 @@ class PlayWindow
 	{
 		pos = [0, 0];
 		camz = 1;
-		modcharts.M_cyber.nreset();
+		M_cyber.resetWindowEffects();
 	}
 
 	public static function reset()
@@ -58,7 +60,7 @@ class PlayWindow
 	{
 		if (PlayState.SONG.song.toLowerCase() == "cyber" && PlayState.storyDifficulty != 0)
 		{
-			modcharts.M_cyber.move(camHUD);
+			M_cyber.updateWindowEffects(camHUD);
 		}
 	}
 }

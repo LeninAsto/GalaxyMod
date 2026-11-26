@@ -1,0 +1,40 @@
+diff --git a/flixel/addons/display/FlxRuntimeShader.hx b/flixel/addons/display/FlxRuntimeShader.hx
+index 8f58478..dee998f 100644
+--- a/flixel/addons/display/FlxRuntimeShader.hx
++++ b/flixel/addons/display/FlxRuntimeShader.hx
+@@ -293,6 +293,11 @@ class FlxRuntimeShader extends FlxGraphicsShader
+ 		shaderInput.input = value;
+ 	}
+ 
++	public inline function setBitmapData(name:String, value:BitmapData):Void
++	{
++		setSampler2D(name, value);
++	}
++
+ 	/**
+ 	 * Retrieve a bitmap data input of the shader.
+ 	 *
+@@ -327,11 +332,11 @@ class FlxRuntimeShader extends FlxGraphicsShader
+ 
+ 		if (storageType == "uniform")
+ 		{
+-			regex = ~/uniform ([A-Za-z0-9]+) ([A-Za-z0-9_]+)/;
++			regex = ~/uniform\s+(?:(?:lowp|mediump|highp)\s+)?([A-Za-z0-9]+)\s+([A-Za-z0-9_]+)/;
+ 		}
+ 		else
+ 		{
+-			regex = ~/attribute ([A-Za-z0-9]+) ([A-Za-z0-9_]+)/;
++			regex = ~/attribute\s+(?:(?:lowp|mediump|highp)\s+)?([A-Za-z0-9]+)\s+([A-Za-z0-9_]+)/;
+ 		}
+ 
+ 		@:privateAccess
+@@ -358,6 +363,9 @@ class FlxRuntimeShader extends FlxGraphicsShader
+ 						__texture = input;
+ 					case "bitmap":
+ 						__bitmap = input;
++					case "sampler0":
++						if (__bitmap == null)
++							__bitmap = input;
+ 					default:
+ 				}
+ 

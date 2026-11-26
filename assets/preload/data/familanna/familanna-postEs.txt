@@ -1,0 +1,26 @@
+:kastiright:¡Oye, Fami!
+:kastiright:Ya deberías estar en la cama.
+:kastiright:¿Por qué tardaste tanto?
+:kastiright:...oh...
+:kastiright:Tuviste una batalla de rap con él, ¿eh?
+:famitir:(Bostezo) Ajá.
+:famitir:Estoy agotada.
+:fami:Esta batalla es demasiado fácil para él.
+:kastiright:Estoy segura de que tu definición de «fácil» es...
+:fami:Vamos a mi habitación, ya quiero dormir.
+:SCREEN:
+:fami:Entonces... ¿todo está bien?
+:kastiright:¡Sí!
+:fami:Espero que todo salga sin problemas.
+:kastiright:Ajá.
+:fami:Entonces, se acerca el momento.
+:kastiright:Sí, necesitamos encontrar «eso» antes que ellos...
+:kastiright:Quién sabe qué pasará si ellos...
+:SCREEN:
+:kastiright:Oh, esta es la habitación.
+:fami:¡Gracias, Kasti!
+:fami:Ojalá nuestro plan no se arruine.
+:kastiright:Buenas noches, Fami.
+:kastiright:...aunque no haya «noche» en el espacio.
+:fami:Jajaja...
+:fami:Buenas noches, Kasti.

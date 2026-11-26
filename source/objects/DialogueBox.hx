@@ -15,6 +15,8 @@ using StringTools;
 class DialogueBox extends FlxSpriteGroup
 {
 	var box:FlxSprite;
+	var psychBox:Bool = false;
+	var lastSpeaker:String = '';
 
 	var curCharacter:String = '';
 
@@ -127,10 +129,17 @@ class DialogueBox extends FlxSpriteGroup
 				add(face);
 			default:
 				hasDialog = true;
-				box = new FlxSprite(-20, 380);
-				box.frames = Paths.getSparrowAtlas('speech_bubble_talking');
+				psychBox = true;
+				box = new FlxSprite(70, 370);
+				box.frames = Paths.getSparrowAtlas('psychSpeechBubble');
+				box.animation.addByPrefix('normal', 'speech bubble normal', 24);
 				box.animation.addByPrefix('normalOpen', 'Speech Bubble Normal Open', 24, false);
-				box.animation.addByIndices('normal', 'Speech Bubble Normal Open', [11], "", 24);
+				box.animation.addByPrefix('angry', 'AHH speech bubble', 24);
+				box.animation.addByPrefix('angryOpen', 'speech bubble loud open', 24, false);
+				box.animation.addByPrefix('center-normal', 'speech bubble middle', 24);
+				box.animation.addByPrefix('center-normalOpen', 'Speech Bubble Middle Open', 24, false);
+				box.animation.addByPrefix('center-angry', 'AHH Speech Bubble middle', 24);
+				box.animation.addByPrefix('center-angryOpen', 'speech bubble Middle loud open', 24, false);
 				box.antialiasing = true;
 		}
 
@@ -214,11 +223,11 @@ class DialogueBox extends FlxSpriteGroup
 		portraitRight.visible = false;
 
 		box.animation.play('normalOpen');
-		box.setGraphicSize(Std.int(box.width * PlayState.daPixelZoom * 0.9));
+		box.setGraphicSize(Std.int(box.width * (psychBox ? 0.9 : PlayState.daPixelZoom * 0.9)));
 		box.updateHitbox();
 		add(box);
 
-		box.screenCenter(X);
+		if (!psychBox) box.screenCenter(X);
 		portraitLeft.screenCenter(X);
 
 		switch (PlayState.SONG.song.toLowerCase())
@@ -233,7 +242,7 @@ class DialogueBox extends FlxSpriteGroup
 			// box.flipX = true;
 		}
 
-		dropText = new FlxText(242, 502, Std.int(FlxG.width * 0.6), "", 32);
+		dropText = new FlxText(psychBox ? 177 : 242, psychBox ? 462 : 502, Std.int(FlxG.width * 0.7), "", 32);
 		if (PlayState.SONG.song.toLowerCase() == 'senpai'
 			|| PlayState.SONG.song.toLowerCase() == 'roses'
 			|| PlayState.SONG.song.toLowerCase() == 'thorns')
@@ -250,7 +259,7 @@ class DialogueBox extends FlxSpriteGroup
 		dropText.color = 0xFFD89494;
 		add(dropText);
 
-		swagDialogue = new FlxTypeText(240, 500, Std.int(FlxG.width * 0.6), "", 32);
+		swagDialogue = new FlxTypeText(psychBox ? 175 : 240, psychBox ? 460 : 500, Std.int(FlxG.width * 0.7), "", 32);
 		if (PlayState.SONG.song.toLowerCase() == 'senpai'
 			|| PlayState.SONG.song.toLowerCase() == 'roses'
 			|| PlayState.SONG.song.toLowerCase() == 'thorns')
@@ -292,9 +301,10 @@ class DialogueBox extends FlxSpriteGroup
 
 		if (box.animation.curAnim != null)
 		{
-			if (box.animation.curAnim.name == 'normalOpen' && box.animation.curAnim.finished)
+			if (box.animation.curAnim.name.endsWith('Open') && box.animation.curAnim.finished)
 			{
-				box.animation.play('normal');
+				var idle = box.animation.curAnim.name.substr(0, box.animation.curAnim.name.length - 4);
+				box.animation.play(idle);
 				dialogueOpened = true;
 			}
 		}
@@ -533,6 +543,16 @@ class DialogueBox extends FlxSpriteGroup
 				portraitRight.visible = false;
 				portraitLeft.visible = true;
 				portraitLeft.animation.play('unknown');
+		}
+
+		if (psychBox && curCharacter != 'MUSIC' && curCharacter != 'SCREEN' && curCharacter != lastSpeaker)
+		{
+			lastSpeaker = curCharacter;
+			box.flipX = portraitLeft.visible && !portraitRight.visible;
+			var center = curCharacter == 'none';
+			var angry = curCharacter == 'famiang';
+			box.animation.play((center ? 'center-' : '') + (angry ? 'angryOpen' : 'normalOpen'), true);
+			box.offset.set(angry ? 50 : 10, (angry ? (center ? 30 : 65) : 0) + (box.flipX ? 0 : 10));
 		}
 	}
 

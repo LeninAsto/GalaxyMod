@@ -21,312 +21,312 @@ class M_cyber
 {
 	public static var count:Int = 0;
 
-	public static function nreset()
+	public static function resetWindowEffects()
 	{
 		count = 0;
 	}
 
-	public static function pos(daNote:Note, strumLine:FlxSprite)
+	public static function updateNotePosition(note:Note, strumLine:FlxSprite)
 	{
 		if (Conductor.songPosition >= 70280.8988764045 && Conductor.songPosition < 91595.50561797764)
-			daNote.y = (PlayMoving.sy
-				- (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(((300 - PlayMoving.sy) / 250) * PlayState.SONG.speed, 2)));
+			note.y = (PlayMoving.receptorBaselineY
+				- (Conductor.songPosition - note.strumTime) * (0.45 * FlxMath.roundDecimal(((300 - PlayMoving.receptorBaselineY) / 250) * PlayState.SONG.speed, 2)));
 		else if (Conductor.songPosition >= 124044.94382022502 && Conductor.songPosition < 145617.977528)
 		{
 			if (FlxG.save.data.downscroll)
-				daNote.y = (strumLine.y + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (strumLine.y + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			else
-				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (strumLine.y - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			if ((!FlxG.save.data.downscroll
-				&& (((Conductor.songPosition - 124044.94382022502) % 2696.62921348 < 1348.31460674 && daNote.y <= PlayMoving.sy)
-					|| ((Conductor.songPosition - 124044.94382022502) % 2696.62921348 >= 1348.31460674 && daNote.y > PlayMoving.sy)))
+				&& (((Conductor.songPosition - 124044.94382022502) % 2696.62921348 < 1348.31460674 && note.y <= PlayMoving.receptorBaselineY)
+					|| ((Conductor.songPosition - 124044.94382022502) % 2696.62921348 >= 1348.31460674 && note.y > PlayMoving.receptorBaselineY)))
 				|| (FlxG.save.data.downscroll
-					&& (((Conductor.songPosition - 124044.94382022502) % 2696.62921348 < 1348.31460674 && daNote.y >= PlayMoving.sy)
-						|| ((Conductor.songPosition - 124044.94382022502) % 2696.62921348 >= 1348.31460674 && daNote.y < PlayMoving.sy))))
+					&& (((Conductor.songPosition - 124044.94382022502) % 2696.62921348 < 1348.31460674 && note.y >= PlayMoving.receptorBaselineY)
+						|| ((Conductor.songPosition - 124044.94382022502) % 2696.62921348 >= 1348.31460674 && note.y < PlayMoving.receptorBaselineY))))
 			{
-				if (daNote.mustPress)
-					daNote.x = PlayMoving.poxlist[daNote.noteData];
+				if (note.mustPress)
+					note.x = PlayMoving.defaultPlayerReceptorX[note.noteData];
 				else
-					daNote.x = PlayMoving.oxlist[daNote.noteData];
+					note.x = PlayMoving.defaultOpponentReceptorX[note.noteData];
 			}
 			else
 			{
-				if (daNote.mustPress)
-					daNote.x = PlayMoving.poxlist[3 - daNote.noteData];
+				if (note.mustPress)
+					note.x = PlayMoving.defaultPlayerReceptorX[3 - note.noteData];
 				else
-					daNote.x = PlayMoving.oxlist[3 - daNote.noteData];
+					note.x = PlayMoving.defaultOpponentReceptorX[3 - note.noteData];
 			}
-			if (daNote.isSustainNote)
-				daNote.x += daNote.width;
+			if (note.isSustainNote)
+				note.x += note.width;
 		}
-		else if (daNote.strumTime >= 145617 && daNote.strumTime < 156236)
+		else if (note.strumTime >= 145617 && note.strumTime < 156236)
 		{
-			if (daNote.mustPress)
-				daNote.x = PlayMoving.poxlist[daNote.noteData];
+			if (note.mustPress)
+				note.x = PlayMoving.defaultPlayerReceptorX[note.noteData];
 			else
-				daNote.x = PlayMoving.oxlist[daNote.noteData];
-			if (daNote.isSustainNote)
-				daNote.x += daNote.width;
+				note.x = PlayMoving.defaultOpponentReceptorX[note.noteData];
+			if (note.isSustainNote)
+				note.x += note.width;
 			else
-				daNote.angle += 5;
+				note.angle += 5;
 			if (FlxG.save.data.downscroll)
-				daNote.y = (strumLine.y + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (strumLine.y + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			else
-				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (strumLine.y - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 		}
-		else if (daNote.strumTime >= 156404 && daNote.strumTime < 168456 && Conductor.songPosition < 167191.0112359552)
+		else if (note.strumTime >= 156404 && note.strumTime < 168456 && Conductor.songPosition < 167191.0112359552)
 		{
-			if (daNote.mustPress)
-				daNote.x = PlayMoving.poxlist[daNote.noteData]
-					+ (Math.sin((daNote.strumTime - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
+			if (note.mustPress)
+				note.x = PlayMoving.defaultPlayerReceptorX[note.noteData]
+					+ (Math.sin((note.strumTime - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
 						+ PlayWindow.stage[0] / 2 - Lib.application.window.x - 320) * 2;
 			else
-				daNote.x = PlayMoving.oxlist[daNote.noteData]
-					+ (Math.sin((daNote.strumTime - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
+				note.x = PlayMoving.defaultOpponentReceptorX[note.noteData]
+					+ (Math.sin((note.strumTime - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
 						+ PlayWindow.stage[0] / 2 - Lib.application.window.x - 320) * 2;
-			daNote.y = strumLine.y
-				+ (Math.cos((daNote.strumTime - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[1] * -2 / 10)
+			note.y = strumLine.y
+				+ (Math.cos((note.strumTime - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[1] * -2 / 10)
 					+ PlayWindow.stage[1] / 2 - Lib.application.window.y - 180) * 2;
 		}
 		else if (Conductor.songPosition >= 167191.0112359552 && Conductor.songPosition < 172584.26966292146)
 		{
-			if (daNote.mustPress)
-				daNote.x = PlayMoving.poxlist[daNote.noteData];
+			if (note.mustPress)
+				note.x = PlayMoving.defaultPlayerReceptorX[note.noteData];
 			else
-				daNote.x = PlayMoving.oxlist[daNote.noteData];
-			if (daNote.strumTime % 2696.62921348 < 1348.31460674)
-				if (daNote.strumTime % 1348.31460674 < 674.157303371)
-					daNote.y = (50
-						+ 500 * (daNote.strumTime % 1348.31460674) / 1348.31460674
-						- (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.x = PlayMoving.defaultOpponentReceptorX[note.noteData];
+			if (note.strumTime % 2696.62921348 < 1348.31460674)
+				if (note.strumTime % 1348.31460674 < 674.157303371)
+					note.y = (50
+						+ 500 * (note.strumTime % 1348.31460674) / 1348.31460674
+						- (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 				else
-					daNote.y = (50
-						+ 500 * (daNote.strumTime % 1348.31460674) / 1348.31460674
-						+ (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-			else if (daNote.strumTime % 1348.31460674 < 674.157303371)
-				daNote.y = (550
-					- 500 * (daNote.strumTime % 1348.31460674) / 1348.31460674
-					+ (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+					note.y = (50
+						+ 500 * (note.strumTime % 1348.31460674) / 1348.31460674
+						+ (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
+			else if (note.strumTime % 1348.31460674 < 674.157303371)
+				note.y = (550
+					- 500 * (note.strumTime % 1348.31460674) / 1348.31460674
+					+ (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			else
-				daNote.y = (550
-					- 500 * (daNote.strumTime % 1348.31460674) / 1348.31460674
-					- (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (550
+					- 500 * (note.strumTime % 1348.31460674) / 1348.31460674
+					- (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 		}
 		else if (Conductor.songPosition >= 172584.26966292146 && Conductor.songPosition < 177977.52808988772)
 		{
-			if (daNote.mustPress)
-				daNote.x = PlayMoving.pxlist[daNote.noteData];
+			if (note.mustPress)
+				note.x = PlayMoving.playerReceptorX[note.noteData];
 			else
-				daNote.x = PlayMoving.xlist[daNote.noteData];
+				note.x = PlayMoving.opponentReceptorX[note.noteData];
 			if (FlxG.save.data.downscroll)
-				daNote.y = (strumLine.y + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (strumLine.y + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			else
-				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (strumLine.y - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 		}
 		/*if(Conductor.songPosition >= 91685.3932584271 && Conductor.songPosition < 102387.64044943838)
 			{
 				if (Conductor.songPosition % 40 < 20)
 				{
-					if (daNote.noteData < 2)
-						daNote.alpha = 0;
+					if (note.noteData < 2)
+						note.alpha = 0;
 					else 
-						daNote.alpha = 1;
+						note.alpha = 1;
 				}
 				else
 				{
-					if (daNote.noteData < 2)
-						daNote.alpha = 1;
+					if (note.noteData < 2)
+						note.alpha = 1;
 					else 
-						daNote.alpha = 0;
+						note.alpha = 0;
 				}
-				if(!daNote.mustPress)
-					daNote.x = PlayMoving.oxlist[1 + daNote.noteData % 2];
+				if(!note.mustPress)
+					note.x = PlayMoving.defaultOpponentReceptorX[1 + note.noteData % 2];
 				else
-					daNote.x = PlayMoving.poxlist[1 + daNote.noteData % 2];
-				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+					note.x = PlayMoving.defaultPlayerReceptorX[1 + note.noteData % 2];
+				note.y = (strumLine.y - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 		}*/
 		else
 		{
 			if (FlxG.save.data.downscroll)
-				daNote.y = (strumLine.y + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (strumLine.y + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			else
-				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (strumLine.y - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 		}
 	}
 
-	public static function spos(dastrum:NoteStrum, strumLine:FlxSprite)
+	public static function updateReceptorPosition(receptor:NoteStrum, strumLine:FlxSprite)
 	{
 		if (Conductor.songPosition >= 48707.86516853933 && Conductor.songPosition < 58988.76404494382)
 		{
 			if (FlxG.save.data.downscroll)
-				dastrum.y = 550 + ((Conductor.songPosition - 48707.86516853933) / 10280.8988764) * 160;
+				receptor.y = 550 + ((Conductor.songPosition - 48707.86516853933) / 10280.8988764) * 160;
 			else
-				dastrum.y = 50 - ((Conductor.songPosition - 48707.86516853933) / 10280.8988764) * 160;
-			strumLine.y = dastrum.y;
+				receptor.y = 50 - ((Conductor.songPosition - 48707.86516853933) / 10280.8988764) * 160;
+			strumLine.y = receptor.y;
 		}
 		else if (Conductor.songPosition >= 59325.84269662921 && Conductor.songPosition < 59494.38202247191)
 		{
 			if (FlxG.save.data.downscroll)
-				dastrum.y = 550;
+				receptor.y = 550;
 			else
-				dastrum.y = 50;
-			strumLine.y = dastrum.y;
+				receptor.y = 50;
+			strumLine.y = receptor.y;
 		}
 		else if (Conductor.songPosition >= 59494.38202247191 && Conductor.songPosition < 69775.28089887642)
 		{
 			if (FlxG.save.data.downscroll)
-				dastrum.y = 550 + ((Conductor.songPosition - 59494.38202247191) / 10280.8988764) * 160;
+				receptor.y = 550 + ((Conductor.songPosition - 59494.38202247191) / 10280.8988764) * 160;
 			else
-				dastrum.y = 50 - ((Conductor.songPosition - 59494.38202247191) / 10280.8988764) * 160;
-			strumLine.y = dastrum.y;
+				receptor.y = 50 - ((Conductor.songPosition - 59494.38202247191) / 10280.8988764) * 160;
+			strumLine.y = receptor.y;
 		}
 		else if (Conductor.songPosition >= 70112.35955056181 && Conductor.songPosition < 70280.8988764045)
 		{
 			if (FlxG.save.data.downscroll)
-				dastrum.y = 550;
+				receptor.y = 550;
 			else
-				dastrum.y = 50;
-			strumLine.y = dastrum.y;
+				receptor.y = 50;
+			strumLine.y = receptor.y;
 		}
 		else if (Conductor.songPosition >= 70280.8988764045 && Conductor.songPosition < 91595.50561797764)
 		{
-			dastrum.y = 300 - Math.sin(((Conductor.songPosition - 70280.8988764045) / 1348.31460674 - 0.5) * 3.1415926535) * 250;
-			strumLine.y = dastrum.y;
-			PlayMoving.sy = dastrum.y;
+			receptor.y = 300 - Math.sin(((Conductor.songPosition - 70280.8988764045) / 1348.31460674 - 0.5) * 3.1415926535) * 250;
+			strumLine.y = receptor.y;
+			PlayMoving.receptorBaselineY = receptor.y;
 		}
 		else if (Conductor.songPosition >= 91685.3932584271 && Conductor.songPosition < 93033.70786516868)
 		{
 			if (FlxG.save.data.downscroll)
-				dastrum.y = 550;
+				receptor.y = 550;
 			else
-				dastrum.y = 50;
-			strumLine.y = dastrum.y;
+				receptor.y = 50;
+			strumLine.y = receptor.y;
 		}
 		else if (Conductor.songPosition >= 124044.94382022502 && Conductor.songPosition < 145617.977528)
 		{
 			if ((Conductor.songPosition - 124044.94382022502) % 2696.62921348 < 1348.31460674)
 			{
-				if (dastrum.x > 640)
-					dastrum.x = PlayMoving.poxlist[dastrum.ID];
+				if (receptor.x > 640)
+					receptor.x = PlayMoving.defaultPlayerReceptorX[receptor.ID];
 				else
-					dastrum.x = PlayMoving.oxlist[dastrum.ID];
+					receptor.x = PlayMoving.defaultOpponentReceptorX[receptor.ID];
 			}
 			else
 			{
-				if (dastrum.x > 640)
-					dastrum.x = PlayMoving.poxlist[3 - dastrum.ID];
+				if (receptor.x > 640)
+					receptor.x = PlayMoving.defaultPlayerReceptorX[3 - receptor.ID];
 				else
-					dastrum.x = PlayMoving.oxlist[3 - dastrum.ID];
+					receptor.x = PlayMoving.defaultOpponentReceptorX[3 - receptor.ID];
 			}
 			if (FlxG.save.data.downscroll)
-				PlayMoving.sy = 550 - ((Conductor.songPosition - 124044.94382022502) % 1348.31460674) / 1348.31460674 * 1230;
+				PlayMoving.receptorBaselineY = 550 - ((Conductor.songPosition - 124044.94382022502) % 1348.31460674) / 1348.31460674 * 1230;
 			else
-				PlayMoving.sy = 50 + ((Conductor.songPosition - 124044.94382022502) % 1348.31460674) / 1348.31460674 * 1230;
+				PlayMoving.receptorBaselineY = 50 + ((Conductor.songPosition - 124044.94382022502) % 1348.31460674) / 1348.31460674 * 1230;
 		}
 		else if (Conductor.songPosition >= 145617.97752809015 && Conductor.songPosition < 156067.4157303373)
 		{
-			if (dastrum.x > 640)
-				dastrum.x = PlayMoving.poxlist[dastrum.ID];
+			if (receptor.x > 640)
+				receptor.x = PlayMoving.defaultPlayerReceptorX[receptor.ID];
 			else
-				dastrum.x = PlayMoving.oxlist[dastrum.ID];
+				receptor.x = PlayMoving.defaultOpponentReceptorX[receptor.ID];
 		}
 		else if (Conductor.songPosition >= 156067.4157303373 && Conductor.songPosition < 156235.95505617998)
 		{
 			if (FlxG.save.data.downscroll)
-				dastrum.y = 550 - (Conductor.songPosition - 156067.4157303373) / 168.539325843 * 250;
+				receptor.y = 550 - (Conductor.songPosition - 156067.4157303373) / 168.539325843 * 250;
 			else
-				dastrum.y = 50 + (Conductor.songPosition - 156067.4157303373) / 168.539325843 * 250;
-			strumLine.y = dastrum.y;
+				receptor.y = 50 + (Conductor.songPosition - 156067.4157303373) / 168.539325843 * 250;
+			strumLine.y = receptor.y;
 		}
 		else if (Conductor.songPosition >= 167191.0112359552 && Conductor.songPosition < 172584.26966292146)
 		{
 			if (Conductor.songPosition % 2696.62921348 < 1348.31460674)
-				dastrum.y = 50 + 500 * (Conductor.songPosition % 1348.31460674) / 1348.31460674;
+				receptor.y = 50 + 500 * (Conductor.songPosition % 1348.31460674) / 1348.31460674;
 			else
-				dastrum.y = 550 - 500 * (Conductor.songPosition % 1348.31460674) / 1348.31460674;
+				receptor.y = 550 - 500 * (Conductor.songPosition % 1348.31460674) / 1348.31460674;
 		}
 		else if (Conductor.songPosition >= 172584.26966292146 && Conductor.songPosition < 177977.52808988772)
 		{
 			if (FlxG.save.data.downscroll)
-				dastrum.y = 550;
+				receptor.y = 550;
 			else
-				dastrum.y = 50;
-			strumLine.y = dastrum.y;
-			dastrum.scale.x = 0.7;
-			dastrum.scale.y = 0.7;
-			if (dastrum.x > 640)
+				receptor.y = 50;
+			strumLine.y = receptor.y;
+			receptor.scale.x = 0.7;
+			receptor.scale.y = 0.7;
+			if (receptor.x > 640)
 			{
-				dastrum.x = PlayMoving.poxlist[dastrum.ID];
+				receptor.x = PlayMoving.defaultPlayerReceptorX[receptor.ID];
 			}
 			else
 			{
-				dastrum.x = PlayMoving.oxlist[dastrum.ID];
+				receptor.x = PlayMoving.defaultOpponentReceptorX[receptor.ID];
 			}
 		}
 		/*else if(Conductor.songPosition >= 91685.3932584271 && Conductor.songPosition < 102387.64044943838)
 			{
 				if (Conductor.songPosition % 40 < 20)
 				{
-					if (dastrum.ID < 2)
-						dastrum.alpha = 0;
+					if (receptor.ID < 2)
+						receptor.alpha = 0;
 					else 
-						dastrum.alpha = 1;
+						receptor.alpha = 1;
 				}
 				else
 				{
-					if (dastrum.ID < 2)
-						dastrum.alpha = 1;
+					if (receptor.ID < 2)
+						receptor.alpha = 1;
 					else 
-						dastrum.alpha = 0;
+						receptor.alpha = 0;
 				}
-				if(dastrum.x<640)
-					dastrum.x = PlayMoving.oxlist[1 + dastrum.ID % 2];
+				if(receptor.x<640)
+					receptor.x = PlayMoving.defaultOpponentReceptorX[1 + receptor.ID % 2];
 				else
-					dastrum.x = PlayMoving.poxlist[1 + dastrum.ID % 2];
+					receptor.x = PlayMoving.defaultPlayerReceptorX[1 + receptor.ID % 2];
 		}*/
 	}
 
-	inline static public function show(daNote:Note):Bool
+	inline static public function shouldHideNote(note:Note):Bool
 	{
 		if (Conductor.songPosition >= 70280.8988764045 && Conductor.songPosition < 91595.50561797764)
-			return (Math.abs(daNote.y - 300) > Math.abs(((300 - PlayMoving.sy) / 250)) * 360);
-		else if (daNote.strumTime >= 156404 && daNote.strumTime < 168456 && Conductor.songPosition < 167191.0112359552)
-			return Conductor.songPosition < 156404 || daNote.strumTime - Conductor.songPosition > 2696.62921348;
+			return (Math.abs(note.y - 300) > Math.abs(((300 - PlayMoving.receptorBaselineY) / 250)) * 360);
+		else if (note.strumTime >= 156404 && note.strumTime < 168456 && Conductor.songPosition < 167191.0112359552)
+			return Conductor.songPosition < 156404 || note.strumTime - Conductor.songPosition > 2696.62921348;
 		else
 		{
 			if (FlxG.save.data.downscroll)
-				return daNote.y < -daNote.height;
+				return note.y < -note.height;
 			else
-				return daNote.y > FlxG.height;
+				return note.y > FlxG.height;
 		}
 	}
 
-	inline static public function kill(daNote:Note):Bool
+	inline static public function shouldRemoveNote(note:Note):Bool
 	{
-		if (daNote.strumTime >= 48707 && daNote.strumTime < 70029)
+		if (note.strumTime >= 48707 && note.strumTime < 70029)
 		{
 			if (FlxG.save.data.downscroll)
-				return daNote.y > FlxG.height && Conductor.songPosition > daNote.strumTime + 1000 / 6;
+				return note.y > FlxG.height && Conductor.songPosition > note.strumTime + 1000 / 6;
 			else
-				return daNote.y < -daNote.height && Conductor.songPosition > daNote.strumTime + 1000 / 6;
+				return note.y < -note.height && Conductor.songPosition > note.strumTime + 1000 / 6;
 		}
 		else if (Conductor.songPosition >= 70280.8988764045 && Conductor.songPosition < 91595.50561797764)
-			return ((Math.abs(daNote.y - 300) > Math.abs(((300 - PlayMoving.sy) / 250)) * 50)
-				&& Conductor.songPosition - daNote.strumTime > 1000 / 6);
-		else if (daNote.strumTime >= 156404 && daNote.strumTime < 168456 && Conductor.songPosition < 167191.0112359552)
-			return Conductor.songPosition > daNote.strumTime + 1000 / 6;
+			return ((Math.abs(note.y - 300) > Math.abs(((300 - PlayMoving.receptorBaselineY) / 250)) * 50)
+				&& Conductor.songPosition - note.strumTime > 1000 / 6);
+		else if (note.strumTime >= 156404 && note.strumTime < 168456 && Conductor.songPosition < 167191.0112359552)
+			return Conductor.songPosition > note.strumTime + 1000 / 6;
 		else if (Conductor.songPosition >= 167191.0112359552 && Conductor.songPosition < 172584.26966292146)
-			return Conductor.songPosition > daNote.strumTime + 1000 / 6;
+			return Conductor.songPosition > note.strumTime + 1000 / 6;
 		else
 		{
 			if (FlxG.save.data.downscroll)
-				return daNote.y > FlxG.height;
+				return note.y > FlxG.height;
 			else
-				return daNote.y < -daNote.height;
+				return note.y < -note.height;
 		}
 	}
 
-	public static function move(camHUD:FlxCamera)
+	public static function updateWindowEffects(camHUD:FlxCamera)
 	{
 		if (FlxG.fullscreen)
 			FlxG.fullscreen = false;
@@ -467,126 +467,7 @@ class M_cyber
 			}
 			else if (Conductor.songPosition >= 48539.32584269663 && Conductor.songPosition < 70112.3595505)
 			{
-				count = 0;
-				FlxG.scaleMode = new FixedScaleMode();
-				if (Lib.application.window.width != 480 || Lib.application.window.height != 640)
-				{
-					Lib.application.window.width = 480;
-					Lib.application.window.height = 640;
-				}
-				PlayWindow.camz = 0.9;
-				if (Conductor.songPosition < 48707.86516853933)
-				{
-					if (FlxG.save.data.downscroll)
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] * (1.3)
-							- ((Conductor.songPosition - 48539.32584269663) / 168.539325843) * (PlayWindow.stage[1] * 0.8)
-							- 320);
-					}
-					else
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] * (-0.3)
-							+ ((Conductor.songPosition - 48539.32584269663) / 168.539325843) * (PlayWindow.stage[1] * 0.8)
-							- 320);
-					}
-					camHUD.x = 320;
-				}
-				else if (Conductor.songPosition < 58988.76404494382)
-				{
-					if (FlxG.save.data.downscroll)
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
-							- ((Conductor.songPosition - 48707.86516853933) / 10280.8988764) * 144
-							- 320);
-					}
-					else
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
-							+ ((Conductor.songPosition - 48707.86516853933) / 10280.8988764) * 144
-							- 320);
-					}
-					camHUD.x = 320;
-				}
-				else if (Conductor.songPosition < 59325.84269662921)
-				{
-					if (FlxG.save.data.downscroll)
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
-							- 144
-							- ((Conductor.songPosition - 58988.76404494382) / 337.078651685) * (PlayWindow.stage[1] * 0.8 - 144)
-							- 320);
-					}
-					else
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
-							+ 144
-							+ ((Conductor.songPosition - 58988.76404494382) / 337.078651685) * (PlayWindow.stage[1] * 0.8 - 144)
-							- 320);
-					}
-					camHUD.x = 320;
-				}
-				else if (Conductor.songPosition < 59494.38202247191)
-				{
-					if (FlxG.save.data.downscroll)
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7 - 240);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] * (1.3)
-							- ((Conductor.songPosition - 59325.84269662921) / 168.539325843) * (PlayWindow.stage[1] * 0.8)
-							- 320);
-					}
-					else
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7 - 240);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] * (-0.3)
-							+ ((Conductor.songPosition - 59325.84269662921) / 168.539325843) * (PlayWindow.stage[1] * 0.8)
-							- 320);
-					}
-					camHUD.x = -260;
-				}
-				else if (Conductor.songPosition < 69775.28089887642)
-				{
-					if (FlxG.save.data.downscroll)
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7 - 240);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
-							- ((Conductor.songPosition - 59494.38202247191) / 10280.8988764) * 144
-							- 320);
-					}
-					else
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7 - 240);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
-							+ ((Conductor.songPosition - 59494.38202247191) / 10280.8988764) * 144
-							- 320);
-					}
-					camHUD.x = -260;
-				}
-				else if (Conductor.songPosition < 70112.3595505)
-				{
-					if (FlxG.save.data.downscroll)
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7 - 240);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
-							- 144
-							- ((Conductor.songPosition - 69775.28089887642) / 337.078651685) * (PlayWindow.stage[1] * 0.8 - 144)
-							- 320);
-					}
-					else
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7 - 240);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
-							+ 144
-							+ ((Conductor.songPosition - 69775.28089887642) / 337.078651685) * (PlayWindow.stage[1] * 0.8 - 144)
-							- 320);
-					}
-					camHUD.x = -260;
-				}
+				updateWindowFrom48539(camHUD);
 			}
 			else if (Conductor.songPosition >= 70112.35955056181 && Conductor.songPosition < 70280.8988764045)
 			{
@@ -695,121 +576,7 @@ class M_cyber
 			}
 			else if (Conductor.songPosition >= 123707.86516853962 && Conductor.songPosition < 156235.95505617998)
 			{
-				count = 0;
-				FlxG.scaleMode = new FixedScaleMode();
-				if (Conductor.songPosition < 145617.97752809015)
-					PlayWindow.camz = 0.9;
-				if (Conductor.songPosition < 124044.94382022502)
-				{
-					Lib.application.window.width = 480;
-					Lib.application.window.height = 1;
-					Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
-					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320);
-					camHUD.x = 320;
-				}
-				else if (Conductor.songPosition < 124213.48314606771)
-				{
-					Lib.application.window.width = 480;
-					Lib.application.window.height = Std.int((Conductor.songPosition - 124044.94382022502) / 168.539325843 * 640);
-					Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
-					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320);
-					camHUD.x = 320;
-				}
-				else if (Conductor.songPosition < 134494.38202247224)
-				{
-					Lib.application.window.width = 480;
-					Lib.application.window.height = 640 + Std.int((Conductor.songPosition - 124213.48314606771) / 10280.8988764 * 80);
-					Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
-					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320);
-					camHUD.x = 320;
-				}
-				else if (Conductor.songPosition < 134662.92134831494)
-				{
-					Lib.application.window.width = 480;
-					Lib.application.window.height = 720 - Std.int((Conductor.songPosition - 134494.38202247224) / 168.539325843 * 719);
-					Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3
-						+ (Conductor.songPosition - 134494.38202247224) / 168.539325843 * (PlayWindow.stage[0] * 0.4))
-						- 240;
-					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320);
-					camHUD.x = 320;
-				}
-				else if (Conductor.songPosition < 134831.46067415763)
-				{
-					Lib.application.window.width = 480;
-					Lib.application.window.height = 1;
-					Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7) - 240;
-					Lib.application.window.x = Std.int(PlayWindow.stage[1] / 2 - 320);
-					camHUD.x = 320;
-				}
-				else if (Conductor.songPosition < 135000.00000000032)
-				{
-					Lib.application.window.width = 480;
-					Lib.application.window.height = Std.int((Conductor.songPosition - 134831.46067415763) / 168.539325843 * 640);
-					Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7) - 240;
-					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320);
-					camHUD.x = -260;
-				}
-				else if (Conductor.songPosition < 145280.89887640477)
-				{
-					Lib.application.window.width = 480;
-					Lib.application.window.height = 640 + Std.int((Conductor.songPosition - 135000.00000000032) / 10280.8988764 * 80);
-					Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7) - 240;
-					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320);
-					camHUD.x = -260;
-				}
-				else if (Conductor.songPosition < 145449.43820224746)
-				{
-					Lib.application.window.width = 480 + Std.int((Conductor.songPosition - 145280.89887640477) / 168.539325843 * 160);
-					Lib.application.window.height = 720 - Std.int((Conductor.songPosition - 145280.89887640477) / 168.539325843 * 719);
-					Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7
-						- 240
-						- (Conductor.songPosition - 145280.89887640477) / 168.539325843 * (PlayWindow.stage[0] * 0.2 + 80));
-					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320 + (Conductor.songPosition - 145280.89887640477) / 168.539325843 * 140);
-					camHUD.x = -260;
-				}
-				else if (Conductor.songPosition < 145617.97752809015)
-				{
-					Lib.application.window.width = 640;
-					Lib.application.window.height = 1;
-					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2) - 320;
-					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 180);
-					camHUD.x = -260;
-				}
-				else if (Conductor.songPosition < 145786.51685393284)
-				{
-					Lib.application.window.width = 640;
-					Lib.application.window.height = Std.int((Conductor.songPosition - 145617.97752809015) / 168.539325843 * 320);
-					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2) - 320;
-					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 180);
-					camHUD.x = 0;
-					PlayWindow.camz = 0.45;
-					PlayState.defaultCamZoom = 0.425;
-				}
-				else if (Conductor.songPosition < 156067.4157303373)
-				{
-					Lib.application.window.width = 640;
-					Lib.application.window.height = 320 + Std.int((Conductor.songPosition - 145786.51685393284) / 10280.8988764 * 40);
-					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2) - 320;
-					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 180);
-					camHUD.x = 0;
-					PlayWindow.camz = 0.5;
-					PlayState.defaultCamZoom = 0.425;
-				}
-				else
-				{
-					if (Lib.application.window.width != 640 || Lib.application.window.height != 360)
-					{
-						Lib.application.window.width = 640;
-						Lib.application.window.height = 360;
-					}
-					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 320);
-					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
-						- (Conductor.songPosition - 156067.4157303373) / 168.539325843 * PlayWindow.stage[1] / 5)
-						- 180;
-					camHUD.x = 0;
-					PlayWindow.camz = 0.5;
-					PlayState.defaultCamZoom = 0.425;
-				}
+				updateWindowFrom123707(camHUD);
 			}
 			else if (Conductor.songPosition >= 156404.49438202268 && Conductor.songPosition < 167106.74157303385)
 			{
@@ -830,108 +597,361 @@ class M_cyber
 			}
 			else if (Conductor.songPosition >= 167191.0112359552 && Conductor.songPosition < 172584.26966292146)
 			{
-				if (Lib.application.window.width != 640 || Lib.application.window.height != 360)
-				{
-					Lib.application.window.width = 640;
-					Lib.application.window.height = 360;
-				}
-				switch (Std.int((Conductor.songPosition - 167191.0112359552) / 337.078651685) % 4)
-				{
-					case 0:
-						if (Conductor.songPosition % 40 < 20)
-						{
-							Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 480);
-							Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 360);
-						}
-						else
-						{
-							Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 160);
-							Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2);
-						}
-					case 1:
-						if (Conductor.songPosition % 40 < 20)
-						{
-							Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2
-								- 480
-								+ 320 * ((Conductor.songPosition - 167191.0112359552) % 337.078651685) / 337.078651685);
-							Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 360);
-						}
-						else
-						{
-							Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2
-								- 160
-								- 320 * ((Conductor.songPosition - 167191.0112359552) % 337.078651685) / 337.078651685);
-							Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2);
-						}
-					case 2:
-						if (Conductor.songPosition % 40 < 20)
-						{
-							Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 160);
-							Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 360);
-						}
-						else
-						{
-							Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 480);
-							Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2);
-						}
-					case 3:
-						if (Conductor.songPosition % 40 < 20)
-						{
-							Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 160);
-							Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
-								- 360
-								+ 360 * ((Conductor.songPosition - 167191.0112359552) % 337.078651685) / 337.078651685);
-						}
-						else
-						{
-							Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 480);
-							Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
-								- 360 * ((Conductor.songPosition - 167191.0112359552) % 337.078651685) / 337.078651685);
-						}
-				}
+				updateWindowFrom167191(camHUD);
 			}
 			else if (Conductor.songPosition >= 172584.26966292146 && Conductor.songPosition < 177977.52808988772)
 			{
-				if (Lib.application.window.width != 640 || Lib.application.window.height != 360)
-				{
-					Lib.application.window.width = 640;
-					Lib.application.window.height = 360;
-				}
-				if (Conductor.songPosition % 1348.31460674 < 674.15730337)
-				{
-					if (Conductor.songPosition % 40 < 20)
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2
-							+ 320 * Math.sin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
-							- 320);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 180);
-					}
-					else
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2
-							- 320 * Math.sin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
-							- 320);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 180);
-					}
-				}
-				else
-				{
-					if (Conductor.songPosition % 40 < 20)
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 320);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
-							+ 180 * Math.sin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
-							- 180);
-					}
-					else
-					{
-						Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 320);
-						Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
-							- 180 * Math.sin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
-							- 180);
-					}
-				}
+				updateWindowFrom172584(camHUD);
 			}
 		}
 	}
+	static function updateWindowFrom48539(camHUD:FlxCamera):Void
+	{
+		count = 0;
+		FlxG.scaleMode = new FixedScaleMode();
+		if (Lib.application.window.width != 480 || Lib.application.window.height != 640)
+		{
+			Lib.application.window.width = 480;
+			Lib.application.window.height = 640;
+		}
+		PlayWindow.camz = 0.9;
+		if (Conductor.songPosition < 48707.86516853933)
+		{
+			if (FlxG.save.data.downscroll)
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] * (1.3)
+					- ((Conductor.songPosition - 48539.32584269663) / 168.539325843) * (PlayWindow.stage[1] * 0.8)
+					- 320);
+			}
+			else
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] * (-0.3)
+					+ ((Conductor.songPosition - 48539.32584269663) / 168.539325843) * (PlayWindow.stage[1] * 0.8)
+					- 320);
+			}
+			camHUD.x = 320;
+		}
+		else if (Conductor.songPosition < 58988.76404494382)
+		{
+			if (FlxG.save.data.downscroll)
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
+					- ((Conductor.songPosition - 48707.86516853933) / 10280.8988764) * 144
+					- 320);
+			}
+			else
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
+					+ ((Conductor.songPosition - 48707.86516853933) / 10280.8988764) * 144
+					- 320);
+			}
+			camHUD.x = 320;
+		}
+		else if (Conductor.songPosition < 59325.84269662921)
+		{
+			if (FlxG.save.data.downscroll)
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
+					- 144
+					- ((Conductor.songPosition - 58988.76404494382) / 337.078651685) * (PlayWindow.stage[1] * 0.8 - 144)
+					- 320);
+			}
+			else
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
+					+ 144
+					+ ((Conductor.songPosition - 58988.76404494382) / 337.078651685) * (PlayWindow.stage[1] * 0.8 - 144)
+					- 320);
+			}
+			camHUD.x = 320;
+		}
+		else if (Conductor.songPosition < 59494.38202247191)
+		{
+			if (FlxG.save.data.downscroll)
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7 - 240);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] * (1.3)
+					- ((Conductor.songPosition - 59325.84269662921) / 168.539325843) * (PlayWindow.stage[1] * 0.8)
+					- 320);
+			}
+			else
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7 - 240);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] * (-0.3)
+					+ ((Conductor.songPosition - 59325.84269662921) / 168.539325843) * (PlayWindow.stage[1] * 0.8)
+					- 320);
+			}
+			camHUD.x = -260;
+		}
+		else if (Conductor.songPosition < 69775.28089887642)
+		{
+			if (FlxG.save.data.downscroll)
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7 - 240);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
+					- ((Conductor.songPosition - 59494.38202247191) / 10280.8988764) * 144
+					- 320);
+			}
+			else
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7 - 240);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
+					+ ((Conductor.songPosition - 59494.38202247191) / 10280.8988764) * 144
+					- 320);
+			}
+			camHUD.x = -260;
+		}
+		else if (Conductor.songPosition < 70112.3595505)
+		{
+			if (FlxG.save.data.downscroll)
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7 - 240);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
+					- 144
+					- ((Conductor.songPosition - 69775.28089887642) / 337.078651685) * (PlayWindow.stage[1] * 0.8 - 144)
+					- 320);
+			}
+			else
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7 - 240);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] * (0.5)
+					+ 144
+					+ ((Conductor.songPosition - 69775.28089887642) / 337.078651685) * (PlayWindow.stage[1] * 0.8 - 144)
+					- 320);
+			}
+			camHUD.x = -260;
+		}
+	}
+
+	static function updateWindowFrom123707(camHUD:FlxCamera):Void
+	{
+		count = 0;
+		FlxG.scaleMode = new FixedScaleMode();
+		if (Conductor.songPosition < 145617.97752809015)
+			PlayWindow.camz = 0.9;
+		if (Conductor.songPosition < 124044.94382022502)
+		{
+			Lib.application.window.width = 480;
+			Lib.application.window.height = 1;
+			Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
+			Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320);
+			camHUD.x = 320;
+		}
+		else if (Conductor.songPosition < 124213.48314606771)
+		{
+			Lib.application.window.width = 480;
+			Lib.application.window.height = Std.int((Conductor.songPosition - 124044.94382022502) / 168.539325843 * 640);
+			Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
+			Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320);
+			camHUD.x = 320;
+		}
+		else if (Conductor.songPosition < 134494.38202247224)
+		{
+			Lib.application.window.width = 480;
+			Lib.application.window.height = 640 + Std.int((Conductor.songPosition - 124213.48314606771) / 10280.8988764 * 80);
+			Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3 - 240);
+			Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320);
+			camHUD.x = 320;
+		}
+		else if (Conductor.songPosition < 134662.92134831494)
+		{
+			Lib.application.window.width = 480;
+			Lib.application.window.height = 720 - Std.int((Conductor.songPosition - 134494.38202247224) / 168.539325843 * 719);
+			Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.3
+				+ (Conductor.songPosition - 134494.38202247224) / 168.539325843 * (PlayWindow.stage[0] * 0.4))
+				- 240;
+			Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320);
+			camHUD.x = 320;
+		}
+		else if (Conductor.songPosition < 134831.46067415763)
+		{
+			Lib.application.window.width = 480;
+			Lib.application.window.height = 1;
+			Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7) - 240;
+			Lib.application.window.x = Std.int(PlayWindow.stage[1] / 2 - 320);
+			camHUD.x = 320;
+		}
+		else if (Conductor.songPosition < 135000.00000000032)
+		{
+			Lib.application.window.width = 480;
+			Lib.application.window.height = Std.int((Conductor.songPosition - 134831.46067415763) / 168.539325843 * 640);
+			Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7) - 240;
+			Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320);
+			camHUD.x = -260;
+		}
+		else if (Conductor.songPosition < 145280.89887640477)
+		{
+			Lib.application.window.width = 480;
+			Lib.application.window.height = 640 + Std.int((Conductor.songPosition - 135000.00000000032) / 10280.8988764 * 80);
+			Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7) - 240;
+			Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320);
+			camHUD.x = -260;
+		}
+		else if (Conductor.songPosition < 145449.43820224746)
+		{
+			Lib.application.window.width = 480 + Std.int((Conductor.songPosition - 145280.89887640477) / 168.539325843 * 160);
+			Lib.application.window.height = 720 - Std.int((Conductor.songPosition - 145280.89887640477) / 168.539325843 * 719);
+			Lib.application.window.x = Std.int(PlayWindow.stage[0] * 0.7
+				- 240
+				- (Conductor.songPosition - 145280.89887640477) / 168.539325843 * (PlayWindow.stage[0] * 0.2 + 80));
+			Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 320 + (Conductor.songPosition - 145280.89887640477) / 168.539325843 * 140);
+			camHUD.x = -260;
+		}
+		else if (Conductor.songPosition < 145617.97752809015)
+		{
+			Lib.application.window.width = 640;
+			Lib.application.window.height = 1;
+			Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2) - 320;
+			Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 180);
+			camHUD.x = -260;
+		}
+		else if (Conductor.songPosition < 145786.51685393284)
+		{
+			Lib.application.window.width = 640;
+			Lib.application.window.height = Std.int((Conductor.songPosition - 145617.97752809015) / 168.539325843 * 320);
+			Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2) - 320;
+			Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 180);
+			camHUD.x = 0;
+			PlayWindow.camz = 0.45;
+			PlayState.defaultCamZoom = 0.425;
+		}
+		else if (Conductor.songPosition < 156067.4157303373)
+		{
+			Lib.application.window.width = 640;
+			Lib.application.window.height = 320 + Std.int((Conductor.songPosition - 145786.51685393284) / 10280.8988764 * 40);
+			Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2) - 320;
+			Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 180);
+			camHUD.x = 0;
+			PlayWindow.camz = 0.5;
+			PlayState.defaultCamZoom = 0.425;
+		}
+		else
+		{
+			if (Lib.application.window.width != 640 || Lib.application.window.height != 360)
+			{
+				Lib.application.window.width = 640;
+				Lib.application.window.height = 360;
+			}
+			Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 320);
+			Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
+				- (Conductor.songPosition - 156067.4157303373) / 168.539325843 * PlayWindow.stage[1] / 5)
+				- 180;
+			camHUD.x = 0;
+			PlayWindow.camz = 0.5;
+			PlayState.defaultCamZoom = 0.425;
+		}
+	}
+
+	static function updateWindowFrom167191(camHUD:FlxCamera):Void
+	{
+		if (Lib.application.window.width != 640 || Lib.application.window.height != 360)
+		{
+			Lib.application.window.width = 640;
+			Lib.application.window.height = 360;
+		}
+		switch (Std.int((Conductor.songPosition - 167191.0112359552) / 337.078651685) % 4)
+		{
+			case 0:
+				if (Conductor.songPosition % 40 < 20)
+				{
+					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 480);
+					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 360);
+				}
+				else
+				{
+					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 160);
+					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2);
+				}
+			case 1:
+				if (Conductor.songPosition % 40 < 20)
+				{
+					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2
+						- 480
+						+ 320 * ((Conductor.songPosition - 167191.0112359552) % 337.078651685) / 337.078651685);
+					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 360);
+				}
+				else
+				{
+					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2
+						- 160
+						- 320 * ((Conductor.songPosition - 167191.0112359552) % 337.078651685) / 337.078651685);
+					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2);
+				}
+			case 2:
+				if (Conductor.songPosition % 40 < 20)
+				{
+					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 160);
+					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 360);
+				}
+				else
+				{
+					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 480);
+					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2);
+				}
+			case 3:
+				if (Conductor.songPosition % 40 < 20)
+				{
+					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 160);
+					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
+						- 360
+						+ 360 * ((Conductor.songPosition - 167191.0112359552) % 337.078651685) / 337.078651685);
+				}
+				else
+				{
+					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 480);
+					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
+						- 360 * ((Conductor.songPosition - 167191.0112359552) % 337.078651685) / 337.078651685);
+				}
+		}
+	}
+
+	static function updateWindowFrom172584(camHUD:FlxCamera):Void
+	{
+		if (Lib.application.window.width != 640 || Lib.application.window.height != 360)
+		{
+			Lib.application.window.width = 640;
+			Lib.application.window.height = 360;
+		}
+		if (Conductor.songPosition % 1348.31460674 < 674.15730337)
+		{
+			if (Conductor.songPosition % 40 < 20)
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2
+					+ 320 * Math.sin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
+					- 320);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 180);
+			}
+			else
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2
+					- 320 * Math.sin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
+					- 320);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 180);
+			}
+		}
+		else
+		{
+			if (Conductor.songPosition % 40 < 20)
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 320);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
+					+ 180 * Math.sin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
+					- 180);
+			}
+			else
+			{
+				Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 320);
+				Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
+					- 180 * Math.sin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
+					- 180);
+			}
+		}
+	}
+
 }

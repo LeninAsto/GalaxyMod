@@ -122,6 +122,8 @@ class FreeplayState extends MusicBeatState
 		// LOAD CHARACTERS
 
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
+		bg.antialiasing = FlxG.save.data.antialiasing;
+		bg.screenCenter();
 		add(bg);
 		bg.color = 0xffffff;
 
@@ -157,7 +159,7 @@ class FreeplayState extends MusicBeatState
 			// songText.screenCenter(X);
 		}
 
-		scoreText = new FlxText(FlxG.width * 0.7, 5, 0, "", 32);
+		scoreText = new FlxText(FlxG.width * 0.7, 5, FlxG.width * 0.29, "", 32);
 		// scoreText.autoSize = false;
 		if (FlxG.save.data.lang == 1)
 			scoreText.setFormat(Paths.font("taipei.ttf"), 32, FlxColor.WHITE, RIGHT);
@@ -169,16 +171,25 @@ class FreeplayState extends MusicBeatState
 		scoreBG.alpha = 0.6;
 		add(scoreBG);
 
-		diffText = new FlxText(scoreText.x, scoreText.y + 36, 0, "", 24);
+		diffText = new FlxText(scoreText.x, scoreText.y + 36, scoreText.fieldWidth, "", 24);
 		diffText.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, RIGHT);
 
-		otherText = new FlxText(diffText.x, diffText.y + 28, 0, "", 20);
+		otherText = new FlxText(diffText.x, diffText.y + 28, diffText.fieldWidth, "", 20);
+        otherText.alignment = RIGHT;
 		otherText.font = scoreText.font;
 
 		add(diffText);
 
 		add(scoreText);
 		add(otherText);
+
+        var helpBG = new FlxSprite(0, FlxG.height - 28).makeGraphic(FlxG.width, 28, FlxColor.BLACK);
+        helpBG.alpha = 0.6;
+        add(helpBG);
+        var helpText = new FlxText(10, FlxG.height - 25, FlxG.width - 20,
+            Language.translate("Use arrows to select, ENTER to play, ESC to return"), 16);
+        helpText.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER);
+        add(helpText);
 
 		changeSelection();
 		changeDiff();
@@ -191,7 +202,6 @@ class FreeplayState extends MusicBeatState
 		selector.text = ">";
 		// add(selector);
 
-		var swag:Alphabet = new Alphabet(1, 0, "swag");
 
 		// JUST DOIN THIS SHIT FOR TESTING!!!
 		/* 
@@ -256,20 +266,6 @@ class FreeplayState extends MusicBeatState
 		lerpAcc = Math.round(FlxMath.lerp(lerpAcc, intendedAcc, 0.4) * 100) / 100;
 		lerpCombo = Math.floor(FlxMath.lerp(lerpCombo, Math.abs(intendedCombo), 0.4));
 
-		var tarc:FlxColor = 0xFF000000;
-		if (intendedAcc == 100)
-			tarc = 0xFFfed700;
-		else if (intendedAcc >= 95)
-			tarc = 0xFFeaeaea;
-		else if (intendedAcc >= 90)
-			tarc = 0xFFff00dd;
-		else if (intendedAcc >= 80)
-			tarc = 0xFFff0000;
-		else if (intendedAcc >= 70)
-			tarc = 0xFF00ff00;
-		else if (intendedAcc > 0)
-			tarc = 0xFF878787;
-
 		if (Math.abs(lerpScore - intendedScore) <= 10)
 			lerpScore = intendedScore;
 		if (Math.abs(lerpAcc - intendedAcc) <= 2)
@@ -280,15 +276,15 @@ class FreeplayState extends MusicBeatState
 		if (FlxG.save.data.lang == 1)
 			scoreText.text = "個人紀錄:" + lerpScore;
 		else
-			scoreText.text = "PERSONAL BEST:" + lerpScore;
+			scoreText.text = Language.translate("PERSONAL BEST:") + lerpScore;
 		var fc:String = "";
 		if (intendedCombo < 0)
 			fc = "(FC)";
 		if (FlxG.save.data.lang == 1)
 			otherText.text = "準確度:" + lerpAcc + "%\n連擊:" + lerpCombo + fc + "\n";
 		else
-			otherText.text = "Accuracy:" + lerpAcc + "%\nCombo:" + lerpCombo + fc + "\n";
-		scoreBG.makeGraphic(Std.int(FlxG.width * 0.35), 115, tarc);
+			otherText.text = Language.translate("Accuracy:") + lerpAcc + "%\n" + Language.translate("Combo:") + lerpCombo + fc + "\n";
+
 
 		var upP = controls.UP_UI;
 		var downP = controls.DOWN_UI;
@@ -299,23 +295,12 @@ class FreeplayState extends MusicBeatState
 			&& FlxG.mouse.viewY > scoreBG.y
 			&& FlxG.mouse.viewY < scoreBG.y + scoreBG.height)
 		{
-			var tarc:FlxColor = 0xFF646464;
-			if (intendedAcc == 100)
-				tarc = 0xFFffff64;
-			else if (intendedAcc >= 95)
-				tarc = 0xFFffffff;
-			else if (intendedAcc >= 90)
-				tarc = 0xFFff64ff;
-			else if (intendedAcc >= 80)
-				tarc = 0xFFff6464;
-			else if (intendedAcc >= 70)
-				tarc = 0xFF64ff64;
-			else if (intendedAcc > 0)
-				tarc = 0xFFebebeb;
-			scoreBG.makeGraphic(Std.int(FlxG.width * 0.35), 115, tarc);
+            scoreBG.alpha = 0.8;
 			if (FlxG.mouse.justPressed)
 				changeDiff(1);
 		}
+
+        else scoreBG.alpha = 0.6;
 
 		var bruh:Int = 0;
 		var brighter:Int = -1;
@@ -470,13 +455,13 @@ class FreeplayState extends MusicBeatState
 		switch (curDifficulty)
 		{
 			case 0:
-				diffText.text = "EASY";
+				diffText.text = Language.translate("EASY");
 			case 1:
-				diffText.text = 'NORMAL';
+				diffText.text = Language.translate("NORMAL");
 			case 2:
-				diffText.text = "HARD";
+				diffText.text = Language.translate("HARD");
 			case 3:
-				diffText.text = "TRUE";
+				diffText.text = Language.translate("TRUE");
 		}
 		changeBoard();
 	}
@@ -494,7 +479,7 @@ class FreeplayState extends MusicBeatState
 		if (curDifficulty > 2)
 		{
 			curDifficulty = 1;
-			diffText.text = 'NORMAL';
+			diffText.text = Language.translate("NORMAL");
 		}
 		if (curSelected < 0)
 			curSelected = songs.length - 1;
@@ -515,7 +500,7 @@ class FreeplayState extends MusicBeatState
 			{
 				var difftexts:Array<String> = ["EASY", "NORMAL", "HARD"];
 				curDifficulty = diffs[0];
-				diffText.text = difftexts[diffs[0]];
+					diffText.text = Language.translate(difftexts[diffs[0]]);
 			}
 		}
 

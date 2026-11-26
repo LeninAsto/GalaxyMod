@@ -61,12 +61,12 @@ class Option
 
 	public final function getDisplay():String
 	{
-		return display;
+		return Language.translate(display);
 	}
 
 	public final function getDisplay2():Array<String>
 	{
-		return display2;
+		return [for (value in display2) Language.translate(value)];
 	}
 
 	public final function getAccept():Bool
@@ -224,30 +224,24 @@ class LangOption extends Option
 	}
 
 	public override function press():Bool
-	{
-		if (!FlxG.save.data.lang)
-			FlxG.save.data.lang = 0;
-		if (FlxG.save.data.lang == 1)
-			FlxG.save.data.lang = 0;
-		else
-			FlxG.save.data.lang += 1;
-		display = updateDisplay();
-		display2 = updateDisplay2();
-		return true;
-	}
+    {
+        if (FlxG.save.data.lang == null) FlxG.save.data.lang = Language.ENGLISH;
+        FlxG.save.data.lang = (FlxG.save.data.lang + 1) % 3;
+        FlxG.save.flush();
+        display = updateDisplay();
+        display2 = updateDisplay2();
+        return true;
+    }
 
-	public override function left():Bool
-	{
-		if (!FlxG.save.data.lang)
-			FlxG.save.data.lang = 0;
-		if (FlxG.save.data.lang == 0)
-			FlxG.save.data.lang = 1;
-		else
-			FlxG.save.data.lang -= 1;
-		display = updateDisplay();
-		display2 = updateDisplay2();
-		return true;
-	}
+    public override function left():Bool
+    {
+        if (FlxG.save.data.lang == null) FlxG.save.data.lang = Language.ENGLISH;
+        FlxG.save.data.lang = (FlxG.save.data.lang + 2) % 3;
+        FlxG.save.flush();
+        display = updateDisplay();
+        display2 = updateDisplay2();
+        return true;
+    }
 
 	public override function right():Bool
 		return press();
@@ -258,16 +252,15 @@ class LangOption extends Option
 	}
 
 	private override function updateDisplay2():Array<String>
-	{
-		if (FlxG.save.data.lang == 1)
-		{
-			return ["Chinese"];
-		}
-		else
-		{
-			return ["English"];
-		}
-	}
+    {
+        return switch (FlxG.save.data.lang)
+        {
+            case 1: ["Chinese"];
+            case 2: ["Español"];
+            default: ["English"];
+        }
+    }
+
 }
 
 class SplashOption extends Option

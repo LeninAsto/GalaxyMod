@@ -24,6 +24,7 @@ class Alphabet extends FlxSpriteGroup
 	public var targetY:Float = 0;
 	public var isMenuItem:Bool = false;
 	public var isOption:Bool = false;
+	public var diagonalOption:Bool = false;
 
 	public var textOffset:Float = 0;
 
@@ -57,7 +58,7 @@ class Alphabet extends FlxSpriteGroup
 	var xScale:Float;
 	var yScale:Float;
 
-	public var sumwidth:Float;
+	public var sumwidth:Float = 0;
 	public var children:Array<Alphabet> = [];
 	public var checkbox:FlxSprite;
 
@@ -94,11 +95,16 @@ class Alphabet extends FlxSpriteGroup
 	public function reType(text, xScale:Float = 1, yScale:Float = 1)
 	{
 		for (i in listOAlphabets)
+		{
 			remove(i);
+			i.destroy();
+		}
 		_finalText = text;
 		this.text = text;
 
 		lastSprite = null;
+		lastWasSpace = false;
+		sumwidth = 0;
 
 		updateHitbox();
 
@@ -124,7 +130,7 @@ class Alphabet extends FlxSpriteGroup
 			// {
 			// }
 
-			if (character == " " && isBold)
+			if (character == " ")
 			{
 				lastWasSpace = true;
 			}
@@ -132,7 +138,7 @@ class Alphabet extends FlxSpriteGroup
 			var isNumber:Bool = AlphaCharacter.numbers.contains(character);
 			var isSymbol:Bool = AlphaCharacter.symbols.contains(character);
 
-			if (AlphaCharacter.alphabet.indexOf(character.toLowerCase()) != -1 || (!isBold && (isNumber || isSymbol)))
+			if (character != " " && AlphaCharacter.supports(character))
 				// if (AlphaCharacter.alphabet.contains(character.toLowerCase()))
 			{
 				if (lastSprite != null)
@@ -230,7 +236,7 @@ class Alphabet extends FlxSpriteGroup
 			var isSymbol:Bool = AlphaCharacter.symbols.indexOf(splitWords[loopNum]) != -1;
 			#end
 
-			if (AlphaCharacter.alphabet.indexOf(splitWords[loopNum].toLowerCase()) != -1 || isNumber || isSymbol)
+			if (splitWords[loopNum] != " " && AlphaCharacter.supports(splitWords[loopNum]))
 				// if (AlphaCharacter.alphabet.contains(splitWords[loopNum].toLowerCase()) || isNumber || isSymbol)
 
 			{
@@ -317,6 +323,8 @@ class Alphabet extends FlxSpriteGroup
 		if (isOption)
 		{
 			y = FlxMath.lerp(y, (targetY * 100) + (FlxG.height * 0.48), 0.30);
+			if (diagonalOption)
+				x = FlxMath.lerp(x, (FlxG.width - sumwidth) / 2 + targetY * 28, 0.30);
 			// if (!isBold)
 			//	y -= boldOffset;
 			if (checkbox != null)
@@ -389,123 +397,61 @@ class Alphabet extends FlxSpriteGroup
 
 class AlphaCharacter extends FlxSprite
 {
-	public static var alphabet:String = "abcdefghijklmnopqrstuvwxyz";
+    public static var alphabet:String = "abcdefghijklmnopqrstuvwxyz";
+    public static var numbers:String = "1234567890";
+    public static var symbols:String = "|~#$%()*+-:;<=>@[]^_.,'!? ";
+    static var alphabetData:Dynamic;
+    public var row:Int = 0;
 
-	public static var numbers:String = "1234567890";
+    static function loadData():Void
+    {
+        if (alphabetData != null) return;
+        alphabetData = haxe.Json.parse(openfl.utils.Assets.getText(Paths.file('images/psychAlphabet.json')));
+    }
 
-	public static var symbols:String = "|~#$%()*+-:;<=>@[]^_.,'!? ";
+    public static function supports(character:String):Bool
+    {
+        loadData();
+        return alphabetData.allowed.indexOf(character.toLowerCase()) >= 0;
+    }
 
-	public var row:Int = 0;
+    public function new(x:Float, y:Float)
+    {
+        super(x, y);
+        loadData();
+        frames = Paths.getSparrowAtlas('psychAlphabet');
+        antialiasing = true;
+    }
 
-	public function new(x:Float, y:Float)
-	{
-		super(x, y);
-		var tex = Paths.getSparrowAtlas('alphabet');
-		frames = tex;
-		antialiasing = true;
-	}
+    function createCharacter(character:String, bold:Bool):Void
+    {
+        var lower = character.toLowerCase();
+        var entry:Dynamic = Reflect.field(alphabetData.characters, lower);
+        var prefix:String = entry != null && entry.animation != null ? entry.animation : lower;
+        var code = lower.charCodeAt(0);
+        var isLetter = (code >= 97 && code <= 122) || (code >= 192 && code <= 255);
+        var suffix = bold ? ' bold' : (isLetter ? (lower == character ? ' lowercase' : ' uppercase') : ' normal');
+        var name = prefix + suffix;
+        animation.addByPrefix(name, name, 24);
+        animation.play(name, true);
+        if (animation.curAnim == null)
+        {
+            name = bold ? 'question bold' : 'question normal';
+            animation.addByPrefix(name, name, 24);
+            animation.play(name, true);
+        }
+        updateHitbox();
+        var letterOffset:Array<Float> = entry == null ? null : (bold ? entry.bold : entry.normal);
+        if (letterOffset != null)
+        {
+            offset.x += letterOffset[0] * scale.x;
+            offset.y += letterOffset[1] * scale.y;
+        }
+        offset.y -= (bold ? 70 : 110) * scale.y - height;
+    }
 
-	public function createBold(letter:String)
-	{
-		animation.addByPrefix(letter, letter.toUpperCase() + " bold", 24);
-		animation.play(letter);
-		updateHitbox();
-	}
-
-	public function createLetter(letter:String):Void
-	{
-		var letterCase:String = "lowercase";
-		if (letter.toLowerCase() != letter)
-		{
-			letterCase = 'capital';
-		}
-
-		animation.addByPrefix(letter, letter + " " + letterCase, 24);
-		animation.play(letter);
-		updateHitbox();
-
-		FlxG.log.add('the row' + row);
-
-		y = (110 - height);
-		y += row * 60;
-		y -= 50;
-
-		y *= scale.y * scale.y;
-	}
-
-	public function createNumber(letter:String):Void
-	{
-		animation.addByPrefix(letter, letter, 24);
-		animation.play(letter);
-
-		updateHitbox();
-		y = 8 * scale.y * scale.y;
-	}
-
-	public function createSymbol(letter:String)
-	{
-		y = 8 * scale.y * scale.y;
-		switch (letter)
-		{
-			case '.':
-				animation.addByPrefix(letter, 'period', 24);
-				animation.play(letter);
-				y += 50;
-			case "'":
-				animation.addByPrefix(letter, 'apostraphie', 24);
-				animation.play(letter);
-				y -= 0;
-			case "?":
-				animation.addByPrefix(letter, 'question mark', 24);
-				animation.play(letter);
-			case "!":
-				animation.addByPrefix(letter, 'exclamation point', 24);
-				animation.play(letter);
-			case '_':
-				animation.addByPrefix(letter, '_', 24);
-				animation.play(letter);
-				y += 50;
-			case "#":
-				animation.addByPrefix(letter, '#', 24);
-				animation.play(letter);
-			case "$":
-				animation.addByPrefix(letter, '$', 24);
-				animation.play(letter);
-			case "%":
-				animation.addByPrefix(letter, '%', 24);
-				animation.play(letter);
-			case "&":
-				animation.addByPrefix(letter, '&', 24);
-				animation.play(letter);
-			case "(":
-				animation.addByPrefix(letter, '(', 24);
-				animation.play(letter);
-			case ")":
-				animation.addByPrefix(letter, ')', 24);
-				animation.play(letter);
-			case "+":
-				animation.addByPrefix(letter, '+', 24);
-				animation.play(letter);
-			case "-":
-				animation.addByPrefix(letter, '-', 24);
-				animation.play(letter);
-				y += 25 * scale.y;
-			case '"':
-				animation.addByPrefix(letter, '"', 24);
-				animation.play(letter);
-				y -= 0;
-			case '@':
-				animation.addByPrefix(letter, '@', 24);
-				animation.play(letter);
-			case "^":
-				animation.addByPrefix(letter, '^', 24);
-				animation.play(letter);
-				y -= 0;
-			case ' ':
-				animation.addByPrefix(letter, 'space', 24);
-				animation.play(letter);
-		}
-
-		updateHitbox();
-	}
+    public function createBold(character:String):Void createCharacter(character, true);
+    public function createLetter(character:String):Void createCharacter(character, false);
+    public function createNumber(character:String):Void createCharacter(character, false);
+    public function createSymbol(character:String):Void createCharacter(character, false);
 }

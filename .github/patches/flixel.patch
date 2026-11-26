@@ -1,0 +1,1650 @@
+diff --git a/flixel/FlxBasic.hx b/flixel/FlxBasic.hx
+index 09729b2e..7c2eaa5c 100644
+--- a/flixel/FlxBasic.hx
++++ b/flixel/FlxBasic.hx
+@@ -60,7 +60,7 @@ class FlxBasic implements IFlxDestroyable
+ 	 * set, it uses the list of default draw targets, which is controlled via `FlxG.camera.setDefaultDrawTarget`
+ 	 * as well as the `DefaultDrawTarget` argument of `FlxG.camera.add`.
+ 	 */
+-	public var cameras(get, set):Array<FlxCamera>;
++	@:isVar public var cameras(get, set):Array<FlxCamera>;
+ 
+ 	/**
+ 	 * Enum that informs the collision system which type of object this is (to avoid expensive type casting).
+diff --git a/flixel/FlxG.hx b/flixel/FlxG.hx
+index a3dca12f..51d39768 100644
+--- a/flixel/FlxG.hx
++++ b/flixel/FlxG.hx
+@@ -46,6 +46,9 @@ import flixel.input.android.FlxAndroidKeys;
+ #if FLX_ACCELEROMETER
+ import flixel.input.FlxAccelerometer;
+ #end
++#if (FLX_GYROSCOPE || mobile || android || ios)
++import flixel.input.FlxGyroscope;
++#end
+ #if FLX_POINTER_INPUT
+ import flixel.input.FlxSwipe;
+ #end
+@@ -258,6 +261,13 @@ class FlxG
+ 	public static var accelerometer(default, null):FlxAccelerometer;
+ 	#end
+ 
++	#if (FLX_GYROSCOPE || mobile || android || ios)
++	/**
++	 * Provides access to gyroscope data on mobile devices as `pitch`/`roll`/`yaw` values.
++	 */
++	public static var gyroscope(default, null):FlxGyroscope;
++	#end
++
+ 	#if js
+ 	/**
+ 	 * Has some HTML5-specific things like browser detection, browser dimensions etc...
+@@ -576,6 +586,10 @@ class FlxG
+ 		accelerometer = new FlxAccelerometer();
+ 		#end
+ 
++		#if (FLX_GYROSCOPE || mobile || android || ios)
++		gyroscope = new FlxGyroscope();
++		#end
++
+ 		#if FLX_SAVE
+ 		initSave();
+ 		#end
+diff --git a/flixel/FlxSprite.hx b/flixel/FlxSprite.hx
+index 898896e9..eea8215e 100644
+--- a/flixel/FlxSprite.hx
++++ b/flixel/FlxSprite.hx
+@@ -268,7 +268,7 @@ class FlxSprite extends FlxObject
+ 	/**
+ 	 * The color effects of this sprite, changes to `color` or `alpha` will be reflected here
+ 	 */
+-	public var colorTransform(default, null) = new ColorTransform();
++	public var colorTransform(default, set) = new ColorTransform();
+ 
+ 	/**
+ 	 * Whether or not to use a `ColorTransform` set via `setColorTransform()`.
+@@ -1194,6 +1194,16 @@ class FlxSprite extends FlxObject
+ 		
+ 		dirty = true;
+ 	}
++
++	function set_colorTransform(value:ColorTransform):ColorTransform
++	{
++		if (value == null)
++			value = new ColorTransform();
++		colorTransform = value;
++		setColorTransform(value.redMultiplier, value.greenMultiplier, value.blueMultiplier, value.alphaMultiplier,
++			value.redOffset, value.greenOffset, value.blueOffset, value.alphaOffset);
++		return value;
++	}
+ 	
+ 	@:haxe.warning("-WDeprecated")
+ 	function updateColorTransform():Void
+diff --git a/flixel/graphics/tile/FlxDrawTrianglesItem.hx b/flixel/graphics/tile/FlxDrawTrianglesItem.hx
+index 38fbcd7b..1538940b 100644
+--- a/flixel/graphics/tile/FlxDrawTrianglesItem.hx
++++ b/flixel/graphics/tile/FlxDrawTrianglesItem.hx
+@@ -28,6 +28,8 @@ class FlxDrawTrianglesItem extends FlxDrawBaseItem<FlxDrawTrianglesItem>
+ 	var alphas:Array<Float>;
+ 	var colorMultipliers:Array<Float>;
+ 	var colorOffsets:Array<Float>;
++	var gpuMeta0:Array<Float>;
++	var gpuMeta1:Array<Float>;
+ 
+ 	public var vertices:DrawData<Float> = new DrawData<Float>();
+ 	public var indices:DrawData<Int> = new DrawData<Int>();
+@@ -41,6 +43,7 @@ class FlxDrawTrianglesItem extends FlxDrawBaseItem<FlxDrawTrianglesItem>
+ 	public var colorsPosition:Int = 0;
+ 
+ 	var bounds:FlxRect = FlxRect.get();
++	var borrowedGeometry:Bool = false;
+ 
+ 	public function new()
+ 	{
+@@ -56,24 +59,57 @@ class FlxDrawTrianglesItem extends FlxDrawBaseItem<FlxDrawTrianglesItem>
+ 
+ 		#if !flash
+ 		var shader = shader != null ? shader : graphics.shader;
+-		shader.bitmap.input = graphics.bitmap;
+-		shader.bitmap.filter = (camera.antialiasing || antialiasing) ? LINEAR : NEAREST;
+-		shader.bitmap.wrap = REPEAT; // in order to prevent breaking tiling behaviour in classes that use drawTriangles
+-		shader.alpha.value = alphas;
++		if (shader == null)
++			return;
++
++		// Macro-generated FlxShader subclasses expose these fields directly.
++		// FlxRuntimeShader keeps them in ShaderData instead, so the inherited
++		// generated field may be null even though the GLSL attribute exists.
++		// Resolve both representations to make runtime vertex shaders safe for
++		// drawTriangles batches.
++		var bitmapInput:Dynamic = shader.bitmap;
++		if (bitmapInput == null) bitmapInput = Reflect.field(shader.data, "bitmap");
++		if (bitmapInput == null) return;
++		bitmapInput.input = graphics.bitmap;
++		bitmapInput.filter = (camera.antialiasing || antialiasing)
++			? openfl.display3D.Context3DTextureFilter.LINEAR
++			: openfl.display3D.Context3DTextureFilter.NEAREST;
++		bitmapInput.wrap = openfl.display3D.Context3DWrapMode.REPEAT; // preserve drawTriangles tiling behaviour
++
++		var alphaParam:Dynamic = shader.alpha;
++		if (alphaParam == null) alphaParam = Reflect.field(shader.data, "alpha");
++		if (alphaParam != null) alphaParam.value = alphas;
+ 
+ 		if (colored || hasColorOffsets)
+ 		{
+-			shader.colorMultiplier.value = colorMultipliers;
+-			shader.colorOffset.value = colorOffsets;
++			var multiplierParam:Dynamic = shader.colorMultiplier;
++			if (multiplierParam == null) multiplierParam = Reflect.field(shader.data, "colorMultiplier");
++			if (multiplierParam != null) multiplierParam.value = colorMultipliers;
++			var offsetParam:Dynamic = shader.colorOffset;
++			if (offsetParam == null) offsetParam = Reflect.field(shader.data, "colorOffset");
++			if (offsetParam != null) offsetParam.value = colorOffsets;
+ 		}
+ 		else
+ 		{
+-			shader.colorMultiplier.value = null;
+-			shader.colorOffset.value = null;
++			var multiplierParam:Dynamic = shader.colorMultiplier;
++			if (multiplierParam == null) multiplierParam = Reflect.field(shader.data, "colorMultiplier");
++			if (multiplierParam != null) multiplierParam.value = null;
++			var offsetParam:Dynamic = shader.colorOffset;
++			if (offsetParam == null) offsetParam = Reflect.field(shader.data, "colorOffset");
++			if (offsetParam != null) offsetParam.value = null;
+ 		}
+ 
+-		setParameterValue(shader.hasTransform, true);
+-		setParameterValue(shader.hasColorTransform, colored || hasColorOffsets);
++		var gpuMeta0Param:Dynamic = Reflect.field(shader.data, "gpuMeta0");
++		var gpuMeta1Param:Dynamic = Reflect.field(shader.data, "gpuMeta1");
++		if (gpuMeta0Param != null && gpuMeta0 != null) gpuMeta0Param.value = gpuMeta0;
++		if (gpuMeta1Param != null && gpuMeta1 != null) gpuMeta1Param.value = gpuMeta1;
++
++		var transformParam:Dynamic = shader.hasTransform;
++		if (transformParam == null) transformParam = Reflect.field(shader.data, "hasTransform");
++		if (transformParam != null) setParameterValue(transformParam, true);
++		var colorTransformParam:Dynamic = shader.hasColorTransform;
++		if (colorTransformParam == null) colorTransformParam = Reflect.field(shader.data, "hasColorTransform");
++		if (colorTransformParam != null) setParameterValue(colorTransformParam, colored || hasColorOffsets);
+ 
+ 		camera.canvas.graphics.overrideBlendMode(blend);
+ 
+@@ -100,9 +136,20 @@ class FlxDrawTrianglesItem extends FlxDrawBaseItem<FlxDrawTrianglesItem>
+ 	override public function reset():Void
+ 	{
+ 		super.reset();
+-		vertices.length = 0;
+-		indices.length = 0;
+-		uvtData.length = 0;
++		if (borrowedGeometry)
++		{
++			vertices = new DrawData<Float>();
++			indices = new DrawData<Int>();
++			uvtData = new DrawData<Float>();
++			alphas = [];
++			borrowedGeometry = false;
++		}
++		else
++		{
++			vertices.length = 0;
++			indices.length = 0;
++			uvtData.length = 0;
++		}
+ 
+ 		verticesPosition = 0;
+ 		indicesPosition = 0;
+@@ -111,6 +158,33 @@ class FlxDrawTrianglesItem extends FlxDrawBaseItem<FlxDrawTrianglesItem>
+ 			colorMultipliers.splice(0, colorMultipliers.length);
+ 		if (colorOffsets != null)
+ 			colorOffsets.splice(0, colorOffsets.length);
++		if (gpuMeta0 != null)
++			gpuMeta0.splice(0, gpuMeta0.length);
++		if (gpuMeta1 != null)
++			gpuMeta1.splice(0, gpuMeta1.length);
++	}
++
++	/**
++	 * Uses immutable caller-owned triangle storage for one render pass.
++	 * Intended for GPU-generated geometry that already owns a persistent mesh.
++	 */
++	public function borrowTriangles(vertices:DrawData<Float>, indices:DrawData<Int>, uvtData:DrawData<Float>, alphaData:Array<Float>,
++		?position:FlxPoint, ?cameraBounds:FlxRect):Bool
++	{
++		if (borrowedGeometry || this.vertices.length != 0 || this.indices.length != 0)
++			return false;
++		this.vertices = vertices;
++		this.indices = indices;
++		this.uvtData = uvtData;
++		#if !flash
++		alphas = alphaData;
++		#end
++		verticesPosition = vertices.length;
++		indicesPosition = indices.length;
++		borrowedGeometry = true;
++		if (position != null) position.putWeak();
++		if (cameraBounds != null) cameraBounds.putWeak();
++		return true;
+ 	}
+ 
+ 	override public function dispose():Void
+@@ -127,7 +201,7 @@ class FlxDrawTrianglesItem extends FlxDrawBaseItem<FlxDrawTrianglesItem>
+ 	}
+ 
+ 	public function addTriangles(vertices:DrawData<Float>, indices:DrawData<Int>, uvtData:DrawData<Float>, ?colors:DrawData<Int>, ?position:FlxPoint,
+-			?cameraBounds:FlxRect, ?transform:ColorTransform):Void
++			?cameraBounds:FlxRect, ?transform:ColorTransform, ?gpuMetadata:Array<Float>):Void
+ 	{
+ 		if (position == null)
+ 			position = point.zero();
+@@ -231,6 +305,27 @@ class FlxDrawTrianglesItem extends FlxDrawBaseItem<FlxDrawTrianglesItem>
+ 
+ 		position.putWeak();
+ 		cameraBounds.putWeak();
++
++		// Only append attributes for triangles accepted by this call. Using the
++		// batch-wide numTriangles here repeated every previous arrow on every add,
++		// causing quadratic CPU work and oversized attribute buffers.
++		final addedTriangles = Std.int((this.indices.length - prevIndicesLength) / 3);
++		if (gpuMetadata != null && gpuMetadata.length >= 8 && addedTriangles > 0)
++		{
++			if (gpuMeta0 == null) gpuMeta0 = [];
++			if (gpuMeta1 == null) gpuMeta1 = [];
++			for (_ in 0...(addedTriangles * 3))
++			{
++				gpuMeta0.push(gpuMetadata[0]);
++				gpuMeta0.push(gpuMetadata[1]);
++				gpuMeta0.push(gpuMetadata[2]);
++				gpuMeta0.push(gpuMetadata[3]);
++				gpuMeta1.push(gpuMetadata[4]);
++				gpuMeta1.push(gpuMetadata[5]);
++				gpuMeta1.push(gpuMetadata[6]);
++				gpuMeta1.push(gpuMetadata[7]);
++			}
++		}
+ 	}
+ 
+ 	inline function setParameterValue(parameter:ShaderParameter<Bool>, value:Bool):Void
+diff --git a/flixel/input/FlxFlick.hx b/flixel/input/FlxFlick.hx
+new file mode 100644
+index 00000000..1f2ac47c
+--- /dev/null
++++ b/flixel/input/FlxFlick.hx
+@@ -0,0 +1,303 @@
++package flixel.input;
++
++import flixel.FlxG;
++import flixel.math.FlxPoint;
++import flixel.math.FlxMath;
++import flixel.util.FlxDestroyUtil;
++import flixel.util.FlxStringUtil;
++
++/**
++ * @author moondroidcoder
++ * The flick management class used in FlxMouse and FlxTouchManager.
++ * It handles all the flick motion, speed calculation, etc.
++ */
++@:allow(flixel.input.mouse.FlxMouse)
++@:allow(flixel.input.touch.FlxTouchManager)
++class FlxFlick implements IFlxDestroyable
++{
++	/**
++	 * The threshold distance that needs to be surpassed for a flick to be returned as true.
++	 * Can be set globally.
++	 */
++	public static var flickThreshold:FlxPoint;
++
++	/**
++	 * The max velocity the flicks are going to have.
++	 * Can be set globally.
++	 */
++	public static var maxVelocity:FlxPoint;
++
++	/**
++	 * Either LEFT_MOUSE, MIDDLE_MOUSE or RIGHT_MOUSE,
++	 * or the touchPointID of a FlxTouch.
++	 */
++	public var ID(default, null):Int;
++
++	/**
++	 * Whether the flick has been instanced or not.
++	 */
++	public var initialized:Bool = false;
++
++	/**
++	 * The speed of flicks (in pixels per second), usually gotten from an input source.
++	 */
++	public var velocity(default, null):FlxPoint;
++
++	/**
++	 * This isn't drag exactly, more like deceleration that is only applied
++	 * when `acceleration` is not affecting the sprite.
++	 */
++	public var drag(default, null):FlxPoint;
++
++	/**
++	 * Whether a flick upwards has been passed or not.
++	 */
++	public var flickUp(get, default):Bool;
++
++	/**
++	 * Whether a flick downwards has been passed or not.
++	 */
++	public var flickDown(get, default):Bool;
++
++	/**
++	 * Indicates when a flick leftwards has been passed or not.
++	 */
++	public var flickLeft(get, default):Bool;
++
++	/**
++	 * Indicates when a flick rightwards has been passed or not.
++	 */
++	public var flickRight(get, default):Bool;
++
++	// Helper variables for proper flick check so it helps performance to avoid handling the checks everytime you get the public check.
++
++	/**
++	 * Helper variable for proper flickUp checks.
++	 */
++	var _flickUp:Bool;
++
++    /**
++	 * Helper variable for proper flickDown checks.
++	 */
++	var _flickDown:Bool;
++
++    /**
++	 * Helper variable for proper flickLeft checks.
++	 */
++	var _flickLeft:Bool;
++
++    /**
++	 * Helper variable for proper flickRight checks.
++	 */
++	var _flickRight:Bool;
++
++	/**
++	 * The distance that has been passed while it calculates the motion
++	 */
++	var _currentDistance:FlxPoint;
++
++	function new()
++	{
++		if (flickThreshold == null)
++		{
++			flickThreshold = FlxPoint.get(10, 10);
++		}
++
++		if (maxVelocity == null)
++		{
++			maxVelocity = FlxPoint.get(100, 100);
++		}
++	}
++
++	/**
++	 * Initialize the flick handling, usually triggered after a justReleased check.
++     * It initializes every important variable needed for calculation the motion of the flicks.
++	 * @param ID The TOUCH ID only for FlxTouch.
++	 * @param StartingVelocity The starting velocity of the input.
++	 * @param Drag How much drag for the velocity check, default is 700 pixels for both axes.
++	 */
++	public function initFlick(?ID:Int = -1, StartingVelocity:FlxPoint, ?Drag:FlxPoint):Void
++	{
++		if (initialized)
++		{
++			return;
++		}
++
++		this.ID = ID;
++		velocity = StartingVelocity.clone();
++		drag = (Drag != null) ? Drag.clone() : FlxPoint.get(700, 700);
++		_currentDistance = FlxPoint.get();
++
++		#if FLX_TOUCH
++		for (touch in FlxG.touches.list)
++		{
++			if (touch == null || touch.touchPointID != ID)
++			{
++				continue;
++			}
++
++			if (Math.abs(touch.deltaViewX) <= 10)
++			{
++				velocity.x = 0;
++			}
++
++			if (Math.abs(touch.deltaViewY) <= 10)
++			{
++				velocity.y = 0;
++			}
++			break;
++		}
++		#end
++
++		initialized = true;
++	}
++
++	/**
++	 * Updates the flick management.
++	 * @param elapsed Time elapsed.
++	 */
++	public function update(elapsed:Float) {
++		if (!initialized)
++		{
++			return;
++		}
++
++		if (Math.abs(velocity.x) + Math.abs(velocity.y) <= 1)
++		{
++			destroy();
++			return;
++		}
++
++		updateMotion(elapsed);
++
++		var modifiedDistance = _currentDistance.x;
++
++		if (Math.abs(_currentDistance.x) > flickThreshold.x)
++		{
++			#if FLX_TOUCH
++			if (FlxG.touches.invertX)
++				modifiedDistance *= -1;
++			#end
++
++			if (modifiedDistance < 0)
++			{
++				_flickLeft = true;
++			}
++			else
++			{
++				_flickRight = true;
++			}
++			_currentDistance.x = 0;
++		}
++
++		modifiedDistance = _currentDistance.y;
++
++		if (Math.abs(_currentDistance.y) > flickThreshold.y)
++		{
++			#if FLX_TOUCH
++			if (FlxG.touches.invertY)
++				modifiedDistance *= -1;
++			#end
++
++			if (modifiedDistance < 0)
++			{
++				_flickDown = true;
++			}
++			else
++			{
++				_flickUp = true;
++			}
++			_currentDistance.y = 0;
++		}
++	}
++
++	/**
++	 * Updates the motion of the flick.
++	 * Uses a framerate and dpi dependent calculation.
++	 * @param elapsed Time elapsed
++	 */
++	@:noCompletion
++	function updateMotion(elapsed:Float):Void
++	{
++		var dpiScale = FlxG.stage.window.display.dpi / 160; // 160 is baseline "medium" DPI
++		dpiScale *= 3.5;
++
++		var framerateAmp = 60 / (FlxG.updateFramerate > 60 ? FlxG.updateFramerate : 60) - 0.05;
++		if (framerateAmp > 0.45) framerateAmp = 0.45;
++
++		// Apple's magic number / math for smooth scrolling momentum
++		var newVelX = Math.min(velocity.x * 0.95, maxVelocity.x);
++		var avgVelX = 0.5 * (velocity.x + newVelX);
++		velocity.x = newVelX;
++		_currentDistance.x += (avgVelX * elapsed) / framerateAmp / dpiScale;
++
++		var newVelY = Math.min(velocity.y * 0.95, maxVelocity.y);
++		var avgVelY = 0.5 * (velocity.y + newVelY);
++		velocity.y = newVelY;
++		_currentDistance.y += (avgVelY * elapsed) / framerateAmp / dpiScale;
++	}
++
++	/**
++	 * This is not a proper destroy function.
++	 * It destroys the motion variables and sets `intiliazed` to false.
++	 */
++	public function destroy()
++	{
++		velocity = FlxDestroyUtil.put(velocity);
++		drag = FlxDestroyUtil.put(drag);
++		_currentDistance = FlxDestroyUtil.put(_currentDistance);
++		initialized = false;
++	}
++
++	@:noCompletion
++	inline function toString():String
++	{
++		return FlxStringUtil.getDebugString([
++			LabelValuePair.weak("ID", ID),
++			LabelValuePair.weak("velocity", velocity),
++			LabelValuePair.weak("drag", drag),
++			LabelValuePair.weak("flickThreshold", flickThreshold),
++			LabelValuePair.weak("currentDistance", _currentDistance),
++		]);
++	}
++
++	@:noCompletion
++	function get_flickUp():Bool {
++		if (_flickUp)
++		{
++			_flickUp = false;
++			return true;
++		}
++		return false;
++	}
++
++	@:noCompletion
++	function get_flickDown():Bool {
++		if (_flickDown)
++		{
++			_flickDown = false;
++			return true;
++		}
++		return false;
++	}
++
++	@:noCompletion
++	function get_flickLeft():Bool {
++		if (_flickLeft)
++		{
++			_flickLeft = false;
++			return true;
++		}
++		return false;
++	}
++
++	@:noCompletion
++	function get_flickRight():Bool {
++		if (_flickRight)
++		{
++			_flickRight = false;
++			return true;
++		}
++		return false;
++	}
++}
+diff --git a/flixel/input/FlxGyroscope.hx b/flixel/input/FlxGyroscope.hx
+new file mode 100644
+index 00000000..6058b3e8
+--- /dev/null
++++ b/flixel/input/FlxGyroscope.hx
+@@ -0,0 +1,83 @@
++package flixel.input;
++
++import openfl.events.DeviceRotationEvent;
++import openfl.sensors.DeviceRotation;
++
++/**
++ * A class providing access to the accelerometer data of the device.
++ */
++class FlxGyroscope
++{
++
++	/**
++	 * Represented as change in pitch per update.
++	 * Meaning if your device was perfectly still, this value would
++	 * be 0.
++	 */
++	public var pitch(default, null):Float = 0;
++
++	/**
++	 * Represented as change in roll per update.
++	 * Meaning if your device was perfectly still, this value would
++	 * be 0.
++	 */
++	public var roll(default, null):Float = 0;
++
++	/**
++	 * Represented as change in yaw per update.
++	 * Meaning if your device was perfectly still, this value would
++	 * be 0.
++	 */
++	public var yaw(default, null):Float = 0;
++
++	/**
++	 * Wether the gyroscope is supported on this device
++	 */
++	public var isSupported(get, never):Bool;
++
++	var _sensor:DeviceRotation;
++
++	public function new()
++	{
++		if (DeviceRotation.isSupported)
++		{
++			_sensor = new DeviceRotation();
++			final addListener:Dynamic = Reflect.field(_sensor, "addEventListener");
++			if (addListener != null)
++				Reflect.callMethod(_sensor, addListener, [DeviceRotationEvent.UPDATE, update]);
++		}
++	}
++
++	inline function get_isSupported():Bool
++	{
++		return DeviceRotation.isSupported;
++	}
++
++	function update(Event:DeviceRotationEvent):Void
++	{
++		// TODO: double check if these values are actually flipped
++		// for android/js, I copy pasted this code from `FlxAccelerometer`!
++
++		#if (android || js)
++		pitch = Event.pitch;
++		roll = Event.roll;
++		yaw = Event.yaw;
++		#else // Values on iOS and BlackBerry are inverted
++		pitch = -Event.pitch;
++		roll = -Event.roll;
++		yaw = -Event.yaw;
++		#end
++
++		// TODO: Check if these divisions are needed on js
++		#if js
++		pitch /= 10;
++		roll /= 10;
++		yaw /= 10;
++		#end
++	}
++
++	public function toString():String
++	{
++		return '$isSupported $pitch $yaw $roll';
++	}
++}
+diff --git a/flixel/input/FlxSwipe.hx b/flixel/input/FlxSwipe.hx
+index 3e7d1e0d..059f872a 100644
+--- a/flixel/input/FlxSwipe.hx
++++ b/flixel/input/FlxSwipe.hx
+@@ -24,10 +24,10 @@ class FlxSwipe implements IFlxDestroyable
+ 	public var radians(get, never):Float;
+ 	public var duration(get, never):Float;
+ 
+-	var _startTimeInTicks:Int;
+-	var _endTimeInTicks:Int;
++	var _startTimeInTicks:Float;
++	var _endTimeInTicks:Float;
+ 
+-	function new(ID:Int, StartPosition:FlxPoint, EndPosition:FlxPoint, StartTimeInTicks:Int)
++	function new(ID:Int, StartPosition:FlxPoint, EndPosition:FlxPoint, StartTimeInTicks:Float)
+ 	{
+ 		this.ID = ID;
+ 		startPosition = StartPosition;
+@@ -42,6 +42,7 @@ class FlxSwipe implements IFlxDestroyable
+ 		endPosition = FlxDestroyUtil.put(endPosition);
+ 	}
+ 
++
+ 	inline function toString():String
+ 	{
+ 		return FlxStringUtil.getDebugString([
+diff --git a/flixel/input/mouse/FlxMouse.hx b/flixel/input/mouse/FlxMouse.hx
+index 38ea2f44..c71d7add 100644
+--- a/flixel/input/mouse/FlxMouse.hx
++++ b/flixel/input/mouse/FlxMouse.hx
+@@ -10,9 +10,11 @@ import openfl.events.MouseEvent;
+ import openfl.Lib;
+ import openfl.ui.Mouse;
+ import flixel.FlxG;
++import flixel.input.FlxFlick;
+ import flixel.input.IFlxInputManager;
+ import flixel.input.FlxInput.FlxInputState;
+ import flixel.input.mouse.FlxMouseButton.FlxMouseButtonID;
++import flixel.math.FlxPoint;
+ import flixel.system.FlxAssets;
+ import flixel.system.replay.MouseRecord;
+ import flixel.util.FlxDestroyUtil;
+@@ -68,6 +70,26 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
+ 	 */
+ 	public var useSystemCursor(default, set):Bool = false;
+ 
++	/**
++	 * Check to see if the mouse has just been moved upwards.
++	 */
++	public var justMovedUp(get, never):Bool;
++
++	/**
++	 * Check to see if the mouse has just been moved downwards.
++	 */
++	public var justMovedDown(get, never):Bool;
++
++	/**
++	 * Check to see if the mouse has just been moved leftwards.
++	 */
++	public var justMovedLeft(get, never):Bool;
++
++	/**
++	 * Check to see if the mouse has just been moved rightwards.
++	 */
++	public var justMovedRight(get, never):Bool;
++
+ 	/**
+ 	 * Check to see if the mouse has just been moved.
+ 	 * @since 4.4.0
+@@ -135,6 +157,25 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
+ 	 */
+ 	public var justPressedTimeInTicks(get, never):Int;
+ 
++	public var ticksDeltaSincePress(get, never):Int;
++
++	/**
++	 * The speed of this mouse in view space.
++	 */
++	public var velocity(default, null):FlxPoint = FlxPoint.get();
++
++	/**
++	 * The threshold to surpass for a movement check to be returned as true.
++	 */
++	public var swipeThreshold(default, null):FlxPoint = FlxPoint.get(100, 100);
++
++	#if FLX_POINTER_INPUT
++	/**
++	 * The FlxFlick class responsible for managing flicks.
++	 */
++	public var flickManager(default, null):FlxFlick = new FlxFlick();
++	#end
++
+ 	#if FLX_MOUSE_ADVANCED
+ 	/**
+ 	 * Check to see if the right mouse button is currently pressed.
+@@ -237,6 +278,10 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
+ 	var _prevScreenX(get, never):Int;
+ 	@:deprecated("_prevScreenY is deprecated, use _prevViewY, instead")
+ 	var _prevScreenY(get, never):Int;
++	var _startX:Float = 0;
++	var _startY:Float = 0;
++	var _swipeDeltaX(get, never):Float;
++	var _swipeDeltaY(get, never):Float;
+ 
+ 	// Helper variable for cleaning up memory
+ 	var _stage:Stage;
+@@ -458,6 +503,12 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
+ 
+ 		_cursorBitmapData = FlxDestroyUtil.dispose(_cursorBitmapData);
+ 		FlxG.signals.postGameStart.remove(onGameStart);
++		velocity = FlxDestroyUtil.put(velocity);
++		swipeThreshold = FlxDestroyUtil.put(swipeThreshold);
++
++		#if FLX_POINTER_INPUT
++		flickManager.destroy();
++		#end
+ 	}
+ 
+ 	/**
+@@ -471,6 +522,10 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
+ 		_middleButton.reset();
+ 		_rightButton.reset();
+ 		#end
++
++		#if FLX_POINTER_INPUT
++		flickManager.destroy();
++		#end
+ 	}
+ 
+ 	/**
+@@ -514,6 +569,7 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
+ 	 */
+ 	function update():Void
+ 	{
++		calculateVelocity();
+ 		_prevX = x;
+ 		_prevY = y;
+ 		_prevViewX = viewX;
+@@ -545,6 +601,35 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
+ 			wheel = 0;
+ 		}
+ 		_wheelUsed = false;
++
++		if (justPressed)
++		{
++			_startX = viewX;
++			_startY = viewY;
++		}
++
++		#if FLX_POINTER_INPUT
++		if (justReleased)
++		{
++			flickManager.initFlick(velocity);
++		}
++
++		if (pressed)
++		{
++			flickManager.destroy();
++		}
++
++		flickManager.update(FlxG.elapsed);
++		#end
++	}
++
++	function calculateVelocity():Void
++	{
++		if (!pressed)
++			return;
++
++		velocity.x = deltaViewX;
++		velocity.y = deltaViewY;
+ 	}
+ 
+ 	/**
+@@ -614,6 +699,44 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
+ 	inline function get_justMoved():Bool
+ 		return _prevX != x || _prevY != y;
+ 
++	inline function get_justMovedUp():Bool
++	{
++		var swiped:Bool = _swipeDeltaY < -swipeThreshold.y;
++		if (swiped)
++			_startY = viewY;
++		return swiped;
++	}
++
++	inline function get_justMovedDown():Bool
++	{
++		var swiped:Bool = _swipeDeltaY > swipeThreshold.y;
++		if (swiped)
++			_startY = viewY;
++		return swiped;
++	}
++
++	inline function get_justMovedLeft():Bool
++	{
++		var swiped:Bool = _swipeDeltaX < -swipeThreshold.x;
++		if (swiped)
++			_startX = viewX;
++		return swiped;
++	}
++
++	inline function get_justMovedRight():Bool
++	{
++		var swiped:Bool = _swipeDeltaX > swipeThreshold.x;
++		if (swiped)
++			_startX = viewX;
++		return swiped;
++	}
++
++	inline function get__swipeDeltaX():Float
++		return viewX - _startX;
++
++	inline function get__swipeDeltaY():Float
++		return viewY - _startY;
++
+ 	inline function get_deltaX():Int
+ 		return x - _prevX;
+ 
+@@ -653,6 +776,9 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
+ 	inline function get_justPressedTimeInTicks():Int
+ 		return _leftButton.justPressedTimeInTicks;
+ 
++	inline function get_ticksDeltaSincePress():Int
++		return FlxG.game.ticks - _leftButton.justPressedTimeInTicks;
++
+ 	#if FLX_MOUSE_ADVANCED
+ 	inline function get_pressedRight():Bool
+ 		return _rightButton.pressed;
+diff --git a/flixel/input/touch/FlxTouch.hx b/flixel/input/touch/FlxTouch.hx
+index 9cea7f11..7b922e0b 100644
+--- a/flixel/input/touch/FlxTouch.hx
++++ b/flixel/input/touch/FlxTouch.hx
+@@ -7,6 +7,7 @@ import flixel.input.FlxInput;
+ import flixel.input.FlxSwipe;
+ import flixel.input.IFlxInput;
+ import flixel.math.FlxPoint;
++import flixel.math.FlxMath;
+ import flixel.util.FlxDestroyUtil;
+ 
+ /**
+@@ -28,21 +29,115 @@ class FlxTouch extends FlxPointer implements IFlxDestroyable implements IFlxInpu
+ 	 */
+ 	public var pressure(default, null):Float;
+ 
+-	public var justReleased(get, never):Bool;
+-	public var released(get, never):Bool;
++	/**
++	 * Check to see if this touch has just been moved upwards.
++	 */
++	public var justMovedUp(get, never):Bool;
++
++	/**
++	 * Check to see if this touch has just been moved downwards.
++	 */
++	public var justMovedDown(get, never):Bool;
++
++	/**
++	 * Check to see if this touch has just been moved leftwards.
++	 */
++	public var justMovedLeft(get, never):Bool;
++
++	/**
++	 * Check to see if this touch has just been moved rightwards.
++	 */
++	public var justMovedRight(get, never):Bool;
++
++	/**
++	 * Check to see if this touch has just been moved.
++	 */
++	public var justMoved(get, never):Bool;
++
++	/**
++	 * Check to see if this touch is currently pressed.
++	 */
+ 	public var pressed(get, never):Bool;
++
++	/**
++	 * Check to see if this touch has just been pressed.
++	 */
+ 	public var justPressed(get, never):Bool;
+ 
++	/**
++	 * Check to see if this touch is currently not pressed.
++	 */
++	public var released(get, never):Bool;
++
++	/**
++	 * Check to see if this touch has just been released.
++	 */
++	public var justReleased(get, never):Bool;
++
++	/**
++	 * Time in ticks of last press.
++	 */
++	public var justPressedTimeInTicks(default, null):Float = -1;
++
++	/**
++	 * Distance in pixels this touch has moved since the last frame in the X direction.
++	 */
++	public var deltaX(get, default):Float;
++
++	/**
++	 * Distance in pixels this touch has moved since the last frame in the Y direction.
++	 */
++	public var deltaY(get, default):Float;
++
++	/**
++	 * Distance in pixels this touch has moved in view space since the last frame in the X direction.
++	 */
++	public var deltaViewX(get, default):Float;
++
++	/**
++	 * Distance in pixels this touch has moved in view space since the last frame in the Y direction.
++	 */
++	public var deltaViewY(get, default):Float;
++
++	/**
++	 * The position of the touch when it was just pressed in FlxPoint.
++	 */
++	public var justPressedPosition(default, null) = FlxPoint.get();
++
++	/**
++	 * Time in ticks that had passed since of last press
++	 */
++	public var ticksDeltaSincePress(get, default):Float;
++
++	/**
++	 * The speed of this touch, always updates.
++	 */
++	public var velocity(default, null):FlxPoint = FlxPoint.get();
++
++	/**
++	 * Helper variables
++	 */
+ 	var input:FlxInput<Int>;
++
+ 	var flashPoint = new Point();
+ 
+-	public var justPressedPosition(default, null) = FlxPoint.get();
+-	public var justPressedTimeInTicks(default, null):Int = -1;
++	var _prevX:Float = 0;
++	var _prevY:Float = 0;
++
++	var _prevViewX:Float = 0;
++	var _prevViewY:Float = 0;
++
++	var _startX:Float = 0;
++	var _startY:Float = 0;
++
++	var _swipeDeltaX(get, never):Float;
++	var _swipeDeltaY(get, never):Float;
+ 
+ 	public function destroy():Void
+ 	{
+ 		input = null;
+ 		justPressedPosition = FlxDestroyUtil.put(justPressedPosition);
++		velocity = FlxDestroyUtil.put(velocity);
+ 		flashPoint = null;
+ 	}
+ 
+@@ -51,7 +146,7 @@ class FlxTouch extends FlxPointer implements IFlxDestroyable implements IFlxInpu
+ 	 */
+ 	public function recycle(x:Int, y:Int, pointID:Int, pressure:Float):Void
+ 	{
+-		setXY(x, y);
++		setXY(x, y, true);
+ 		input.ID = pointID;
+ 		input.reset();
+ 		this.pressure = pressure;
+@@ -68,7 +163,7 @@ class FlxTouch extends FlxPointer implements IFlxDestroyable implements IFlxInpu
+ 		super();
+ 
+ 		input = new FlxInput(pointID);
+-		setXY(x, y);
++		setXY(x, y, true);
+ 		this.pressure = pressure;
+ 	}
+ 
+@@ -83,13 +178,21 @@ class FlxTouch extends FlxPointer implements IFlxDestroyable implements IFlxInpu
+ 		{
+ 			justPressedPosition.set(viewX, viewY);
+ 			justPressedTimeInTicks = FlxG.game.ticks;
++			_startX = viewX;
++			_startY = viewY;
+ 		}
+ 		#if FLX_POINTER_INPUT
+-		else if (justReleased)
++		if (justReleased)
+ 		{
++			FlxG.touches.flickManager.initFlick(touchPointID, velocity);
+ 			FlxG.swipes.push(new FlxSwipe(touchPointID, justPressedPosition.copyTo(), getViewPosition(), justPressedTimeInTicks));
+ 		}
++		if (pressed)
++		{
++			FlxG.touches.flickManager.destroy();
++		}
+ 		#end
++
+ 	}
+ 
+ 	/**
+@@ -97,39 +200,133 @@ class FlxTouch extends FlxPointer implements IFlxDestroyable implements IFlxInpu
+ 	 *
+ 	 * @param	X	stageX touch coordinate
+ 	 * @param	Y	stageY touch coordinate
++	 * @param updatePrev Wether the previous touch position values should be updated with the current touch postion or new one
+ 	 */
+-	function setXY(X:Int, Y:Int):Void
++	function setXY(X:Int, Y:Int, updatePrev:Bool = false):Void
+ 	{
++		calculateVelocity();
++
++		if (!updatePrev)
++		{
++			_prevX = x;
++			_prevY = y;
++			_prevViewX = viewX;
++			_prevViewY = viewY;
++		}
++
+ 		flashPoint.setTo(X, Y);
+ 		flashPoint = FlxG.game.globalToLocal(flashPoint);
+ 
+ 		setRawPositionUnsafe(flashPoint.x, flashPoint.y);
++		if (updatePrev)
++		{
++			_prevX = x;
++			_prevY = y;
++			_prevViewX = viewX;
++			_prevViewY = viewY;
++		}
+ 	}
+ 
+-	inline function get_touchPointID():Int
++	/**
++	 * Calculates this touch's velocity.
++	 */
++	function calculateVelocity():Void
+ 	{
+-		return input.ID;
++		if (!pressed)
++			return;
++
++
++		velocity.x = deltaViewX;
++		velocity.y = deltaViewY;
+ 	}
+ 
++	@:noCompletion
++	inline function get_touchPointID():Int
++		return input.ID;
++
++	@:noCompletion
+ 	inline function get_justReleased():Bool
+-	{
+ 		return input.justReleased;
+-	}
+ 
++	@:noCompletion
+ 	inline function get_released():Bool
+-	{
+ 		return input.released;
+-	}
+ 
++	@:noCompletion
+ 	inline function get_pressed():Bool
+-	{
+ 		return input.pressed;
+-	}
+ 
++	@:noCompletion
+ 	inline function get_justPressed():Bool
+-	{
+ 		return input.justPressed;
++
++	@:noCompletion
++	inline function get_justMoved():Bool
++		return x != _prevX || y != _prevY;
++
++	@:noCompletion
++	inline function get_justMovedUp():Bool
++	{
++		var swiped:Bool = _swipeDeltaY > FlxG.touches.swipeThreshold.y;
++		if (swiped)
++			_startY = viewY;
++		return swiped;
++	}
++
++	@:noCompletion
++	inline function get_justMovedDown():Bool
++	{
++		var swiped:Bool = _swipeDeltaY < -FlxG.touches.swipeThreshold.y;
++		if (swiped)
++			_startY = viewY;
++		return swiped;
+ 	}
++
++	@:noCompletion
++	inline function get_justMovedLeft():Bool
++	{
++		var swiped:Bool = _swipeDeltaX > FlxG.touches.swipeThreshold.x;
++		if (swiped)
++			_startX = viewX;
++		return swiped;
++	}
++
++	@:noCompletion
++	inline function get_justMovedRight():Bool
++	{
++		var swiped:Bool = _swipeDeltaX < -FlxG.touches.swipeThreshold.x;
++		if (swiped)
++			_startX = viewX;
++		return swiped;
++	}
++
++	@:noCompletion
++	inline function get_deltaX():Float
++		return x - _prevX;
++
++	@:noCompletion
++	inline function get_deltaY():Float
++		return y - _prevY;
++
++	@:noCompletion
++	inline function get_deltaViewX():Float
++		return viewX - _prevViewX;
++
++	@:noCompletion
++	inline function get_deltaViewY():Float
++		return viewY - _prevViewY;
++
++	@:noCompletion
++	inline function get__swipeDeltaX():Float
++		return viewX - _startX;
++
++	@:noCompletion
++	inline function get__swipeDeltaY():Float
++		return viewY - _startY;
++
++	@:noCompletion
++	inline function get_ticksDeltaSincePress():Float
++		return FlxG.game.ticks - justPressedTimeInTicks;
+ }
+ #else
+ class FlxTouch {}
+diff --git a/flixel/input/touch/FlxTouchManager.hx b/flixel/input/touch/FlxTouchManager.hx
+index 3aca4bf5..f9c3c2b1 100644
+--- a/flixel/input/touch/FlxTouchManager.hx
++++ b/flixel/input/touch/FlxTouchManager.hx
+@@ -6,7 +6,8 @@ import openfl.Lib;
+ import openfl.events.TouchEvent;
+ import openfl.ui.Multitouch;
+ import openfl.ui.MultitouchInputMode;
+-
++import flixel.input.FlxFlick;
++import flixel.math.FlxPoint;
+ /**
+  * @author Zaphod
+  */
+@@ -23,6 +24,30 @@ class FlxTouchManager implements IFlxInputManager
+ 	 */
+ 	public final list:Array<FlxTouch> = [];
+ 
++	/**
++	 * The FlxFlick class responsible for managing flicks.
++	 */
++	#if FLX_POINTER_INPUT
++	public var flickManager:FlxFlick = new FlxFlick();
++	#end
++
++	/**
++	 * Inverts movement checks for the X axis.
++	 * On by default.
++	 */
++	public var invertX:Bool = true;
++
++	/**
++	 * Inverts movement checks for the Y axis.
++	 * On by default.
++	 */
++	public var invertY:Bool = true;
++
++	/**
++	 * The threshold to surpass for a movement check to be returned as true.
++	 */
++	public var swipeThreshold:FlxPoint = FlxPoint.get(100, 100);
++
+ 	/**
+ 	 * Storage for inactive touches (some sort of cache for them).
+ 	 */
+@@ -58,6 +83,10 @@ class FlxTouchManager implements IFlxInputManager
+ 		_touchesCache.clear();
+ 		FlxDestroyUtil.destroyArray(list);
+ 		FlxDestroyUtil.destroyArray(_inactiveTouches);
++
++		#if FLX_POINTER_INPUT
++		flickManager.destroy();
++		#end
+ 	}
+ 
+ 	/**
+@@ -134,6 +163,9 @@ class FlxTouchManager implements IFlxInputManager
+ 		}
+ 
+ 		list.resize(0);
++		#if FLX_POINTER_INPUT
++		flickManager.destroy();
++		#end
+ 	}
+ 
+ 	@:allow(flixel.FlxG)
+@@ -155,7 +187,7 @@ class FlxTouchManager implements IFlxInputManager
+ 		var touch:Null<FlxTouch> = _touchesCache.get(FlashEvent.touchPointID);
+ 		if (touch != null)
+ 		{
+-			touch.setXY(Std.int(FlashEvent.stageX), Std.int(FlashEvent.stageY));
++			touch.setXY(Std.int(FlashEvent.stageX), Std.int(FlashEvent.stageY), true);
+ 			touch.pressure = FlashEvent.pressure;
+ 		}
+ 		else
+@@ -231,13 +263,15 @@ class FlxTouchManager implements IFlxInputManager
+ 	 */
+ 	function update():Void
+ 	{
++		#if FLX_POINTER_INPUT
++		flickManager.update(FlxG.elapsed);
++		#end
++
+ 		var i:Int = list.length - 1;
+-		var touch:FlxTouch;
+ 
+ 		while (i >= 0)
+ 		{
+-			touch = list[i];
+-
++			var touch:FlxTouch = list[i];
+ 			// Touch ended at previous frame
+ 			if (touch.released && !touch.justReleased)
+ 			{
+diff --git a/flixel/system/frontEnds/SoundFrontEnd.hx b/flixel/system/frontEnds/SoundFrontEnd.hx
+index 4aafb35d..f83d3bbe 100644
+--- a/flixel/system/frontEnds/SoundFrontEnd.hx
++++ b/flixel/system/frontEnds/SoundFrontEnd.hx
+@@ -478,7 +478,6 @@ class SoundFrontEnd
+ 		{
+ 			volumeHandler(muted ? 0 : volume);
+ 		}
+-
+ 		onVolumeChange.dispatch(muted ? 0 : volume);
+ 
+ 		showSoundTray(true);
+@@ -511,6 +510,11 @@ class SoundFrontEnd
+ 		#end
+ 	}
+ 	
++	public inline function logToLinear(value:Float):Float
++	{
++		return value;
++	}
++
+ 	/**
+ 	 * Takes the volume scale used by Flixel fields and gives the final transformed volume that is
+ 	 * actually used to play the sound. To reverse this operation, use `reverseSoundCurve`. This
+diff --git a/flixel/system/macros/FlxDefines.hx b/flixel/system/macros/FlxDefines.hx
+index 4e06969d..b05045ba 100644
+--- a/flixel/system/macros/FlxDefines.hx
++++ b/flixel/system/macros/FlxDefines.hx
+@@ -14,6 +14,7 @@ import flixel.addons.system.macros.FlxAddonDefines;
+ 
+ private enum UserDefine
+ {
++	FLX_GYROSCOPE;
+ 	FLX_NO_MOUSE_ADVANCED;
+ 	FLX_NO_GAMEPAD;
+ 	FLX_NO_NATIVE_CURSOR;
+diff --git a/flixel/system/macros/FlxMacroUtil.hx b/flixel/system/macros/FlxMacroUtil.hx
+index 08edc64a..66c7c180 100644
+--- a/flixel/system/macros/FlxMacroUtil.hx
++++ b/flixel/system/macros/FlxMacroUtil.hx
+@@ -56,6 +56,9 @@ class FlxMacroUtil
+ 	
+ 	public static macro function deprecateOverride(fieldName:String, ?msg:String):Array<Field>
+ 	{
++		if (Context.defined("no-deprecation-warnings"))
++			return null;
++
+ 		var fields = Context.getBuildFields();
+ 		var pos:Position = null;
+ 		for (field in fields)
+diff --git a/flixel/tweens/FlxEase.hx b/flixel/tweens/FlxEase.hx
+index be898980..1878cae7 100644
+--- a/flixel/tweens/FlxEase.hx
++++ b/flixel/tweens/FlxEase.hx
+@@ -32,12 +32,121 @@ class FlxEase
+ 	static var ELASTIC_AMPLITUDE:Float = 1;
+ 	static var ELASTIC_PERIOD:Float = 0.4;
+ 
++	static inline function sampleCurveX(t:Float, x1:Float, x2:Float):Float
++	{
++		final invT = 1 - t;
++		return 3 * x1 * invT * invT * t + 3 * x2 * invT * t * t + t * t * t;
++	}
++
++	static inline function sampleCurveY(t:Float, y1:Float, y2:Float):Float
++	{
++		final invT = 1 - t;
++		return 3 * y1 * invT * invT * t + 3 * y2 * invT * t * t + t * t * t;
++	}
++
++	static inline function sampleCurveDerivativeX(t:Float, x1:Float, x2:Float):Float
++	{
++		return 3 * x1 * (-3 * t * t + 4 * t - 1) + 3 * x2 * (-3 * t * t + 2 * t);
++	}
++
++	static function solveCurveX(t:Float, x1:Float, x2:Float):Float
++	{
++		var x = t;
++
++		for (_ in 0...6)
++		{
++			final dx = sampleCurveX(x, x1, x2) - t;
++			final d = sampleCurveDerivativeX(x, x1, x2);
++			if (Math.abs(d) < 1e-6)
++				break;
++			x -= dx / d;
++		}
++
++		return x;
++	}
++
++	static inline function cubicBezier(t:Float, x1:Float, y1:Float, x2:Float, y2:Float):Float
++	{
++		final x = solveCurveX(t, x1, x2);
++		return sampleCurveY(x, y1, y2);
++	}
++
+ 	/** @since 4.3.0 */
+ 	public static inline function linear(t:Float):Float
+ 	{
+ 		return t;
+ 	}
+ 
++	public static inline function standard(t:Float):Float
++	{
++		return cubicBezier(t, 0.2, 0.0, 0.0, 1.0);
++	}
++
++	public static inline function decelerate(t:Float):Float
++	{
++		return cubicBezier(t, 0.0, 0.0, 0.0, 1.0);
++	}
++
++	public static inline function accelerate(t:Float):Float
++	{
++		return cubicBezier(t, 0.3, 0.0, 1.0, 1.0);
++	}
++
++	public static inline function emphasizedDecelerate(t:Float):Float
++	{
++		return cubicBezier(t, 0.05, 0.7, 0.1, 1.0);
++	}
++
++	public static inline function emphasizedAccelerate(t:Float):Float
++	{
++		return cubicBezier(t, 0.3, 0.0, 0.8, 0.15);
++	}
++
++	public static inline function instant(t:Float):Float
++	{
++		return 1;
++	}
++
++	public static inline function tri(t:Float):Float
++	{
++		return 1 - Math.abs(2 * t - 1);
++	}
++
++	public static inline function bell(t:Float):Float
++	{
++		return quintInOut(tri(t));
++	}
++
++	public static inline function pop(t:Float):Float
++	{
++		return 3.5 * (1 - t) * (1 - t) * Math.sqrt(t);
++	}
++
++	public static inline function tap(t:Float):Float
++	{
++		return 3.5 * t * t * Math.sqrt(1 - t);
++	}
++
++	public static inline function pulse(t:Float):Float
++	{
++		return t < 0.5 ? tap(t * 2) : -pop(t * 2 - 1);
++	}
++
++	public static inline function bounce(t:Float):Float
++	{
++		return 4 * t * (1 - t);
++	}
++
++	public static inline function spike(t:Float):Float
++	{
++		return Math.exp(-10 * Math.abs(2 * t - 1));
++	}
++
++	public static inline function inverse(t:Float):Float
++	{
++		return t * t * (1 - t) * (1 - t) / (0.5 - t);
++	}
++
+ 	public static inline function quadIn(t:Float):Float
+ 	{
+ 		return t * t;
+@@ -53,6 +162,16 @@ class FlxEase
+ 		return t <= .5 ? t * t * 2 : 1 - (--t) * t * 2;
+ 	}
+ 
++	public static inline function quadOutIn(t:Float):Float
++	{
++		return t < 0.5 ? quadOut(t * 2) * 0.5 : quadIn(t * 2 - 1) * 0.5 + 0.5;
++	}
++
++	public static inline function outInQuad(t:Float):Float
++	{
++		return quadOutIn(t);
++	}
++
+ 	public static inline function cubeIn(t:Float):Float
+ 	{
+ 		return t * t * t;
+@@ -68,6 +187,16 @@ class FlxEase
+ 		return t <= .5 ? t * t * t * 4 : 1 + (--t) * t * t * 4;
+ 	}
+ 
++	public static inline function cubicOutIn(t:Float):Float
++	{
++		return t < 0.5 ? cubeOut(t * 2) * 0.5 : cubeIn(t * 2 - 1) * 0.5 + 0.5;
++	}
++
++	public static inline function outInCubic(t:Float):Float
++	{
++		return cubicOutIn(t);
++	}
++
+ 	public static inline function quartIn(t:Float):Float
+ 	{
+ 		return t * t * t * t;
+@@ -83,6 +212,16 @@ class FlxEase
+ 		return t <= .5 ? t * t * t * t * 8 : (1 - (t = t * 2 - 2) * t * t * t) / 2 + .5;
+ 	}
+ 
++	public static inline function quartOutIn(t:Float):Float
++	{
++		return t < 0.5 ? quartOut(t * 2) * 0.5 : quartIn(t * 2 - 1) * 0.5 + 0.5;
++	}
++
++	public static inline function outInQuart(t:Float):Float
++	{
++		return quartOutIn(t);
++	}
++
+ 	public static inline function quintIn(t:Float):Float
+ 	{
+ 		return t * t * t * t * t;
+@@ -98,6 +237,16 @@ class FlxEase
+ 		return ((t *= 2) < 1) ? (t * t * t * t * t) / 2 : ((t -= 2) * t * t * t * t + 2) / 2;
+ 	}
+ 
++	public static inline function quintOutIn(t:Float):Float
++	{
++		return t < 0.5 ? quintOut(t * 2) * 0.5 : quintIn(t * 2 - 1) * 0.5 + 0.5;
++	}
++
++	public static inline function outInQuint(t:Float):Float
++	{
++		return quintOutIn(t);
++	}
++
+ 	/** @since 4.3.0 */
+ 	public static inline function smoothStepIn(t:Float):Float
+ 	{
+@@ -149,6 +298,16 @@ class FlxEase
+ 		return -Math.cos(Math.PI * t) / 2 + .5;
+ 	}
+ 
++	public static inline function sineOutIn(t:Float):Float
++	{
++		return t < 0.5 ? sineOut(t * 2) * 0.5 : sineIn(t * 2 - 1) * 0.5 + 0.5;
++	}
++
++	public static inline function outInSine(t:Float):Float
++	{
++		return sineOutIn(t);
++	}
++
+ 	public static function bounceIn(t:Float):Float
+ 	{
+ 		return 1 - bounceOut(1 - t);
+@@ -172,6 +331,16 @@ class FlxEase
+ 			: (1 + bounceOut(2 * t - 1)) / 2;
+ 	}
+ 
++	public static inline function bounceOutIn(t:Float):Float
++	{
++		return t < 0.5 ? bounceOut(t * 2) * 0.5 : bounceIn(t * 2 - 1) * 0.5 + 0.5;
++	}
++
++	public static inline function outInBounce(t:Float):Float
++	{
++		return bounceOutIn(t);
++	}
++
+ 	public static inline function circIn(t:Float):Float
+ 	{
+ 		return -(Math.sqrt(1 - t * t) - 1);
+@@ -187,6 +356,16 @@ class FlxEase
+ 		return t <= .5 ? (Math.sqrt(1 - t * t * 4) - 1) / -2 : (Math.sqrt(1 - (t * 2 - 2) * (t * 2 - 2)) + 1) / 2;
+ 	}
+ 
++	public static inline function circOutIn(t:Float):Float
++	{
++		return t < 0.5 ? circOut(t * 2) * 0.5 : circIn(t * 2 - 1) * 0.5 + 0.5;
++	}
++
++	public static inline function outInCirc(t:Float):Float
++	{
++		return circOutIn(t);
++	}
++
+ 	public static inline function expoIn(t:Float):Float
+ 	{
+ 		return Math.pow(2, 10 * (t - 1));
+@@ -202,6 +381,16 @@ class FlxEase
+ 		return t < .5 ? Math.pow(2, 10 * (t * 2 - 1)) / 2 : (-Math.pow(2, -10 * (t * 2 - 1)) + 2) / 2;
+ 	}
+ 
++	public static inline function expoOutIn(t:Float):Float
++	{
++		return t < 0.5 ? expoOut(t * 2) * 0.5 : expoIn(t * 2 - 1) * 0.5 + 0.5;
++	}
++
++	public static inline function outInExpo(t:Float):Float
++	{
++		return expoOutIn(t);
++	}
++
+ 	public static inline function backIn(t:Float):Float
+ 	{
+ 		return t * t * (2.70158 * t - 1.70158);
+@@ -221,6 +410,16 @@ class FlxEase
+ 		return (1 - (--t) * (t) * (-2.70158 * t - 1.70158)) / 2 + .5;
+ 	}
+ 
++	public static inline function backOutIn(t:Float):Float
++	{
++		return t < 0.5 ? backOut(t * 2) * 0.5 : backIn(t * 2 - 1) * 0.5 + 0.5;
++	}
++
++	public static inline function outInBack(t:Float):Float
++	{
++		return backOutIn(t);
++	}
++
+ 	public static inline function elasticIn(t:Float):Float
+ 	{
+ 		return -(ELASTIC_AMPLITUDE * Math.pow(2,
+@@ -242,6 +441,16 @@ class FlxEase
+ 		}
+ 		return Math.pow(2, -10 * (t -= 0.5)) * Math.sin((t - (ELASTIC_PERIOD / 4)) * (2 * Math.PI) / ELASTIC_PERIOD) * 0.5 + 1;
+ 	}
++
++	public static inline function elasticOutIn(t:Float):Float
++	{
++		return t < 0.5 ? elasticOut(t * 2) * 0.5 : elasticIn(t * 2 - 1) * 0.5 + 0.5;
++	}
++
++	public static inline function outInElastic(t:Float):Float
++	{
++		return elasticOutIn(t);
++	}
+ }
+ 
+ typedef EaseFunction = Float->Float;

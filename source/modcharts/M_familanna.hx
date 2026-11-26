@@ -16,447 +16,412 @@ using StringTools;
 
 class M_familanna
 {
-	public static var cent:Array<Float> = [0, 0];
+	public static var receptorCenter:Array<Float> = [0, 0];
 
 	public static function reset()
 	{
-		cent = [0, 0];
+		receptorCenter = [0, 0];
 	}
 
-	public static function pos(daNote:Note, strumLine:FlxSprite)
+	public static function updateNotePosition(note:Note, strumLine:FlxSprite)
 	{
-		if (daNote.strumTime > 20983 && daNote.strumTime < 31388)
+		if (note.strumTime > 20983 && note.strumTime < 31388)
 		{
 			if (FlxG.save.data.downscroll)
-				daNote.y = (50 - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (50 - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			else
-				daNote.y = (550 + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (550 + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 		}
-		else if (daNote.strumTime > 115409 && daNote.strumTime < 157296)
+		else if (note.strumTime > 115409 && note.strumTime < 157296)
 		{
 			if (FlxG.save.data.downscroll)
 			{
-				daNote.y = (strumLine.y + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed / 1.2, 2)));
-				if (daNote.mustPress)
-					daNote.x = PlayMoving.poxlist[daNote.noteData]
-						- ((daNote.y - 550) / (-daNote.height - 550)) * (PlayMoving.poxlist[daNote.noteData] - PlayMoving.oxlist[daNote.noteData]);
+				note.y = (strumLine.y + (Conductor.songPosition - note.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed / 1.2, 2)));
+				if (note.mustPress)
+					note.x = PlayMoving.defaultPlayerReceptorX[note.noteData]
+						- ((note.y - 550) / (-note.height - 550)) * (PlayMoving.defaultPlayerReceptorX[note.noteData] - PlayMoving.defaultOpponentReceptorX[note.noteData]);
 				else
-					daNote.x = PlayMoving.oxlist[daNote.noteData]
-						- ((daNote.y - 550) / (-daNote.height - 550)) * (PlayMoving.oxlist[daNote.noteData] - PlayMoving.poxlist[daNote.noteData]);
+					note.x = PlayMoving.defaultOpponentReceptorX[note.noteData]
+						- ((note.y - 550) / (-note.height - 550)) * (PlayMoving.defaultOpponentReceptorX[note.noteData] - PlayMoving.defaultPlayerReceptorX[note.noteData]);
 			}
 			else
 			{
-				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed / 1.2, 2)));
-				if (daNote.mustPress)
-					daNote.x = PlayMoving.poxlist[daNote.noteData]
-						- ((daNote.y - 50) / (FlxG.height - 50)) * (PlayMoving.poxlist[daNote.noteData] - PlayMoving.oxlist[daNote.noteData]);
+				note.y = (strumLine.y - (Conductor.songPosition - note.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed / 1.2, 2)));
+				if (note.mustPress)
+					note.x = PlayMoving.defaultPlayerReceptorX[note.noteData]
+						- ((note.y - 50) / (FlxG.height - 50)) * (PlayMoving.defaultPlayerReceptorX[note.noteData] - PlayMoving.defaultOpponentReceptorX[note.noteData]);
 				else
-					daNote.x = PlayMoving.oxlist[daNote.noteData]
-						- ((daNote.y - 50) / (FlxG.height - 50)) * (PlayMoving.oxlist[daNote.noteData] - PlayMoving.poxlist[daNote.noteData]);
+					note.x = PlayMoving.defaultOpponentReceptorX[note.noteData]
+						- ((note.y - 50) / (FlxG.height - 50)) * (PlayMoving.defaultOpponentReceptorX[note.noteData] - PlayMoving.defaultPlayerReceptorX[note.noteData]);
 			}
 		}
-		else if (daNote.strumTime > 73442 && daNote.strumTime < 83847)
+		else if (note.strumTime > 73442 && note.strumTime < 83847)
 		{
-			if (daNote.mustPress)
-			{
-				switch (daNote.noteData)
-				{
-					case 0:
-						daNote.x = (584 + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-						daNote.y = 468;
-					case 1:
-						daNote.x = (584 + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-						daNote.y = 356;
-					case 2:
-						daNote.x = (696 - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-						daNote.y = 356;
-					case 3:
-						daNote.x = (696 - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-						daNote.y = 468;
-				}
-			}
-			else
-			{
-				switch (daNote.noteData)
-				{
-					case 0:
-						daNote.x = (584 + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-						daNote.y = 162;
-					case 1:
-						daNote.x = (584 + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-						daNote.y = 50;
-					case 2:
-						daNote.x = (696 - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-						daNote.y = 50;
-					case 3:
-						daNote.x = (696 - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-						daNote.y = 162;
-				}
-			}
+			applyNotesFrom73442(note, strumLine);
 		}
-		else if (daNote.strumTime >= 104918.0327868854 && daNote.strumTime < 107540.98360655754)
+		else if (note.strumTime >= 104918.0327868854 && note.strumTime < 107540.98360655754)
 		{
 			if (FlxG.save.data.downscroll)
-				cent = [
+				receptorCenter = [
 					218,
-					FlxMath.lerp(550, 300, (daNote.strumTime - 104918.0327868854) / 2622.95081967)
+					FlxMath.lerp(550, 300, (note.strumTime - 104918.0327868854) / 2622.95081967)
 				];
 			else
-				cent = [
+				receptorCenter = [
 					218,
-					FlxMath.lerp(50, 300, (daNote.strumTime - 104918.0327868854) / 2622.95081967)
+					FlxMath.lerp(50, 300, (note.strumTime - 104918.0327868854) / 2622.95081967)
 				];
-			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * Math.cos(daNote.strumTime * 3.1415926 / 163.93442623);
-			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * Math.sin(daNote.strumTime * 3.1415926 / 163.93442623);
+			note.x = receptorCenter[0] + (note.noteData - 1.5) * 112 * Math.cos(note.strumTime * 3.1415926 / 163.93442623);
+			note.y = receptorCenter[1] + (1.5 - note.noteData) * 112 * Math.sin(note.strumTime * 3.1415926 / 163.93442623);
 		}
-		else if (daNote.strumTime >= 107540.98360655754 && daNote.strumTime < 108852.45901639361)
+		else if (note.strumTime >= 107540.98360655754 && note.strumTime < 108852.45901639361)
 		{
-			cent = [
-				FlxMath.lerp(218, 1000, (daNote.strumTime - 107540.98360655754) / 1311.47540983),
+			receptorCenter = [
+				FlxMath.lerp(218, 1000, (note.strumTime - 107540.98360655754) / 1311.47540983),
 				300
 			];
-			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * Math.cos(daNote.strumTime * 3.1415926 / 163.93442623);
-			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * Math.sin(daNote.strumTime * 3.1415926 / 163.93442623);
+			note.x = receptorCenter[0] + (note.noteData - 1.5) * 112 * Math.cos(note.strumTime * 3.1415926 / 163.93442623);
+			note.y = receptorCenter[1] + (1.5 - note.noteData) * 112 * Math.sin(note.strumTime * 3.1415926 / 163.93442623);
 		}
-		else if (daNote.strumTime >= 108852.45901639361 && daNote.strumTime < 109508.19672131164)
+		else if (note.strumTime >= 108852.45901639361 && note.strumTime < 109508.19672131164)
 		{
-			cent = [
-				FlxMath.lerp(1000, 218, (daNote.strumTime - 108852.45901639361) / 655.737704917),
+			receptorCenter = [
+				FlxMath.lerp(1000, 218, (note.strumTime - 108852.45901639361) / 655.737704917),
 				300
 			];
-			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * Math.cos(daNote.strumTime * 3.1415926 / 163.93442623);
-			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * Math.sin(daNote.strumTime * 3.1415926 / 163.93442623);
+			note.x = receptorCenter[0] + (note.noteData - 1.5) * 112 * Math.cos(note.strumTime * 3.1415926 / 163.93442623);
+			note.y = receptorCenter[1] + (1.5 - note.noteData) * 112 * Math.sin(note.strumTime * 3.1415926 / 163.93442623);
 		}
-		else if (daNote.strumTime >= 109508.19672131164 && daNote.strumTime < 110163.93442622968)
+		else if (note.strumTime >= 109508.19672131164 && note.strumTime < 110163.93442622968)
 		{
-			cent = [
-				FlxMath.lerp(218, 1000, (daNote.strumTime - 109508.19672131164) / 655.737704917),
+			receptorCenter = [
+				FlxMath.lerp(218, 1000, (note.strumTime - 109508.19672131164) / 655.737704917),
 				300
 			];
-			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * Math.cos(daNote.strumTime * 3.1415926 / 163.93442623);
-			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * Math.sin(daNote.strumTime * 3.1415926 / 163.93442623);
+			note.x = receptorCenter[0] + (note.noteData - 1.5) * 112 * Math.cos(note.strumTime * 3.1415926 / 163.93442623);
+			note.y = receptorCenter[1] + (1.5 - note.noteData) * 112 * Math.sin(note.strumTime * 3.1415926 / 163.93442623);
 		}
-		else if (daNote.strumTime >= 110163.93442622968 && daNote.strumTime < 112786.88524590182)
+		else if (note.strumTime >= 110163.93442622968 && note.strumTime < 112786.88524590182)
 		{
 			if (FlxG.save.data.downscroll)
-				cent = [
-					FlxMath.lerp(1000, 218, (daNote.strumTime - 110163.93442622968) / 2622.95081967),
-					FlxMath.lerp(300, 50, (daNote.strumTime - 110163.93442622968) / 2622.95081967)
+				receptorCenter = [
+					FlxMath.lerp(1000, 218, (note.strumTime - 110163.93442622968) / 2622.95081967),
+					FlxMath.lerp(300, 50, (note.strumTime - 110163.93442622968) / 2622.95081967)
 				];
 			else
-				cent = [
-					FlxMath.lerp(1000, 218, (daNote.strumTime - 110163.93442622968) / 2622.95081967),
-					FlxMath.lerp(300, 550, (daNote.strumTime - 110163.93442622968) / 2622.95081967)
+				receptorCenter = [
+					FlxMath.lerp(1000, 218, (note.strumTime - 110163.93442622968) / 2622.95081967),
+					FlxMath.lerp(300, 550, (note.strumTime - 110163.93442622968) / 2622.95081967)
 				];
-			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * Math.cos(daNote.strumTime * 3.1415926 / 163.93442623);
-			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * Math.sin(daNote.strumTime * 3.1415926 / 163.93442623);
+			note.x = receptorCenter[0] + (note.noteData - 1.5) * 112 * Math.cos(note.strumTime * 3.1415926 / 163.93442623);
+			note.y = receptorCenter[1] + (1.5 - note.noteData) * 112 * Math.sin(note.strumTime * 3.1415926 / 163.93442623);
 		}
-		else if (daNote.strumTime >= 112786.88524590182 && daNote.strumTime < 115409.836066)
+		else if (note.strumTime >= 112786.88524590182 && note.strumTime < 115409.836066)
 		{
 			if (FlxG.save.data.downscroll)
-				cent = [
+				receptorCenter = [
 					218,
-					FlxMath.lerp(50, 550, (daNote.strumTime - 112786.88524590182) / 2622.95081967)
+					FlxMath.lerp(50, 550, (note.strumTime - 112786.88524590182) / 2622.95081967)
 				];
 			else
-				cent = [
+				receptorCenter = [
 					218,
-					FlxMath.lerp(550, 50, (daNote.strumTime - 112786.88524590182) / 2622.95081967)
+					FlxMath.lerp(550, 50, (note.strumTime - 112786.88524590182) / 2622.95081967)
 				];
-			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * Math.cos(daNote.strumTime * 3.1415926 / 163.93442623);
-			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * Math.sin(daNote.strumTime * 3.1415926 / 163.93442623);
+			note.x = receptorCenter[0] + (note.noteData - 1.5) * 112 * Math.cos(note.strumTime * 3.1415926 / 163.93442623);
+			note.y = receptorCenter[1] + (1.5 - note.noteData) * 112 * Math.sin(note.strumTime * 3.1415926 / 163.93442623);
 		}
-		else if (daNote.strumTime >= 83934 && daNote.strumTime < 94426)
+		else if (note.strumTime >= 83934 && note.strumTime < 94426)
 		{
 			if (FlxG.save.data.downscroll)
-				daNote.y = (PlayMoving.ylist[daNote.noteData]
-					+ (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (PlayMoving.receptorY[note.noteData]
+					+ (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			else
-				daNote.y = (PlayMoving.ylist[daNote.noteData]
-					- (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (PlayMoving.receptorY[note.noteData]
+					- (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 		}
-		else if (daNote.strumTime >= 94426 && daNote.strumTime < 104918)
+		else if (note.strumTime >= 94426 && note.strumTime < 104918)
 		{
 			if (FlxG.save.data.downscroll)
-				daNote.y = (strumLine.y + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (strumLine.y + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			else
-				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-			if (daNote.mustPress)
-				daNote.x = PlayMoving.pxlist[daNote.noteData];
+				note.y = (strumLine.y - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
+			if (note.mustPress)
+				note.x = PlayMoving.playerReceptorX[note.noteData];
 			else
-				daNote.x = PlayMoving.xlist[daNote.noteData];
-			if (daNote.isSustainNote)
-				daNote.x += daNote.width;
+				note.x = PlayMoving.opponentReceptorX[note.noteData];
+			if (note.isSustainNote)
+				note.x += note.width;
 		}
-		else if (daNote.strumTime >= 157377 && daNote.strumTime < 178274)
+		else if (note.strumTime >= 157377 && note.strumTime < 178274)
 		{
 			if (FlxG.save.data.downscroll)
-				daNote.y = (PlayMoving.ylist[daNote.noteData]
-					+ (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (PlayMoving.receptorY[note.noteData]
+					+ (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			else
-				daNote.y = (PlayMoving.ylist[daNote.noteData]
-					- (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (PlayMoving.receptorY[note.noteData]
+					- (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 		}
-		else if (daNote.strumTime >= 188852 && daNote.strumTime < 199257)
+		else if (note.strumTime >= 188852 && note.strumTime < 199257)
 		{
 			if (FlxG.save.data.downscroll)
-				daNote.y = (strumLine.y + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (strumLine.y + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			else
-				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-			if (daNote.mustPress)
-				daNote.x = PlayMoving.pxlist[daNote.noteData];
+				note.y = (strumLine.y - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
+			if (note.mustPress)
+				note.x = PlayMoving.playerReceptorX[note.noteData];
 			else
-				daNote.x = PlayMoving.xlist[daNote.noteData];
+				note.x = PlayMoving.opponentReceptorX[note.noteData];
 		}
-		else if (daNote.strumTime >= 199344 && daNote.strumTime < 209755)
+		else if (note.strumTime >= 199344 && note.strumTime < 209755)
 		{
-			if (PlayMoving.sy > 300)
-				daNote.y = (PlayMoving.sy + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+			if (PlayMoving.receptorBaselineY > 300)
+				note.y = (PlayMoving.receptorBaselineY + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			else
-				daNote.y = (PlayMoving.sy - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (PlayMoving.receptorBaselineY - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 		}
-		else if (daNote.strumTime >= 209836 && daNote.strumTime < 220164)
+		else if (note.strumTime >= 209836 && note.strumTime < 220164)
 		{
-			if (daNote.mustPress)
+			if (note.mustPress)
 			{
 				if (FlxG.save.data.downscroll)
-					daNote.y = (PlayMoving.pylist[daNote.noteData]
-						+ (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+					note.y = (PlayMoving.playerReceptorY[note.noteData]
+						+ (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 				else
-					daNote.y = (PlayMoving.pylist[daNote.noteData]
-						- (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+					note.y = (PlayMoving.playerReceptorY[note.noteData]
+						- (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			}
 			else
 			{
 				if (FlxG.save.data.downscroll)
-					daNote.y = (PlayMoving.ylist[daNote.noteData]
-						+ (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+					note.y = (PlayMoving.receptorY[note.noteData]
+						+ (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 				else
-					daNote.y = (PlayMoving.ylist[daNote.noteData]
-						- (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+					note.y = (PlayMoving.receptorY[note.noteData]
+						- (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			}
 		}
-		else if (daNote.strumTime >= 220327 && daNote.strumTime < 241230)
+		else if (note.strumTime >= 220327 && note.strumTime < 241230)
 		{
 			if (FlxG.save.data.downscroll)
-				daNote.y = (strumLine.y + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(3, 2)));
+				note.y = (strumLine.y + (Conductor.songPosition - note.strumTime) * (0.45 * FlxMath.roundDecimal(3, 2)));
 			else
-				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(3, 2)));
+				note.y = (strumLine.y - (Conductor.songPosition - note.strumTime) * (0.45 * FlxMath.roundDecimal(3, 2)));
 		}
 		else
 		{
 			if (FlxG.save.data.downscroll)
-				daNote.y = (strumLine.y + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (strumLine.y + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 			else
-				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
+				note.y = (strumLine.y - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 		}
 	}
 
-	public static function spos(dastrum:NoteStrum, strumLine:FlxSprite)
+	public static function updateReceptorPosition(receptor:NoteStrum, strumLine:FlxSprite)
 	{
 		if (Conductor.songPosition >= 20655.737704918025 && Conductor.songPosition < 20819.672131147534)
 		{
-			if (dastrum.x < 640)
+			if (receptor.x < 640)
 			{
 				if (FlxG.save.data.downscroll)
-					dastrum.y = 550 - (Conductor.songPosition - 20655.737704918025) / 163.93442623 * (FlxG.height - 550);
+					receptor.y = 550 - (Conductor.songPosition - 20655.737704918025) / 163.93442623 * (FlxG.height - 550);
 				else
-					dastrum.y = 50 - (Conductor.songPosition - 20655.737704918025) / 163.93442623 * (dastrum.height - 50);
+					receptor.y = 50 - (Conductor.songPosition - 20655.737704918025) / 163.93442623 * (receptor.height - 50);
 			}
 		}
 		else if (Conductor.songPosition >= 20819.672131147534 && Conductor.songPosition < 20983.60655737704)
 		{
-			if (dastrum.x < 640)
+			if (receptor.x < 640)
 			{
 				if (FlxG.save.data.downscroll)
-					dastrum.y = dastrum.height - (Conductor.songPosition - 20819.672131147534) / 163.93442623 * (dastrum.height - 50);
+					receptor.y = receptor.height - (Conductor.songPosition - 20819.672131147534) / 163.93442623 * (receptor.height - 50);
 				else
-					dastrum.y = FlxG.height - (Conductor.songPosition - 20819.672131147534) / 163.93442623 * (FlxG.height - 550);
+					receptor.y = FlxG.height - (Conductor.songPosition - 20819.672131147534) / 163.93442623 * (FlxG.height - 550);
 			}
 		}
 		else if (Conductor.songPosition >= 20983.60655737704 && Conductor.songPosition < 21147.54098360655)
 		{
-			if (dastrum.x > 640)
+			if (receptor.x > 640)
 			{
 				if (FlxG.save.data.downscroll)
-					dastrum.y = 550 - (Conductor.songPosition - 20983.60655737704) / 163.93442623 * (FlxG.height - 550);
+					receptor.y = 550 - (Conductor.songPosition - 20983.60655737704) / 163.93442623 * (FlxG.height - 550);
 				else
-					dastrum.y = 50 - (Conductor.songPosition - 20983.60655737704) / 163.93442623 * (dastrum.height - 50);
+					receptor.y = 50 - (Conductor.songPosition - 20983.60655737704) / 163.93442623 * (receptor.height - 50);
 			}
 		}
 		else if (Conductor.songPosition >= 21147.54098360655 && Conductor.songPosition < 21311.475409836057)
 		{
-			if (dastrum.x > 640)
+			if (receptor.x > 640)
 			{
 				if (FlxG.save.data.downscroll)
-					dastrum.y = dastrum.height - (Conductor.songPosition - 21147.54098360655) / 163.93442623 * (dastrum.height - 50);
+					receptor.y = receptor.height - (Conductor.songPosition - 21147.54098360655) / 163.93442623 * (receptor.height - 50);
 				else
-					dastrum.y = FlxG.height - (Conductor.songPosition - 21147.54098360655) / 163.93442623 * (FlxG.height - 550);
+					receptor.y = FlxG.height - (Conductor.songPosition - 21147.54098360655) / 163.93442623 * (FlxG.height - 550);
 			}
 		}
 		else if (Conductor.songPosition >= 31475.409836065555 && Conductor.songPosition < 31576)
 		{
 			if (FlxG.save.data.downscroll)
-				dastrum.y = 550;
+				receptor.y = 550;
 			else
-				dastrum.y = 50;
+				receptor.y = 50;
 		}
 		else if (Conductor.songPosition >= 73442.62295081967 && Conductor.songPosition < 74442.62295081967)
 		{
-			switch (dastrum.ID)
+			switch (receptor.ID)
 			{
 				case 0:
-					dastrum.x = 584;
-					dastrum.y = 162;
+					receptor.x = 584;
+					receptor.y = 162;
 				case 1:
-					dastrum.x = 584;
-					dastrum.y = 50;
+					receptor.x = 584;
+					receptor.y = 50;
 				case 2:
-					dastrum.x = 696;
-					dastrum.y = 50;
+					receptor.x = 696;
+					receptor.y = 50;
 				case 3:
-					dastrum.x = 696;
-					dastrum.y = 162;
+					receptor.x = 696;
+					receptor.y = 162;
 			}
 		}
 		else if (Conductor.songPosition >= 104918.0327868854 && Conductor.songPosition < 107540.98360655754)
 		{
 			if (FlxG.save.data.downscroll)
-				cent = [
+				receptorCenter = [
 					218,
 					FlxMath.lerp(550, 300, (Conductor.songPosition - 104918.0327868854) / 2622.95081967)
 				];
 			else
-				cent = [
+				receptorCenter = [
 					218,
 					FlxMath.lerp(50, 300, (Conductor.songPosition - 104918.0327868854) / 2622.95081967)
 				];
-			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.x = receptorCenter[0] + (receptor.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.y = receptorCenter[1] + (1.5 - receptor.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 		else if (Conductor.songPosition >= 107540.98360655754 && Conductor.songPosition < 108852.45901639361)
 		{
-			cent = [
+			receptorCenter = [
 				FlxMath.lerp(218, 1000, (Conductor.songPosition - 107540.98360655754) / 1311.47540983),
 				300
 			];
-			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.x = receptorCenter[0] + (receptor.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.y = receptorCenter[1] + (1.5 - receptor.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 		else if (Conductor.songPosition >= 108852.45901639361 && Conductor.songPosition < 109508.19672131164)
 		{
-			cent = [
+			receptorCenter = [
 				FlxMath.lerp(1000, 218, (Conductor.songPosition - 108852.45901639361) / 655.737704917),
 				300
 			];
-			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.x = receptorCenter[0] + (receptor.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.y = receptorCenter[1] + (1.5 - receptor.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 		else if (Conductor.songPosition >= 109508.19672131164 && Conductor.songPosition < 110163.93442622968)
 		{
-			cent = [
+			receptorCenter = [
 				FlxMath.lerp(218, 1000, (Conductor.songPosition - 109508.19672131164) / 655.737704917),
 				300
 			];
-			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.x = receptorCenter[0] + (receptor.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.y = receptorCenter[1] + (1.5 - receptor.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 		else if (Conductor.songPosition >= 110163.93442622968 && Conductor.songPosition < 112786.88524590182)
 		{
 			if (FlxG.save.data.downscroll)
-				cent = [
+				receptorCenter = [
 					FlxMath.lerp(1000, 218, (Conductor.songPosition - 110163.93442622968) / 2622.95081967),
 					FlxMath.lerp(300, 50, (Conductor.songPosition - 110163.93442622968) / 2622.95081967)
 				];
 			else
-				cent = [
+				receptorCenter = [
 					FlxMath.lerp(1000, 218, (Conductor.songPosition - 110163.93442622968) / 2622.95081967),
 					FlxMath.lerp(300, 550, (Conductor.songPosition - 110163.93442622968) / 2622.95081967)
 				];
-			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.x = receptorCenter[0] + (receptor.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.y = receptorCenter[1] + (1.5 - receptor.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 		else if (Conductor.songPosition >= 112786.88524590182 && Conductor.songPosition < 115409.836066)
 		{
 			if (FlxG.save.data.downscroll)
-				cent = [
+				receptorCenter = [
 					218,
 					FlxMath.lerp(50, 550, (Conductor.songPosition - 112786.88524590182) / 2622.95081967)
 				];
 			else
-				cent = [
+				receptorCenter = [
 					218,
 					FlxMath.lerp(550, 50, (Conductor.songPosition - 112786.88524590182) / 2622.95081967)
 				];
-			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.x = receptorCenter[0] + (receptor.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.y = receptorCenter[1] + (1.5 - receptor.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 		else if (Conductor.songPosition >= 83934.42622950824 && Conductor.songPosition < 94426.22950819682)
 		{
-			dastrum.x = PlayMoving.oxlist[dastrum.ID];
+			receptor.x = PlayMoving.defaultOpponentReceptorX[receptor.ID];
 			if (FlxG.save.data.downscroll)
-				dastrum.y = 550 - 30 * (dastrum.ID);
+				receptor.y = 550 - 30 * (receptor.ID);
 			else
-				dastrum.y = 50 + 30 * (dastrum.ID);
-			PlayMoving.ylist[dastrum.ID] = dastrum.y;
+				receptor.y = 50 + 30 * (receptor.ID);
+			PlayMoving.receptorY[receptor.ID] = receptor.y;
 		}
 		else if (Conductor.songPosition >= 94426.22950819682 && Conductor.songPosition < 104918.0327868854)
 		{
 			if (Conductor.songPosition < 94508.19672131157)
 			{
 				if (FlxG.save.data.downscroll)
-					dastrum.y = FlxMath.lerp(550 - 30 * (dastrum.ID), 550, (Conductor.songPosition - 94426.22950819682) / 81.9672131148);
+					receptor.y = FlxMath.lerp(550 - 30 * (receptor.ID), 550, (Conductor.songPosition - 94426.22950819682) / 81.9672131148);
 				else
-					dastrum.y = FlxMath.lerp(50 + 30 * (dastrum.ID), 50, (Conductor.songPosition - 94426.22950819682) / 81.9672131148);
+					receptor.y = FlxMath.lerp(50 + 30 * (receptor.ID), 50, (Conductor.songPosition - 94426.22950819682) / 81.9672131148);
 			}
 			else
-				dastrum.y = strumLine.y;
-			if (dastrum.x < 640)
+				receptor.y = strumLine.y;
+			if (receptor.x < 640)
 			{
-				dastrum.x = 218 + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 655.73770492);
-				PlayMoving.xlist[dastrum.ID] = dastrum.x;
+				receptor.x = 218 + (receptor.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 655.73770492);
+				PlayMoving.opponentReceptorX[receptor.ID] = receptor.x;
 			}
 			else
 			{
-				dastrum.x = 858 + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 655.73770492);
-				PlayMoving.pxlist[dastrum.ID] = dastrum.x;
+				receptor.x = 858 + (receptor.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 655.73770492);
+				PlayMoving.playerReceptorX[receptor.ID] = receptor.x;
 			}
 		}
 		else if (Conductor.songPosition >= 115409.83606557397 && Conductor.songPosition < 115509.83606557397)
 		{
-			if (dastrum.x < 640)
-				dastrum.x = PlayMoving.oxlist[dastrum.ID];
+			if (receptor.x < 640)
+				receptor.x = PlayMoving.defaultOpponentReceptorX[receptor.ID];
 			else
-				dastrum.x = PlayMoving.poxlist[dastrum.ID];
-			dastrum.y = strumLine.y;
+				receptor.x = PlayMoving.defaultPlayerReceptorX[receptor.ID];
+			receptor.y = strumLine.y;
 		}
 		else if (Conductor.songPosition >= 157377.04918032826 && Conductor.songPosition < 178273.22404371633)
 		{
 			if (FlxG.save.data.downscroll)
-				dastrum.y = FlxMath.lerp(550, 550 - 30 * (dastrum.ID), (Conductor.songPosition % 1311.47540984) / 1311.47540984);
+				receptor.y = FlxMath.lerp(550, 550 - 30 * (receptor.ID), (Conductor.songPosition % 1311.47540984) / 1311.47540984);
 			else
-				dastrum.y = FlxMath.lerp(50, 50 + 30 * (dastrum.ID), (Conductor.songPosition % 1311.47540984) / 1311.47540984);
-			PlayMoving.ylist[dastrum.ID] = dastrum.y;
+				receptor.y = FlxMath.lerp(50, 50 + 30 * (receptor.ID), (Conductor.songPosition % 1311.47540984) / 1311.47540984);
+			PlayMoving.receptorY[receptor.ID] = receptor.y;
 		}
 		else if (Conductor.songPosition >= 178360.6557377054 && Conductor.songPosition < 178460.6557377054)
 		{
 			if (FlxG.save.data.downscroll)
-				dastrum.y = 550;
+				receptor.y = 550;
 			else
-				dastrum.y = 50;
-			PlayMoving.ylist[dastrum.ID] = dastrum.y;
+				receptor.y = 50;
+			PlayMoving.receptorY[receptor.ID] = receptor.y;
 		}
 		else if (Conductor.songPosition >= 188852.459016394 && Conductor.songPosition < 199344.26229508256)
 		{
-			if (dastrum.x < 640)
+			if (receptor.x < 640)
 			{
-				dastrum.x = 50 + 56 * dastrum.ID * (Math.cos(Conductor.songPosition / 1311.47540984 * 3.1415926) + 1);
-				PlayMoving.xlist[dastrum.ID] = dastrum.x;
+				receptor.x = 50 + 56 * receptor.ID * (Math.cos(Conductor.songPosition / 1311.47540984 * 3.1415926) + 1);
+				PlayMoving.opponentReceptorX[receptor.ID] = receptor.x;
 			}
 			else
 			{
-				dastrum.x = 1026 - 56 * (3 - dastrum.ID) * (Math.cos(Conductor.songPosition / 1311.47540984 * 3.1415926) + 1);
-				PlayMoving.pxlist[dastrum.ID] = dastrum.x;
+				receptor.x = 1026 - 56 * (3 - receptor.ID) * (Math.cos(Conductor.songPosition / 1311.47540984 * 3.1415926) + 1);
+				PlayMoving.playerReceptorX[receptor.ID] = receptor.x;
 			}
 		}
 		else if (Conductor.songPosition >= 199344.26229508256 && Conductor.songPosition < 209836.065574)
@@ -464,143 +429,183 @@ class M_familanna
 			if (Conductor.songPosition >= 204590.16393442685 && Conductor.songPosition < 204640.16393442685)
 			{
 				if (FlxG.save.data.downscroll)
-					PlayMoving.sy = 550;
+					PlayMoving.receptorBaselineY = 550;
 				else
-					PlayMoving.sy = 50;
+					PlayMoving.receptorBaselineY = 50;
 			}
 			if (Conductor.songPosition >= 207213.114754099 && Conductor.songPosition < 207263.114754099)
 			{
 				if (FlxG.save.data.downscroll)
-					PlayMoving.sy = 550;
+					PlayMoving.receptorBaselineY = 550;
 				else
-					PlayMoving.sy = 50;
+					PlayMoving.receptorBaselineY = 50;
 			}
-			if (dastrum.x < 640)
-				dastrum.x = PlayMoving.oxlist[dastrum.ID];
+			if (receptor.x < 640)
+				receptor.x = PlayMoving.defaultOpponentReceptorX[receptor.ID];
 			else
-				dastrum.x = PlayMoving.poxlist[dastrum.ID];
-			dastrum.y = PlayMoving.sy;
+				receptor.x = PlayMoving.defaultPlayerReceptorX[receptor.ID];
+			receptor.y = PlayMoving.receptorBaselineY;
 		}
 		else if (Conductor.songPosition >= 209836.065574 && Conductor.songPosition < 220327.868852)
 		{
-			if (dastrum.x < 640)
-				dastrum.y = PlayMoving.ylist[dastrum.ID];
+			if (receptor.x < 640)
+				receptor.y = PlayMoving.receptorY[receptor.ID];
 			else
-				dastrum.y = PlayMoving.pylist[dastrum.ID];
+				receptor.y = PlayMoving.playerReceptorY[receptor.ID];
 		}
 		else if (Conductor.songPosition >= 220327.8688524597 && Conductor.songPosition < 241229.5081967221)
 		{
 			if (FlxG.save.data.downscroll)
-				dastrum.y = 550;
+				receptor.y = 550;
 			else
-				dastrum.y = 50;
+				receptor.y = 50;
 		}
 	}
 
-	public static function pspos(dastrum:NoteStrum, strumLine:FlxSprite)
+	public static function updatePlayerReceptorPosition(receptor:NoteStrum, strumLine:FlxSprite)
 	{
 		if (Conductor.songPosition >= 73442.62295081967 && Conductor.songPosition < 74442.62295081967)
 		{
-			switch (dastrum.ID)
+			switch (receptor.ID)
 			{
 				case 0:
-					dastrum.x = 584;
-					dastrum.y = 468;
+					receptor.x = 584;
+					receptor.y = 468;
 				case 1:
-					dastrum.x = 584;
-					dastrum.y = 356;
+					receptor.x = 584;
+					receptor.y = 356;
 				case 2:
-					dastrum.x = 696;
-					dastrum.y = 356;
+					receptor.x = 696;
+					receptor.y = 356;
 				case 3:
-					dastrum.x = 696;
-					dastrum.y = 468;
+					receptor.x = 696;
+					receptor.y = 468;
 			}
 		}
 		else if (Conductor.songPosition >= 83934.42622950824 && Conductor.songPosition < 94426.22950819682)
 		{
-			dastrum.x = PlayMoving.poxlist[dastrum.ID];
+			receptor.x = PlayMoving.defaultPlayerReceptorX[receptor.ID];
 		}
 		else if (Conductor.songPosition >= 104918.0327868854 && Conductor.songPosition < 115409.836066)
 		{
-			dastrum.x = 858 + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = strumLine.y + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.x = 858 + (receptor.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			receptor.y = strumLine.y + (1.5 - receptor.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 	}
 
-	public static function ongood(daNote:Note):Void
+	public static function onGoodNoteHit(note:Note):Void
 	{
-		if (daNote.strumTime >= 199344 && daNote.strumTime < 204427)
+		if (note.strumTime >= 199344 && note.strumTime < 204427)
 		{
-			PlayMoving.sy = 600 - PlayMoving.sy;
+			PlayMoving.receptorBaselineY = 600 - PlayMoving.receptorBaselineY;
 		}
-		else if (daNote.strumTime >= 204590 && daNote.strumTime < 209755)
+		else if (note.strumTime >= 204590 && note.strumTime < 209755)
 		{
 			if (FlxG.save.data.downscroll)
-				PlayMoving.sy -= 5;
+				PlayMoving.receptorBaselineY -= 5;
 			else
-				PlayMoving.sy += 5;
+				PlayMoving.receptorBaselineY += 5;
 		}
-		else if (daNote.strumTime >= 209836 && daNote.strumTime < 220164)
+		else if (note.strumTime >= 209836 && note.strumTime < 220164)
 		{
 			if (FlxG.save.data.downscroll)
 			{
-				if (daNote.mustPress)
-					PlayMoving.pylist[daNote.noteData] -= 30;
+				if (note.mustPress)
+					PlayMoving.playerReceptorY[note.noteData] -= 30;
 				else
-					PlayMoving.ylist[daNote.noteData] -= 30;
+					PlayMoving.receptorY[note.noteData] -= 30;
 			}
 			else
 			{
-				if (daNote.mustPress)
-					PlayMoving.pylist[daNote.noteData] += 30;
+				if (note.mustPress)
+					PlayMoving.playerReceptorY[note.noteData] += 30;
 				else
-					PlayMoving.ylist[daNote.noteData] += 30;
+					PlayMoving.receptorY[note.noteData] += 30;
 			}
 		}
 	}
 
-	inline static public function show(daNote:Note):Bool
+	inline static public function shouldHideNote(note:Note):Bool
 	{
-		if (daNote.strumTime > 20983 && daNote.strumTime < 31388)
+		if (note.strumTime > 20983 && note.strumTime < 31388)
 		{
 			if (FlxG.save.data.downscroll)
-				return daNote.y > FlxG.height;
+				return note.y > FlxG.height;
 			else
-				return daNote.y < -daNote.height;
+				return note.y < -note.height;
 		}
 		else
 		{
 			if (FlxG.save.data.downscroll)
-				return daNote.y < -daNote.height;
+				return note.y < -note.height;
 			else
-				return daNote.y > FlxG.height;
+				return note.y > FlxG.height;
 		}
 	}
 
-	inline static public function kill(daNote:Note):Bool
+	inline static public function shouldRemoveNote(note:Note):Bool
 	{
-		if (daNote.strumTime > 20983 && daNote.strumTime < 31388)
+		if (note.strumTime > 20983 && note.strumTime < 31388)
 		{
 			if (FlxG.save.data.downscroll)
-				return daNote.y < -daNote.height;
+				return note.y < -note.height;
 			else
-				return daNote.y > FlxG.height;
+				return note.y > FlxG.height;
 		}
-		else if (daNote.strumTime > 73442 && daNote.strumTime < 83847)
+		else if (note.strumTime > 73442 && note.strumTime < 83847)
 		{
-			return (daNote.x > FlxG.width || daNote.x < -daNote.width) && Conductor.songPosition > daNote.strumTime;
+			return (note.x > FlxG.width || note.x < -note.width) && Conductor.songPosition > note.strumTime;
 		}
-		else if (daNote.strumTime >= 199344 && daNote.strumTime < 220164)
+		else if (note.strumTime >= 199344 && note.strumTime < 220164)
 		{
-			return Conductor.songPosition > daNote.strumTime + 1000 / 6;
+			return Conductor.songPosition > note.strumTime + 1000 / 6;
 		}
 		else
 		{
 			if (FlxG.save.data.downscroll)
-				return daNote.y > FlxG.height;
+				return note.y > FlxG.height;
 			else
-				return daNote.y < -daNote.height;
+				return note.y < -note.height;
 		}
 	}
+	static function applyNotesFrom73442(note:Note, strumLine:FlxSprite):Void
+	{
+		if (note.mustPress)
+		{
+			switch (note.noteData)
+			{
+				case 0:
+					note.x = (584 + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
+					note.y = 468;
+				case 1:
+					note.x = (584 + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
+					note.y = 356;
+				case 2:
+					note.x = (696 - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
+					note.y = 356;
+				case 3:
+					note.x = (696 - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
+					note.y = 468;
+			}
+		}
+		else
+		{
+			switch (note.noteData)
+			{
+				case 0:
+					note.x = (584 + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
+					note.y = 162;
+				case 1:
+					note.x = (584 + (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
+					note.y = 50;
+				case 2:
+					note.x = (696 - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
+					note.y = 50;
+				case 3:
+					note.x = (696 - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
+					note.y = 162;
+			}
+		}
+	}
+
 }

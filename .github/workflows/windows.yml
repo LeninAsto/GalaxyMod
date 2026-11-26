@@ -1,0 +1,46 @@
+name: Windows build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: 4.3.7
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          $PSNativeCommandUseErrorActionPreference = $true
+          haxelib install hxcpp 4.3.2 --quiet
+          haxelib git lime https://github.com/Psych-Plus-Team/lime.git 350d4a81c22af94970bed050c410f39501734b45 --quiet
+          haxelib git openfl https://github.com/Psych-Plus-Team/openfl.git dc7238456ea7bb7e3726dcf447513aceaa1a8ba9 --quiet
+          haxelib install hscript 2.7.0 --quiet
+          haxelib install flixel-ui 2.6.5 --quiet
+          haxelib git polymod https://github.com/Psych-Plus-Team/polymod.git d1d1d5b51624f865eeaaadf455fc05dd62801479 --quiet
+          haxelib install hxdiscord_rpc 1.3.0 --quiet
+          haxelib install hxvlc 2.3.2 --quiet
+          git clone https://github.com/HaxeFlixel/flixel.git .ci-deps/flixel
+          git -C .ci-deps/flixel checkout 91d16d375166e67a14a19bce41b7d5efec0469d9
+          git -C .ci-deps/flixel apply "$env:GITHUB_WORKSPACE/.github/patches/flixel.patch"
+          haxelib dev flixel "$env:GITHUB_WORKSPACE/.ci-deps/flixel"
+          git clone https://github.com/HaxeFlixel/flixel-addons.git .ci-deps/flixel-addons
+          git -C .ci-deps/flixel-addons checkout 58c25298bc55b5c50af3a2670515c7efa14239f5
+          git -C .ci-deps/flixel-addons apply "$env:GITHUB_WORKSPACE/.github/patches/flixel-addons.patch"
+          haxelib dev flixel-addons "$env:GITHUB_WORKSPACE/.ci-deps/flixel-addons"
+      - name: Build
+        run: haxelib run lime build windows
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v6
+        with:
+          name: GalaxyMod-windows
+          path: export/release/windows/bin
+          if-no-files-found: error

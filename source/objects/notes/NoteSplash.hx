@@ -122,8 +122,8 @@ class NoteSplash extends NoteObject
 			case 2:
 				var inc:Vector<Int> = new Vector(6, true, [0, 1, 2, 1, 3, 2]);
 				var gdata:FlxGraphic = mapData();
-				var rem:Float = 1 - renderer.bili;
-				while (rem + 0.1 < 1)
+				var segmentCursor:Float = 1 - renderer.pathRatio;
+				while (segmentCursor + 0.1 < 1)
 				{
 					for (camera in cameras)
 					{
@@ -131,8 +131,8 @@ class NoteSplash extends NoteObject
 						{
 							continue;
 						}
-						var start:Float = rem;
-						var end:Float = rem + 0.1;
+						var start:Float = segmentCursor;
+						var end:Float = segmentCursor + 0.1;
 						var lists:Array<Array<Float>> = renderer.start(start, end);
 						var v:Vector<Float> = new Vector(8, true, lists[0]);
 						var u:Vector<Float> = new Vector(lists[1].length, true, lists[1]);
@@ -140,7 +140,7 @@ class NoteSplash extends NoteObject
 							end = 1;
 						getScreenPosition(_point, camera).subtract(offset);
 						camera.drawTriangles(gdata, v, inc, u, null, _point, blend, false, antialiasing);
-						rem = end;
+						segmentCursor = end;
 					}
 				}
 			case 1:

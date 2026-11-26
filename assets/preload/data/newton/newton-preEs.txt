@@ -1,0 +1,36 @@
+:MUSIC:seriouspilot
+:famiserious:Oh, no...
+:famiserious:Ha llegado el momento, «eso» apareció.
+:kastiright:Por fin. ¿Pero por qué dices «oh, no»?
+:famiserious:El lugar donde apareció...
+:kastiserious:Oh, no... No llegaremos a tiempo.
+:famiserious:Sí, ellos...
+:SCREEN:
+:kastiserious:Espera...
+:kastishock:¡Mira eso!
+:famishock:Dios mío.
+:famishock:Hay una señal de energía muy superior a nuestra tecnología.
+:kastiright:Parece que debería salir, ¿no?
+:fami:Sí, ten cuidado.
+:SCREEN:
+:MUSIC:showup
+:kastispace:(Oh...)
+:kastispace:(Es una extraterrestre.)
+:unknown:E*&T&**&E*&T*@W?
+:kastispace:(Bien, es de una especie que nunca hemos visto.)
+:kastispaceserious:(Es imposible aprender su idioma en tan poco tiempo...)
+:SCREEN:
+:bf:Beep bop?
+:kastispaceo:Uy, ¿por qué están ustedes dos ahí?
+:gf:Solo tenemos curiosidad.
+:gf:¿Es una extraterrestre?
+:kastispace:Sí.
+:bf:Beep beep bop!
+:SCREEN:
+:bfspace:Beep beep bop bop!
+:unknown:&(*@T!*&!T(*!&**#*^(
+:unknown:(*&&)@&#%^###^@
+:unknown:(*#&(@#))(!
+:bfspace:Beep bop beep boop?
+:gfspace:Vamos, es una extraterrestre. Claro que no entendemos lo que dice.
+:unknown:&^(^%&^$*

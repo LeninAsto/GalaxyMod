@@ -1,0 +1,16 @@
+:MUSIC:spaceship
+:kastiright:Oye, Rara. Ayúdanos a calcular la posición de esos planetas.
+:rara:Bien, mmm...
+:rara:¡Listo! Enviaré los datos a tu panel.
+:kastiright:¡Gracias, Rara!
+:famiright:Aún me pregunto algo. Si eres sacerdotisa, ¿por qué te uniste a una organización científica?
+:rara:Eh...
+:SCREEN:
+:MUSIC:rayarara
+:raramiko:Mmm...
+:raramiko:Hoy hace un día hermoso.
+:raramiko:Los pájaros cantan, las flores...
+:MUSIC:
+:SCREEN:
+:none:(Explosión)
+:raramikoshocked:¿Qué?

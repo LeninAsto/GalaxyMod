@@ -1,0 +1,18 @@
+:famitir:(Bostezo) Conducir la nave todo el día es agotador...
+:famitir:...aunque en el espacio no hay «día».
+:SCREEN:
+:bf:Beep!
+:famitir:¿Qué?
+:gf:Quiere una batalla de rap contigo.
+:famitir:¿En serio?
+:famiang:¿Sabes lo dañino que es para el cuerpo humano conducir una nave sin descansar?
+:famitir:Ahora me toca descansar. Necesito dormir.
+:bf:Beep beep boop!
+:gf:Últimamente te has vuelto muy competitivo...
+:gf:Sabes que solo tiene 14 años, igual que Kastimagina, ¿verdad?
+:bf:Bop.
+:MUSIC:famitheme
+:famiang:Bien, ¿de verdad quieres una batalla de rap?
+:fami:Hagámoslo.
+:fami:...Soy Familanna Arcala Mathena.
+:fami:No me culpes si te resulta demasiado fácil.

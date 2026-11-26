@@ -19,15 +19,15 @@ using StringTools;
 class RenderPath
 {
 	public var mode:Int;
-	public var par:Array<Float>;
+	public var parameters:Array<Float>;
 	public var isSplash:Bool = false;
 
-	public var bili:Float = 1;
+	public var pathRatio:Float = 1;
 
-	public function new(mode:Int, pars:Array<Float>, isSplash:Bool = false)
+	public function new(mode:Int, params:Array<Float>, isSplash:Bool = false)
 	{
 		this.mode = mode;
-		par = pars;
+		parameters = params;
 		this.isSplash = isSplash;
 	}
 
@@ -37,43 +37,43 @@ class RenderPath
 		switch (mode)
 		{
 			case 0: // circle [num, all, x, y, r]
-				var sorder:Float = (par[0] + head) / par[1];
-				var eorder:Float = (par[0] + tail) / par[1];
+				var startOrder:Float = (parameters[0] + head) / parameters[1];
+				var endOrder:Float = (parameters[0] + tail) / parameters[1];
 
-				var ang1 = sorder * (2 * Math.PI);
-				var ang2 = eorder * (2 * Math.PI);
+				var ang1 = startOrder * (2 * Math.PI);
+				var ang2 = endOrder * (2 * Math.PI);
 
-				var x1 = par[2] - Math.sin(ang1) * par[4];
-				var y1 = par[3] + Math.cos(ang1) * par[4];
-				var x2 = par[2] - Math.sin(ang2) * par[4];
-				var y2 = par[3] + Math.cos(ang2) * par[4];
+				var x1 = parameters[2] - Math.sin(ang1) * parameters[4];
+				var y1 = parameters[3] + Math.cos(ang1) * parameters[4];
+				var x2 = parameters[2] - Math.sin(ang2) * parameters[4];
+				var y2 = parameters[3] + Math.cos(ang2) * parameters[4];
 
-				return [[par[2], par[3], x1, y1, par[2], par[3], x2, y2], uvt];
-			case 1: // angle [sdist, edist, x, y, width, ang, maxdis]
-				var sdist:Float = FlxMath.lerp(par[0], par[1], head);
-				var edist:Float = FlxMath.lerp(par[0], par[1], tail);
+				return [[parameters[2], parameters[3], x1, y1, parameters[2], parameters[3], x2, y2], uvt];
+			case 1: // angle [startDistance, endDistance, x, y, width, angleDegrees, maxDistance]
+				var startDistance:Float = FlxMath.lerp(parameters[0], parameters[1], head);
+				var endDistance:Float = FlxMath.lerp(parameters[0], parameters[1], tail);
 
-				var tael:Float = tail;
-				if (par[6] > 0 && sdist > par[6])
+				var clippedTail:Float = tail;
+				if (parameters[6] > 0 && startDistance > parameters[6])
 					return [[0, 0, 0, 0, 0, 0, 0, 0], uvt];
-				if (par[6] > 0 && edist > par[6])
+				if (parameters[6] > 0 && endDistance > parameters[6])
 				{
-					tael = head + (par[6] - sdist) / (edist - sdist) * (tail - head);
-					edist = par[6];
+					clippedTail = head + (parameters[6] - startDistance) / (endDistance - startDistance) * (tail - head);
+					endDistance = parameters[6];
 				}
 
-				var ang:Float = par[5] / 180 * Math.PI;
+				var angleRadians:Float = parameters[5] / 180 * Math.PI;
 
-				var x1:Float = par[2] - Math.cos(ang) * par[4] / 2 - Math.sin(ang) * sdist;
-				var y1:Float = par[3] - Math.sin(ang) * par[4] / 2 + Math.cos(ang) * sdist;
-				var x2:Float = par[2] + Math.cos(ang) * par[4] / 2 - Math.sin(ang) * sdist;
-				var y2:Float = par[3] + Math.sin(ang) * par[4] / 2 + Math.cos(ang) * sdist;
-				var x3:Float = par[2] - Math.cos(ang) * par[4] / 2 - Math.sin(ang) * edist;
-				var y3:Float = par[3] - Math.sin(ang) * par[4] / 2 + Math.cos(ang) * edist;
-				var x4:Float = par[2] + Math.cos(ang) * par[4] / 2 - Math.sin(ang) * edist;
-				var y4:Float = par[3] + Math.sin(ang) * par[4] / 2 + Math.cos(ang) * edist;
+				var x1:Float = parameters[2] - Math.cos(angleRadians) * parameters[4] / 2 - Math.sin(angleRadians) * startDistance;
+				var y1:Float = parameters[3] - Math.sin(angleRadians) * parameters[4] / 2 + Math.cos(angleRadians) * startDistance;
+				var x2:Float = parameters[2] + Math.cos(angleRadians) * parameters[4] / 2 - Math.sin(angleRadians) * startDistance;
+				var y2:Float = parameters[3] + Math.sin(angleRadians) * parameters[4] / 2 + Math.cos(angleRadians) * startDistance;
+				var x3:Float = parameters[2] - Math.cos(angleRadians) * parameters[4] / 2 - Math.sin(angleRadians) * endDistance;
+				var y3:Float = parameters[3] - Math.sin(angleRadians) * parameters[4] / 2 + Math.cos(angleRadians) * endDistance;
+				var x4:Float = parameters[2] + Math.cos(angleRadians) * parameters[4] / 2 - Math.sin(angleRadians) * endDistance;
+				var y4:Float = parameters[3] + Math.sin(angleRadians) * parameters[4] / 2 + Math.cos(angleRadians) * endDistance;
 
-				uvt = [0, head, 1, head, 0, tael, 1, tael];
+				uvt = [0, head, 1, head, 0, clippedTail, 1, clippedTail];
 				return [[x1, y1, x2, y2, x3, y3, x4, y4], uvt];
 		}
 		return null;

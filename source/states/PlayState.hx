@@ -279,52 +279,52 @@ class PlayState extends MusicBeatState
 				if (FlxG.save.data.lang == 1)
 					dialogue = CoolUtil.coolTextFile(Paths.txt('galaxy/galaxyDialogueCh'));
 				else
-					dialogue = CoolUtil.coolTextFile(Paths.txt('galaxy/galaxyDialogue'));
+					dialogue = CoolUtil.coolTextFile(Language.dialoguePath('galaxy/galaxyDialogue'));
 			case 'game':
 				if (FlxG.save.data.lang == 1)
 					dialogue = CoolUtil.coolTextFile(Paths.txt('game/gameDialogueCh'));
 				else
-					dialogue = CoolUtil.coolTextFile(Paths.txt('game/gameDialogue'));
+					dialogue = CoolUtil.coolTextFile(Language.dialoguePath('game/gameDialogue'));
 			case 'kastimagina':
 				if (FlxG.save.data.lang == 1)
 					dialogue = CoolUtil.coolTextFile(Paths.txt('kastimagina/kastimaginaDialogueCh'));
 				else
-					dialogue = CoolUtil.coolTextFile(Paths.txt('kastimagina/kastimaginaDialogue'));
+					dialogue = CoolUtil.coolTextFile(Language.dialoguePath('kastimagina/kastimaginaDialogue'));
 			case 'cona':
 				if (FlxG.save.data.lang == 1)
 					dialogue = CoolUtil.coolTextFile(Paths.txt('cona/conaDialogue1Ch'));
 				else
-					dialogue = CoolUtil.coolTextFile(Paths.txt('cona/conaDialogue1'));
+					dialogue = CoolUtil.coolTextFile(Language.dialoguePath('cona/conaDialogue1'));
 			case 'underworld':
 				if (FlxG.save.data.lang == 1)
 					dialogue = CoolUtil.coolTextFile(Paths.txt('underworld/underworldDialogueCh'));
 				else
-					dialogue = CoolUtil.coolTextFile(Paths.txt('underworld/underworldDialogue'));
+					dialogue = CoolUtil.coolTextFile(Language.dialoguePath('underworld/underworldDialogue'));
 			case 'cyber':
 				if (FlxG.save.data.lang == 1)
 					dialogue = CoolUtil.coolTextFile(Paths.txt('cyber/cyberDialogueCh'));
 				else
-					dialogue = CoolUtil.coolTextFile(Paths.txt('cyber/cyberDialogue'));
+					dialogue = CoolUtil.coolTextFile(Language.dialoguePath('cyber/cyberDialogue'));
 			case 'familanna':
 				if (FlxG.save.data.lang == 1)
 					dialogue = CoolUtil.coolTextFile(Paths.txt('familanna/familanna-preCH'));
 				else
-					dialogue = CoolUtil.coolTextFile(Paths.txt('familanna/familanna-pre'));
+					dialogue = CoolUtil.coolTextFile(Language.dialoguePath('familanna/familanna-pre'));
 			case 'newton':
 				if (FlxG.save.data.lang == 1)
 					dialogue = CoolUtil.coolTextFile(Paths.txt('newton/newton-preCH'));
 				else
-					dialogue = CoolUtil.coolTextFile(Paths.txt('newton/newton-pre'));
+					dialogue = CoolUtil.coolTextFile(Language.dialoguePath('newton/newton-pre'));
 			case 'destiny':
 				if (FlxG.save.data.lang == 1)
 					dialogue = CoolUtil.coolTextFile(Paths.txt('destiny/destiny-preCH'));
 				else
-					dialogue = CoolUtil.coolTextFile(Paths.txt('destiny/destiny-pre'));
+					dialogue = CoolUtil.coolTextFile(Language.dialoguePath('destiny/destiny-pre'));
 			case 'peace':
 				if (FlxG.save.data.lang == 1)
 					dialogue = CoolUtil.coolTextFile(Paths.txt('peace/peace-preCH'));
 				else
-					dialogue = CoolUtil.coolTextFile(Paths.txt('peace/peace-pre'));
+					dialogue = CoolUtil.coolTextFile(Language.dialoguePath('peace/peace-pre'));
 		}
 
 		#if desktop
@@ -649,12 +649,12 @@ class PlayState extends MusicBeatState
 		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
 			'health', 0, 2);
 		healthBar.scrollFactor.set();
-		healthBar.createFilledBar(0xFFFF0000, 0xFF66FF33);
+		healthBar.createFilledBar(0xFFFF0000, SONG.player1.startsWith("bf") ? 0xFF31B0D1 : 0xFF66FF33);
 		// healthBar
 		add(healthBar);
 
-		scoreTxt = new FlxText(healthBarBG.x + healthBarBG.width - 190, healthBarBG.y + 30, 0, "", 20);
-		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT);
+		scoreTxt = new FlxText(0, healthBarBG.y + 40, FlxG.width, "", 20);
+		scoreTxt.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER);
 		scoreTxt.scrollFactor.set();
 		scoreTxt.color = 0xFFffffff;
 		scoreTxt.borderStyle = OUTLINE;
@@ -1053,7 +1053,7 @@ class PlayState extends MusicBeatState
 				if (FlxG.save.data.lang == 1)
 					sddd = CoolUtil.coolTextFile(Paths.txt('cona/conaDialogue2Ch'));
 				else
-					sddd = CoolUtil.coolTextFile(Paths.txt('cona/conaDialogue2'));
+					sddd = CoolUtil.coolTextFile(Language.dialoguePath('cona/conaDialogue2'));
 				var sth:DialogueBox = new DialogueBox(false, sddd, 1);
 				sth.scrollFactor.set();
 				sth.finishThing = startCountdown;
@@ -1365,7 +1365,7 @@ class PlayState extends MusicBeatState
 					unspawnNotes.push(sustainNote);
 
 					sustainNote.mustPress = gottaHitNote;
-					PlayMoving.clone(sustainNote);
+					PlayMoving.cloneNote(sustainNote);
 
 					if (sustainNote.mustPress)
 					{
@@ -1406,7 +1406,7 @@ class PlayState extends MusicBeatState
 					unspawnNotes.push(endNote);
 
 					endNote.mustPress = gottaHitNote;
-					PlayMoving.clone(endNote);
+					PlayMoving.cloneNote(endNote);
 
 					if (endNote.mustPress)
 					{
@@ -1415,7 +1415,7 @@ class PlayState extends MusicBeatState
 				}
 
 				swagNote.mustPress = gottaHitNote;
-				PlayMoving.clone(swagNote);
+				PlayMoving.cloneNote(swagNote);
 
 				if (swagNote.mustPress)
 				{
@@ -1771,7 +1771,8 @@ class PlayState extends MusicBeatState
 				scoreTxt.color = 0xFFffff00;
 			else
 				scoreTxt.color = 0xFFffffff;
-			scoreTxt.text = "Score:" + Math.round(songScore);
+			scoreTxt.text = Language.translate("Score:") + " " + Math.round(songScore) + " | " + Language.translate("Misses:") + " " + misses
+				+ " | " + Language.translate("Rating:") + " " + (total > 0 ? acc + "%" : "?");
 
 			if (practice && health > 1)
 				health = 1;
@@ -2034,7 +2035,7 @@ class PlayState extends MusicBeatState
 			{
 				notes.forEachAlive(function(daNote:Note)
 				{
-					if (PlayMoving.show(daNote))
+					if (PlayMoving.shouldHideNote(daNote))
 					{
 						daNote.active = false;
 						daNote.visible = false;
@@ -2045,9 +2046,9 @@ class PlayState extends MusicBeatState
 						daNote.active = true;
 					}
 
-					PlayMoving.pos(daNote, strumLine);
+					PlayMoving.updateNotePosition(daNote, strumLine);
 
-					PlayMoving.shape(daNote, strumLine, camHUD);
+					PlayMoving.applyNoteShape(daNote, strumLine, camHUD);
 
 					if ((!daNote.mustPress || daNote.isLastSustain) && daNote.wasGoodHit)
 					{
@@ -2082,7 +2083,7 @@ class PlayState extends MusicBeatState
 						if (SONG.needsVoices)
 							vocals.volume = 1;
 
-						PlayMoving.ongood(daNote);
+						PlayMoving.onGoodNoteHit(daNote);
 						daNote.kill();
 						notes.remove(daNote, true);
 						noteAndStrum.remove(daNote, true);
@@ -2113,7 +2114,7 @@ class PlayState extends MusicBeatState
 						missanim(daNote.noteData);
 					}
 
-					if (PlayMoving.kill(daNote))
+					if (PlayMoving.shouldRemoveNote(daNote))
 					{
 						if (!daNote.played && daNote.mustPress && !daNote.isLastSustain)
 						{
@@ -2149,13 +2150,13 @@ class PlayState extends MusicBeatState
 			var mustkill:Array<NoteStrum> = [];
 			strumLineNotes.forEachAlive(function(dastrum:NoteStrum)
 			{
-				PlayMoving.spos(dastrum, strumLine);
+				PlayMoving.updateReceptorPosition(dastrum, strumLine);
 				if (dastrum.mustBeKilled)
 					mustkill.push(dastrum);
 			});
 			playerStrums.forEachAlive(function(dastrum:NoteStrum)
 			{
-				PlayMoving.pspos(dastrum, strumLine);
+				PlayMoving.updatePlayerReceptorPosition(dastrum, strumLine);
 			});
 			for (dastrum in mustkill)
 			{
@@ -2167,7 +2168,7 @@ class PlayState extends MusicBeatState
 				dastrum.destroy();
 			}
 			PlayWindow.move(camHUD);
-			PlayMoving.special(this);
+			PlayMoving.updateSpecialReceptors(this);
 			noteAndStrum.sort(sortNoteByShit, FlxSort.DESCENDING);
 		}
 
@@ -2199,7 +2200,7 @@ class PlayState extends MusicBeatState
 				if (FlxG.save.data.lang == 1)
 					sddd = CoolUtil.coolTextFile(Paths.txt('peace/peace-post2CH'));
 				else
-					sddd = CoolUtil.coolTextFile(Paths.txt('peace/peace-post2'));
+					sddd = CoolUtil.coolTextFile(Language.dialoguePath('peace/peace-post2'));
 		}
 		var sth:DialogueBox = new DialogueBox(false, sddd, num, 1);
 		sth.scrollFactor.set();
@@ -2229,12 +2230,12 @@ class PlayState extends MusicBeatState
 				if (FlxG.save.data.lang == 1)
 					sddd = CoolUtil.coolTextFile(Paths.txt('familanna/familanna-postCH'));
 				else
-					sddd = CoolUtil.coolTextFile(Paths.txt('familanna/familanna-post'));
+					sddd = CoolUtil.coolTextFile(Language.dialoguePath('familanna/familanna-post'));
 			case 'peace':
 				if (FlxG.save.data.lang == 1)
 					sddd = CoolUtil.coolTextFile(Paths.txt('peace/peace-postCH'));
 				else
-					sddd = CoolUtil.coolTextFile(Paths.txt('peace/peace-post'));
+					sddd = CoolUtil.coolTextFile(Language.dialoguePath('peace/peace-post'));
 		}
 		var sth:DialogueBox = new DialogueBox(false, sddd, num, 1);
 		sth.scrollFactor.set();
@@ -3039,14 +3040,14 @@ class PlayState extends MusicBeatState
 			{
 				if (Math.abs(note.noteData) == spr.ID)
 				{
-					spr.animation.play('confirm' + PlayMoving.ns, true);
+					spr.animation.play('confirm' + PlayMoving.noteAnimationSuffix, true);
 				}
 			});
 
 			note.wasGoodHit = true;
 			vocals.volume = 1;
 
-			PlayMoving.ongood(note);
+			PlayMoving.onGoodNoteHit(note);
 			note.kill();
 			notes.remove(note, true);
 			noteAndStrum.remove(note, true);
@@ -3301,9 +3302,9 @@ class PlayState extends MusicBeatState
 			for (i in 0...4)
 			{
 				strumtext[i].text = strumtextlist[3][i];
-				strumtext[i].y = PlayMoving.ylist[i] + 120;
+				strumtext[i].y = PlayMoving.receptorY[i] + 120;
 				if (FlxG.save.data.downscroll)
-					strumtext[i].y = PlayMoving.ylist[i] - 10 - strumtext[i].height;
+					strumtext[i].y = PlayMoving.receptorY[i] - 10 - strumtext[i].height;
 			}
 		}
 		if (curBeat >= 520 && curBeat < 528)
@@ -3701,7 +3702,7 @@ class PlayState extends MusicBeatState
 			lightningStrikeShit();
 		}
 
-		PlayMoving.beatHit(this, curBeat);
+		PlayMoving.onBeatHit(this, curBeat);
 	}
 
 	var curLight:Int = 0;
