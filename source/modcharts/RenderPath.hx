@@ -1,6 +1,6 @@
 package modcharts;
 
-import Song.SwagSong;
+import backend.data.Song.SwagSong;
 import Std;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -43,10 +43,10 @@ class RenderPath
 				var ang1 = sorder * (2 * Math.PI);
 				var ang2 = eorder * (2 * Math.PI);
 
-				var x1 = par[2] - FlxMath.fastSin(ang1) * par[4];
-				var y1 = par[3] + FlxMath.fastCos(ang1) * par[4];
-				var x2 = par[2] - FlxMath.fastSin(ang2) * par[4];
-				var y2 = par[3] + FlxMath.fastCos(ang2) * par[4];
+				var x1 = par[2] - Math.sin(ang1) * par[4];
+				var y1 = par[3] + Math.cos(ang1) * par[4];
+				var x2 = par[2] - Math.sin(ang2) * par[4];
+				var y2 = par[3] + Math.cos(ang2) * par[4];
 
 				return [[par[2], par[3], x1, y1, par[2], par[3], x2, y2], uvt];
 			case 1: // angle [sdist, edist, x, y, width, ang, maxdis]
@@ -64,14 +64,14 @@ class RenderPath
 
 				var ang:Float = par[5] / 180 * Math.PI;
 
-				var x1:Float = par[2] - FlxMath.fastCos(ang) * par[4] / 2 - FlxMath.fastSin(ang) * sdist;
-				var y1:Float = par[3] - FlxMath.fastSin(ang) * par[4] / 2 + FlxMath.fastCos(ang) * sdist;
-				var x2:Float = par[2] + FlxMath.fastCos(ang) * par[4] / 2 - FlxMath.fastSin(ang) * sdist;
-				var y2:Float = par[3] + FlxMath.fastSin(ang) * par[4] / 2 + FlxMath.fastCos(ang) * sdist;
-				var x3:Float = par[2] - FlxMath.fastCos(ang) * par[4] / 2 - FlxMath.fastSin(ang) * edist;
-				var y3:Float = par[3] - FlxMath.fastSin(ang) * par[4] / 2 + FlxMath.fastCos(ang) * edist;
-				var x4:Float = par[2] + FlxMath.fastCos(ang) * par[4] / 2 - FlxMath.fastSin(ang) * edist;
-				var y4:Float = par[3] + FlxMath.fastSin(ang) * par[4] / 2 + FlxMath.fastCos(ang) * edist;
+				var x1:Float = par[2] - Math.cos(ang) * par[4] / 2 - Math.sin(ang) * sdist;
+				var y1:Float = par[3] - Math.sin(ang) * par[4] / 2 + Math.cos(ang) * sdist;
+				var x2:Float = par[2] + Math.cos(ang) * par[4] / 2 - Math.sin(ang) * sdist;
+				var y2:Float = par[3] + Math.sin(ang) * par[4] / 2 + Math.cos(ang) * sdist;
+				var x3:Float = par[2] - Math.cos(ang) * par[4] / 2 - Math.sin(ang) * edist;
+				var y3:Float = par[3] - Math.sin(ang) * par[4] / 2 + Math.cos(ang) * edist;
+				var x4:Float = par[2] + Math.cos(ang) * par[4] / 2 - Math.sin(ang) * edist;
+				var y4:Float = par[3] + Math.sin(ang) * par[4] / 2 + Math.cos(ang) * edist;
 
 				uvt = [0, head, 1, head, 0, tael, 1, tael];
 				return [[x1, y1, x2, y2, x3, y3, x4, y4], uvt];

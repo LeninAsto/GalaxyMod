@@ -1,5 +1,7 @@
 package;
 
+import states.TitleState;
+import objects.FPSCounter;
 import flixel.FlxG;
 import flixel.FlxGame;
 import flixel.FlxState;
@@ -83,7 +85,7 @@ class Main extends Sprite
 			framerate = FlxG.save.data.FPS;
 		}
 
-		addChild(new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, skipSplash, startFullscreen));
+		addChild(new FlxGame(gameWidth, gameHeight, initialState, framerate, framerate, skipSplash, startFullscreen));
 
 		#if !mobile
 		fps = new FPSCounter(10, 3, 0xFFFFFF);

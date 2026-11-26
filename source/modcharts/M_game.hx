@@ -1,6 +1,6 @@
 package modcharts;
 
-import Song.SwagSong;
+import backend.data.Song.SwagSong;
 import Std;
 import flixel.FlxCamera;
 import flixel.FlxG;

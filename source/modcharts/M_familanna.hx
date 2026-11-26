@@ -1,6 +1,6 @@
 package modcharts;
 
-import Song.SwagSong;
+import backend.data.Song.SwagSong;
 import Std;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -106,8 +106,8 @@ class M_familanna
 					218,
 					FlxMath.lerp(50, 300, (daNote.strumTime - 104918.0327868854) / 2622.95081967)
 				];
-			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * FlxMath.fastCos(daNote.strumTime * 3.1415926 / 163.93442623);
-			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * FlxMath.fastSin(daNote.strumTime * 3.1415926 / 163.93442623);
+			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * Math.cos(daNote.strumTime * 3.1415926 / 163.93442623);
+			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * Math.sin(daNote.strumTime * 3.1415926 / 163.93442623);
 		}
 		else if (daNote.strumTime >= 107540.98360655754 && daNote.strumTime < 108852.45901639361)
 		{
@@ -115,8 +115,8 @@ class M_familanna
 				FlxMath.lerp(218, 1000, (daNote.strumTime - 107540.98360655754) / 1311.47540983),
 				300
 			];
-			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * FlxMath.fastCos(daNote.strumTime * 3.1415926 / 163.93442623);
-			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * FlxMath.fastSin(daNote.strumTime * 3.1415926 / 163.93442623);
+			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * Math.cos(daNote.strumTime * 3.1415926 / 163.93442623);
+			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * Math.sin(daNote.strumTime * 3.1415926 / 163.93442623);
 		}
 		else if (daNote.strumTime >= 108852.45901639361 && daNote.strumTime < 109508.19672131164)
 		{
@@ -124,8 +124,8 @@ class M_familanna
 				FlxMath.lerp(1000, 218, (daNote.strumTime - 108852.45901639361) / 655.737704917),
 				300
 			];
-			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * FlxMath.fastCos(daNote.strumTime * 3.1415926 / 163.93442623);
-			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * FlxMath.fastSin(daNote.strumTime * 3.1415926 / 163.93442623);
+			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * Math.cos(daNote.strumTime * 3.1415926 / 163.93442623);
+			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * Math.sin(daNote.strumTime * 3.1415926 / 163.93442623);
 		}
 		else if (daNote.strumTime >= 109508.19672131164 && daNote.strumTime < 110163.93442622968)
 		{
@@ -133,8 +133,8 @@ class M_familanna
 				FlxMath.lerp(218, 1000, (daNote.strumTime - 109508.19672131164) / 655.737704917),
 				300
 			];
-			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * FlxMath.fastCos(daNote.strumTime * 3.1415926 / 163.93442623);
-			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * FlxMath.fastSin(daNote.strumTime * 3.1415926 / 163.93442623);
+			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * Math.cos(daNote.strumTime * 3.1415926 / 163.93442623);
+			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * Math.sin(daNote.strumTime * 3.1415926 / 163.93442623);
 		}
 		else if (daNote.strumTime >= 110163.93442622968 && daNote.strumTime < 112786.88524590182)
 		{
@@ -148,8 +148,8 @@ class M_familanna
 					FlxMath.lerp(1000, 218, (daNote.strumTime - 110163.93442622968) / 2622.95081967),
 					FlxMath.lerp(300, 550, (daNote.strumTime - 110163.93442622968) / 2622.95081967)
 				];
-			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * FlxMath.fastCos(daNote.strumTime * 3.1415926 / 163.93442623);
-			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * FlxMath.fastSin(daNote.strumTime * 3.1415926 / 163.93442623);
+			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * Math.cos(daNote.strumTime * 3.1415926 / 163.93442623);
+			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * Math.sin(daNote.strumTime * 3.1415926 / 163.93442623);
 		}
 		else if (daNote.strumTime >= 112786.88524590182 && daNote.strumTime < 115409.836066)
 		{
@@ -163,8 +163,8 @@ class M_familanna
 					218,
 					FlxMath.lerp(550, 50, (daNote.strumTime - 112786.88524590182) / 2622.95081967)
 				];
-			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * FlxMath.fastCos(daNote.strumTime * 3.1415926 / 163.93442623);
-			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * FlxMath.fastSin(daNote.strumTime * 3.1415926 / 163.93442623);
+			daNote.x = cent[0] + (daNote.noteData - 1.5) * 112 * Math.cos(daNote.strumTime * 3.1415926 / 163.93442623);
+			daNote.y = cent[1] + (1.5 - daNote.noteData) * 112 * Math.sin(daNote.strumTime * 3.1415926 / 163.93442623);
 		}
 		else if (daNote.strumTime >= 83934 && daNote.strumTime < 94426)
 		{
@@ -331,8 +331,8 @@ class M_familanna
 					218,
 					FlxMath.lerp(50, 300, (Conductor.songPosition - 104918.0327868854) / 2622.95081967)
 				];
-			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * FlxMath.fastCos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * FlxMath.fastSin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 		else if (Conductor.songPosition >= 107540.98360655754 && Conductor.songPosition < 108852.45901639361)
 		{
@@ -340,8 +340,8 @@ class M_familanna
 				FlxMath.lerp(218, 1000, (Conductor.songPosition - 107540.98360655754) / 1311.47540983),
 				300
 			];
-			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * FlxMath.fastCos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * FlxMath.fastSin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 		else if (Conductor.songPosition >= 108852.45901639361 && Conductor.songPosition < 109508.19672131164)
 		{
@@ -349,8 +349,8 @@ class M_familanna
 				FlxMath.lerp(1000, 218, (Conductor.songPosition - 108852.45901639361) / 655.737704917),
 				300
 			];
-			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * FlxMath.fastCos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * FlxMath.fastSin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 		else if (Conductor.songPosition >= 109508.19672131164 && Conductor.songPosition < 110163.93442622968)
 		{
@@ -358,8 +358,8 @@ class M_familanna
 				FlxMath.lerp(218, 1000, (Conductor.songPosition - 109508.19672131164) / 655.737704917),
 				300
 			];
-			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * FlxMath.fastCos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * FlxMath.fastSin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 		else if (Conductor.songPosition >= 110163.93442622968 && Conductor.songPosition < 112786.88524590182)
 		{
@@ -373,8 +373,8 @@ class M_familanna
 					FlxMath.lerp(1000, 218, (Conductor.songPosition - 110163.93442622968) / 2622.95081967),
 					FlxMath.lerp(300, 550, (Conductor.songPosition - 110163.93442622968) / 2622.95081967)
 				];
-			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * FlxMath.fastCos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * FlxMath.fastSin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 		else if (Conductor.songPosition >= 112786.88524590182 && Conductor.songPosition < 115409.836066)
 		{
@@ -388,8 +388,8 @@ class M_familanna
 					218,
 					FlxMath.lerp(550, 50, (Conductor.songPosition - 112786.88524590182) / 2622.95081967)
 				];
-			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * FlxMath.fastCos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * FlxMath.fastSin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.x = cent[0] + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.y = cent[1] + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 		else if (Conductor.songPosition >= 83934.42622950824 && Conductor.songPosition < 94426.22950819682)
 		{
@@ -413,12 +413,12 @@ class M_familanna
 				dastrum.y = strumLine.y;
 			if (dastrum.x < 640)
 			{
-				dastrum.x = 218 + (dastrum.ID - 1.5) * 112 * FlxMath.fastCos(Conductor.songPosition * 3.1415926 / 655.73770492);
+				dastrum.x = 218 + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 655.73770492);
 				PlayMoving.xlist[dastrum.ID] = dastrum.x;
 			}
 			else
 			{
-				dastrum.x = 858 + (dastrum.ID - 1.5) * 112 * FlxMath.fastCos(Conductor.songPosition * 3.1415926 / 655.73770492);
+				dastrum.x = 858 + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 655.73770492);
 				PlayMoving.pxlist[dastrum.ID] = dastrum.x;
 			}
 		}
@@ -450,12 +450,12 @@ class M_familanna
 		{
 			if (dastrum.x < 640)
 			{
-				dastrum.x = 50 + 56 * dastrum.ID * (FlxMath.fastCos(Conductor.songPosition / 1311.47540984 * 3.1415926) + 1);
+				dastrum.x = 50 + 56 * dastrum.ID * (Math.cos(Conductor.songPosition / 1311.47540984 * 3.1415926) + 1);
 				PlayMoving.xlist[dastrum.ID] = dastrum.x;
 			}
 			else
 			{
-				dastrum.x = 1026 - 56 * (3 - dastrum.ID) * (FlxMath.fastCos(Conductor.songPosition / 1311.47540984 * 3.1415926) + 1);
+				dastrum.x = 1026 - 56 * (3 - dastrum.ID) * (Math.cos(Conductor.songPosition / 1311.47540984 * 3.1415926) + 1);
 				PlayMoving.pxlist[dastrum.ID] = dastrum.x;
 			}
 		}
@@ -523,8 +523,8 @@ class M_familanna
 		}
 		else if (Conductor.songPosition >= 104918.0327868854 && Conductor.songPosition < 115409.836066)
 		{
-			dastrum.x = 858 + (dastrum.ID - 1.5) * 112 * FlxMath.fastCos(Conductor.songPosition * 3.1415926 / 163.93442623);
-			dastrum.y = strumLine.y + (1.5 - dastrum.ID) * 112 * FlxMath.fastSin(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.x = 858 + (dastrum.ID - 1.5) * 112 * Math.cos(Conductor.songPosition * 3.1415926 / 163.93442623);
+			dastrum.y = strumLine.y + (1.5 - dastrum.ID) * 112 * Math.sin(Conductor.songPosition * 3.1415926 / 163.93442623);
 		}
 	}
 

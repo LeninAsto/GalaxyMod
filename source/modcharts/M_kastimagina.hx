@@ -1,6 +1,6 @@
 package modcharts;
 
-import Song.SwagSong;
+import backend.data.Song.SwagSong;
 import Std;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -245,14 +245,14 @@ class M_kastimagina
 		{
 			if (dastrum.x > 640)
 			{
-				PlayMoving.pxlist[dastrum.ID] = FlxMath.fastSin((((Conductor.songPosition - 124640.8839779005) / 1325.96685083
+				PlayMoving.pxlist[dastrum.ID] = Math.sin((((Conductor.songPosition - 124640.8839779005) / 1325.96685083
 					+ (-0.5 + dastrum.ID / 3)) * 3.1415926535)) * 168
 					+ 858;
 				dastrum.x = PlayMoving.pxlist[dastrum.ID];
 			}
 			else
 			{
-				PlayMoving.xlist[dastrum.ID] = FlxMath.fastSin((((Conductor.songPosition - 124640.8839779005) / 1325.96685083
+				PlayMoving.xlist[dastrum.ID] = Math.sin((((Conductor.songPosition - 124640.8839779005) / 1325.96685083
 					+ (-0.5 + dastrum.ID / 3)) * 3.1415926535)) * 168
 					+ 218;
 				dastrum.x = PlayMoving.xlist[dastrum.ID];

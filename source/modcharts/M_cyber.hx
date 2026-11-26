@@ -1,6 +1,6 @@
 package modcharts;
 
-import Song.SwagSong;
+import backend.data.Song.SwagSong;
 import Std;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -78,14 +78,14 @@ class M_cyber
 		{
 			if (daNote.mustPress)
 				daNote.x = PlayMoving.poxlist[daNote.noteData]
-					+ (FlxMath.fastSin((daNote.strumTime - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
+					+ (Math.sin((daNote.strumTime - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
 						+ PlayWindow.stage[0] / 2 - Lib.application.window.x - 320) * 2;
 			else
 				daNote.x = PlayMoving.oxlist[daNote.noteData]
-					+ (FlxMath.fastSin((daNote.strumTime - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
+					+ (Math.sin((daNote.strumTime - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
 						+ PlayWindow.stage[0] / 2 - Lib.application.window.x - 320) * 2;
 			daNote.y = strumLine.y
-				+ (FlxMath.fastCos((daNote.strumTime - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[1] * -2 / 10)
+				+ (Math.cos((daNote.strumTime - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[1] * -2 / 10)
 					+ PlayWindow.stage[1] / 2 - Lib.application.window.y - 180) * 2;
 		}
 		else if (Conductor.songPosition >= 167191.0112359552 && Conductor.songPosition < 172584.26966292146)
@@ -190,7 +190,7 @@ class M_cyber
 		}
 		else if (Conductor.songPosition >= 70280.8988764045 && Conductor.songPosition < 91595.50561797764)
 		{
-			dastrum.y = 300 - FlxMath.fastSin(((Conductor.songPosition - 70280.8988764045) / 1348.31460674 - 0.5) * 3.1415926535) * 250;
+			dastrum.y = 300 - Math.sin(((Conductor.songPosition - 70280.8988764045) / 1348.31460674 - 0.5) * 3.1415926535) * 250;
 			strumLine.y = dastrum.y;
 			PlayMoving.sy = dastrum.y;
 		}
@@ -366,10 +366,10 @@ class M_cyber
 					Lib.application.window.width = 640;
 					Lib.application.window.height = 360;
 				}
-				Lib.application.window.x = Std.int(FlxMath.fastSin((Conductor.songPosition - 16179.775280898875) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
+				Lib.application.window.x = Std.int(Math.sin((Conductor.songPosition - 16179.775280898875) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
 					+ PlayWindow.stage[0] / 2
 						- 320);
-				Lib.application.window.y = Std.int(FlxMath.fastCos((Conductor.songPosition - 16179.775280898875) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[1] * -2 / 10)
+				Lib.application.window.y = Std.int(Math.cos((Conductor.songPosition - 16179.775280898875) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[1] * -2 / 10)
 					+ PlayWindow.stage[1] / 2
 						- 180);
 			}
@@ -612,16 +612,16 @@ class M_cyber
 				if (Conductor.songPosition >= 80898.87640449445)
 				{
 					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2
-						+ FlxMath.fastSin(((Conductor.songPosition - 80898.87640449445) / 1348.31460674) * 3.1415926535) * PlayWindow.stage[0] / 5 - 320);
+						+ Math.sin(((Conductor.songPosition - 80898.87640449445) / 1348.31460674) * 3.1415926535) * PlayWindow.stage[0] / 5 - 320);
 					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
-						+ FlxMath.fastSin(((Conductor.songPosition - 70280.8988764045) / 1348.31460674 - 0.5) * 3.1415926535) * 125
+						+ Math.sin(((Conductor.songPosition - 70280.8988764045) / 1348.31460674 - 0.5) * 3.1415926535) * 125
 						- 180);
 				}
 				else
 				{
 					Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 320);
 					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
-						+ FlxMath.fastSin(((Conductor.songPosition - 70280.8988764045) / 1348.31460674 - 0.5) * 3.1415926535) * 125
+						+ Math.sin(((Conductor.songPosition - 70280.8988764045) / 1348.31460674 - 0.5) * 3.1415926535) * 125
 						- 180);
 				}
 			}
@@ -634,21 +634,21 @@ class M_cyber
 				}
 				if (Conductor.songPosition % 40 < 20)
 				{
-					Lib.application.window.x = Std.int(FlxMath.fastSin(((Conductor.songPosition - 16179.775280898875) / (2696.62921348)
+					Lib.application.window.x = Std.int(Math.sin(((Conductor.songPosition - 16179.775280898875) / (2696.62921348)
 						+ 1) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
 						+ PlayWindow.stage[0] / 2
 							- 320);
-					Lib.application.window.y = Std.int(FlxMath.fastCos(((Conductor.songPosition - 16179.775280898875) / (2696.62921348)
+					Lib.application.window.y = Std.int(Math.cos(((Conductor.songPosition - 16179.775280898875) / (2696.62921348)
 						+ 1) * 3.1415926535) * (PlayWindow.stage[1] * -2 / 10)
 						+ PlayWindow.stage[1] / 2
 							- 180);
 				}
 				else
 				{
-					Lib.application.window.x = Std.int(FlxMath.fastSin((Conductor.songPosition - 16179.775280898875) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
+					Lib.application.window.x = Std.int(Math.sin((Conductor.songPosition - 16179.775280898875) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
 						+ PlayWindow.stage[0] / 2
 							- 320);
-					Lib.application.window.y = Std.int(FlxMath.fastCos((Conductor.songPosition - 16179.775280898875) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[1] * -2 / 10)
+					Lib.application.window.y = Std.int(Math.cos((Conductor.songPosition - 16179.775280898875) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[1] * -2 / 10)
 						+ PlayWindow.stage[1] / 2
 							- 180);
 				}
@@ -665,14 +665,14 @@ class M_cyber
 					Lib.application.window.x = Std.int(PlayWindow.stage[0] * 4 / 10
 						+ (((Conductor.songPosition - 102471.91011235974) % 337.078651685) / 337.078651685) * PlayWindow.stage[0] / 5 - 320);
 					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
-						- Math.abs(FlxMath.fastSin(((Conductor.songPosition - 102471.91011235974) % 337.078651685) / 337.078651685 * 3.1415926)) * PlayWindow.stage[1] / 10 - 180);
+						- Math.abs(Math.sin(((Conductor.songPosition - 102471.91011235974) % 337.078651685) / 337.078651685 * 3.1415926)) * PlayWindow.stage[1] / 10 - 180);
 				}
 				else
 				{
 					Lib.application.window.x = Std.int(PlayWindow.stage[0] * 6 / 10
 						- (((Conductor.songPosition - 102471.91011235974) % 337.078651685) / 337.078651685) * PlayWindow.stage[0] / 5 - 320);
 					Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
-						- Math.abs(FlxMath.fastSin(((Conductor.songPosition - 102471.91011235974) % 337.078651685) / 337.078651685 * 3.1415926)) * PlayWindow.stage[1] / 10 - 180);
+						- Math.abs(Math.sin(((Conductor.songPosition - 102471.91011235974) % 337.078651685) / 337.078651685 * 3.1415926)) * PlayWindow.stage[1] / 10 - 180);
 				}
 			}
 			else if (Conductor.songPosition >= 113258.42696629238 && Conductor.songPosition < 123707.86516853962)
@@ -821,10 +821,10 @@ class M_cyber
 					Lib.application.window.width = 640;
 					Lib.application.window.height = 360;
 				}
-				Lib.application.window.x = Std.int(FlxMath.fastSin((Conductor.songPosition - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
+				Lib.application.window.x = Std.int(Math.sin((Conductor.songPosition - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[0] * 2 / 10)
 					+ PlayWindow.stage[0] / 2
 						- 320);
-				Lib.application.window.y = Std.int(FlxMath.fastCos((Conductor.songPosition - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[1] * -2 / 10)
+				Lib.application.window.y = Std.int(Math.cos((Conductor.songPosition - 156404.49438202268) / (2696.62921348) * 3.1415926535) * (PlayWindow.stage[1] * -2 / 10)
 					+ PlayWindow.stage[1] / 2
 						- 180);
 			}
@@ -902,14 +902,14 @@ class M_cyber
 					if (Conductor.songPosition % 40 < 20)
 					{
 						Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2
-							+ 320 * FlxMath.fastSin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
+							+ 320 * Math.sin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
 							- 320);
 						Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 180);
 					}
 					else
 					{
 						Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2
-							- 320 * FlxMath.fastSin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
+							- 320 * Math.sin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
 							- 320);
 						Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2 - 180);
 					}
@@ -920,14 +920,14 @@ class M_cyber
 					{
 						Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 320);
 						Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
-							+ 180 * FlxMath.fastSin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
+							+ 180 * Math.sin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
 							- 180);
 					}
 					else
 					{
 						Lib.application.window.x = Std.int(PlayWindow.stage[0] / 2 - 320);
 						Lib.application.window.y = Std.int(PlayWindow.stage[1] / 2
-							- 180 * FlxMath.fastSin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
+							- 180 * Math.sin((Conductor.songPosition % 674.15730337) / 674.15730337 * 3.1415926535)
 							- 180);
 					}
 				}

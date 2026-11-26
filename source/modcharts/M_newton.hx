@@ -1,6 +1,6 @@
 package modcharts;
 
-import Song.SwagSong;
+import backend.data.Song.SwagSong;
 import Std;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -188,7 +188,7 @@ class M_newton
 				daNote.y = (550 + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
 			else
 				daNote.y = (50 - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-			daNote.alpha = FlxMath.fastCos((Conductor.songPosition / 441.176470588 * 2) * Math.PI) + 1;
+			daNote.alpha = Math.cos((Conductor.songPosition / 441.176470588 * 2) * Math.PI) + 1;
 			if (daNote.isSustainNote)
 				daNote.alpha *= 0.6;
 		}
@@ -203,7 +203,7 @@ class M_newton
 				x = PlayMoving.pxlist[daNote.noteData];
 			var a:Float = 1;
 			if (Conductor.songPosition > 91764.70588235292)
-				a = 1 + FlxMath.fastSin(Conductor.songPosition / 1764.70588235 * Math.PI) * 0.5;
+				a = 1 + Math.sin(Conductor.songPosition / 1764.70588235 * Math.PI) * 0.5;
 			else if (Conductor.songPosition < 63529.411764705925)
 				a = 0;
 			else if (Conductor.songPosition < 63639.70588235298)
@@ -400,7 +400,7 @@ class M_newton
 			if (dastrum.player == 0)
 			{
 				dastrum.x = PlayMoving.xlist[dastrum.ID]
-					- (FlxMath.fastCos((Conductor.songPosition - 28235.294117647052) / 441.176470588 * Math.PI) - 1) * 127;
+					- (Math.cos((Conductor.songPosition - 28235.294117647052) / 441.176470588 * Math.PI) - 1) * 127;
 			}
 		}
 		else if (Conductor.songPosition >= 35294.11764705882 && Conductor.songPosition < 49411.76470588237)
@@ -445,7 +445,7 @@ class M_newton
 				y = FlxG.save.data.downscroll ? 550 : 50;
 			else if (Conductor.songPosition >= 77647.05882352943 + 220.588235294 * dastrum.ID)
 			{
-				y -= FlxMath.fastSin((Conductor.songPosition - 220.588235294 * dastrum.ID) / 441.176470588 * Math.PI) * 20;
+				y -= Math.sin((Conductor.songPosition - 220.588235294 * dastrum.ID) / 441.176470588 * Math.PI) * 20;
 			}
 			PlayMoving.ylist[dastrum.ID] = y;
 			var w = dastrum.width * 0.7;
@@ -459,7 +459,7 @@ class M_newton
 			}
 			var a:Float = 1;
 			if (Conductor.songPosition > 91764.70588235292)
-				a = 1 + FlxMath.fastSin(Conductor.songPosition / 1764.70588235 * Math.PI) * 0.5;
+				a = 1 + Math.sin(Conductor.songPosition / 1764.70588235 * Math.PI) * 0.5;
 			if (Conductor.songPosition < 63639.70588235298)
 				a = PlayMoving.ease((Conductor.songPosition - 63529.411764705925) / 110.294117647);
 			if (Conductor.songPosition > 92647.0588235294)
@@ -620,8 +620,8 @@ class R_newton extends RenderPath
 				var stime:Float = FlxMath.lerp(par[0], par[1], head);
 				var etime:Float = FlxMath.lerp(par[0], par[1], tail);
 
-				var x0:Float = par[2] - (FlxMath.fastCos((stime - 28235.294117647052) / 441.176470588 * Math.PI) - 1) * 127;
-				var x1:Float = par[2] - (FlxMath.fastCos((etime - 28235.294117647052) / 441.176470588 * Math.PI) - 1) * 127;
+				var x0:Float = par[2] - (Math.cos((stime - 28235.294117647052) / 441.176470588 * Math.PI) - 1) * 127;
+				var x1:Float = par[2] - (Math.cos((etime - 28235.294117647052) / 441.176470588 * Math.PI) - 1) * 127;
 
 				return [
 					[
@@ -640,14 +640,14 @@ class R_newton extends RenderPath
 				var stime:Float = FlxMath.lerp(par[0], par[1], head);
 				var etime:Float = FlxMath.lerp(par[0], par[1], tail);
 
-				var x0:Float = FlxMath.fastSin(stime / 882.352941176 * Math.PI) * -(200 - par[3] / 2) + par[2];
-				var x1:Float = FlxMath.fastSin(stime / 882.352941176 * Math.PI) * -(200 + par[3] / 2) + par[2];
-				var x2:Float = FlxMath.fastSin(etime / 882.352941176 * Math.PI) * -(200 - par[3] / 2) + par[2];
-				var x3:Float = FlxMath.fastSin(etime / 882.352941176 * Math.PI) * -(200 + par[3] / 2) + par[2];
-				var y0:Float = FlxMath.fastCos(stime / 882.352941176 * Math.PI) * (200 - par[3] / 2) + 360;
-				var y1:Float = FlxMath.fastCos(stime / 882.352941176 * Math.PI) * (200 + par[3] / 2) + 360;
-				var y2:Float = FlxMath.fastCos(etime / 882.352941176 * Math.PI) * (200 - par[3] / 2) + 360;
-				var y3:Float = FlxMath.fastCos(etime / 882.352941176 * Math.PI) * (200 + par[3] / 2) + 360;
+				var x0:Float = Math.sin(stime / 882.352941176 * Math.PI) * -(200 - par[3] / 2) + par[2];
+				var x1:Float = Math.sin(stime / 882.352941176 * Math.PI) * -(200 + par[3] / 2) + par[2];
+				var x2:Float = Math.sin(etime / 882.352941176 * Math.PI) * -(200 - par[3] / 2) + par[2];
+				var x3:Float = Math.sin(etime / 882.352941176 * Math.PI) * -(200 + par[3] / 2) + par[2];
+				var y0:Float = Math.cos(stime / 882.352941176 * Math.PI) * (200 - par[3] / 2) + 360;
+				var y1:Float = Math.cos(stime / 882.352941176 * Math.PI) * (200 + par[3] / 2) + 360;
+				var y2:Float = Math.cos(etime / 882.352941176 * Math.PI) * (200 - par[3] / 2) + 360;
+				var y3:Float = Math.cos(etime / 882.352941176 * Math.PI) * (200 + par[3] / 2) + 360;
 				return [[x0, y0, x1, y1, x2, y2, x3, y3], uvt];
 			case 2: // bounce [startTime, endTime, x, y, w, h, a]
 				var stime:Float = FlxMath.lerp(par[0], par[1], head);

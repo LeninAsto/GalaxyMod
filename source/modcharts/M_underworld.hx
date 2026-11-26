@@ -1,6 +1,6 @@
 package modcharts;
 
-import Song.SwagSong;
+import backend.data.Song.SwagSong;
 import Std;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -351,13 +351,13 @@ class M_underworld
 		{
 			if (daNote.mustPress)
 			{
-				daNote.x = 538 + (PlayMoving.poxlist[daNote.noteData] - 538) * FlxMath.fastCos(daNote.strumTime / 1518.98734177 * 3.1415926);
-				daNote.y = 300 - (100 + 50 * daNote.noteData) * FlxMath.fastSin(daNote.strumTime / 1518.98734177 * 3.1415926);
+				daNote.x = 538 + (PlayMoving.poxlist[daNote.noteData] - 538) * Math.cos(daNote.strumTime / 1518.98734177 * 3.1415926);
+				daNote.y = 300 - (100 + 50 * daNote.noteData) * Math.sin(daNote.strumTime / 1518.98734177 * 3.1415926);
 			}
 			else
 			{
-				daNote.x = 538 - (538 - PlayMoving.oxlist[daNote.noteData]) * FlxMath.fastCos(daNote.strumTime / 1518.98734177 * 3.1415926);
-				daNote.y = 300 + (100 + 50 * (3 - daNote.noteData)) * FlxMath.fastSin(daNote.strumTime / 1518.98734177 * 3.1415926);
+				daNote.x = 538 - (538 - PlayMoving.oxlist[daNote.noteData]) * Math.cos(daNote.strumTime / 1518.98734177 * 3.1415926);
+				daNote.y = 300 + (100 + 50 * (3 - daNote.noteData)) * Math.sin(daNote.strumTime / 1518.98734177 * 3.1415926);
 			}
 		}
 		else
@@ -670,8 +670,8 @@ class M_underworld
 				dastrum.x = PlayMoving.oxlist[dastrum.ID];
 			dastrum.y = 300;
 			dastrum.alpha = 1;
-			dastrum.x = 538 - (538 - PlayMoving.oxlist[dastrum.ID]) * FlxMath.fastCos(Conductor.songPosition / 1518.98734177 * 3.1415926);
-			dastrum.y = 300 + (100 + 50 * (3 - dastrum.ID)) * FlxMath.fastSin(Conductor.songPosition / 1518.98734177 * 3.1415926);
+			dastrum.x = 538 - (538 - PlayMoving.oxlist[dastrum.ID]) * Math.cos(Conductor.songPosition / 1518.98734177 * 3.1415926);
+			dastrum.y = 300 + (100 + 50 * (3 - dastrum.ID)) * Math.sin(Conductor.songPosition / 1518.98734177 * 3.1415926);
 			dastrum.scale.x = (Conductor.songPosition - 121139.24050632922) / 189.873417722 * 0.7;
 			dastrum.scale.y = (Conductor.songPosition - 121139.24050632922) / 189.873417722 * 0.7;
 		}
@@ -679,8 +679,8 @@ class M_underworld
 		{
 			dastrum.scale.x = 0.7;
 			dastrum.scale.y = 0.7;
-			dastrum.x = 538 - (538 - PlayMoving.oxlist[dastrum.ID]) * FlxMath.fastCos(Conductor.songPosition / 1518.98734177 * 3.1415926);
-			dastrum.y = 300 + (100 + 50 * (3 - dastrum.ID)) * FlxMath.fastSin(Conductor.songPosition / 1518.98734177 * 3.1415926);
+			dastrum.x = 538 - (538 - PlayMoving.oxlist[dastrum.ID]) * Math.cos(Conductor.songPosition / 1518.98734177 * 3.1415926);
+			dastrum.y = 300 + (100 + 50 * (3 - dastrum.ID)) * Math.sin(Conductor.songPosition / 1518.98734177 * 3.1415926);
 		}
 	}
 
@@ -690,8 +690,8 @@ class M_underworld
 		{
 			dastrum.scale.x = 0.7;
 			dastrum.scale.y = 0.7;
-			dastrum.x = 538 + (PlayMoving.poxlist[dastrum.ID] - 538) * FlxMath.fastCos(Conductor.songPosition / 1518.98734177 * 3.1415926);
-			dastrum.y = 300 - (100 + 50 * dastrum.ID) * FlxMath.fastSin(Conductor.songPosition / 1518.98734177 * 3.1415926);
+			dastrum.x = 538 + (PlayMoving.poxlist[dastrum.ID] - 538) * Math.cos(Conductor.songPosition / 1518.98734177 * 3.1415926);
+			dastrum.y = 300 - (100 + 50 * dastrum.ID) * Math.sin(Conductor.songPosition / 1518.98734177 * 3.1415926);
 		}
 	}
 

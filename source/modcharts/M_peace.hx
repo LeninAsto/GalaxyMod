@@ -1,6 +1,6 @@
 package modcharts;
 
-import Song.SwagSong;
+import backend.data.Song.SwagSong;
 import Std;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -57,12 +57,12 @@ class M_peace
 			}
 			else
 			{
-				daNote.wy = 360 + FlxMath.fastSin(Conductor.songPosition / 1200 * Math.PI) * 200;
-				daNote.wx = 100 + daNote.noteData * 360 + FlxMath.fastCos(daNote.strumTime / 1200 * Math.PI) * 100;
+				daNote.wy = 360 + Math.sin(Conductor.songPosition / 1200 * Math.PI) * 200;
+				daNote.wx = 100 + daNote.noteData * 360 + Math.cos(daNote.strumTime / 1200 * Math.PI) * 100;
 				daNote.z = (daNote.strumTime - Conductor.songPosition) * 2.5;
 				if (daNote.isEnd)
 				{
-					daNote.wy = 360 + FlxMath.fastSin((Conductor.songPosition + daNote.sustainLength * Conductor.stepCrochet) / 1200 * Math.PI) * 200;
+					daNote.wy = 360 + Math.sin((Conductor.songPosition + daNote.sustainLength * Conductor.stepCrochet) / 1200 * Math.PI) * 200;
 					daNote.offsetWhenDraw = false;
 				}
 				daNote.scaleW();
@@ -107,15 +107,15 @@ class M_peace
 			else
 			{
 				daNote.z = 250 - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2));
-				daNote.wx = 640 + FlxMath.fastCos(daNote.strumTime / 600 * Math.PI) * 500;
+				daNote.wx = 640 + Math.cos(daNote.strumTime / 600 * Math.PI) * 500;
 				daNote.wy = 400
-					+ FlxMath.fastSin(daNote.strumTime / 600 * Math.PI) * 200
+					+ Math.sin(daNote.strumTime / 600 * Math.PI) * 200
 					+ (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2));
 				if (daNote.strumTime >= 48000)
 				{
-					daNote.wx = 640 + FlxMath.fastCos(daNote.strumTime / 600 * Math.PI) * 500;
+					daNote.wx = 640 + Math.cos(daNote.strumTime / 600 * Math.PI) * 500;
 					daNote.wy = 400
-						+ FlxMath.fastSin(daNote.strumTime / 300 * Math.PI) * 200
+						+ Math.sin(daNote.strumTime / 300 * Math.PI) * 200
 						+ (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2));
 				}
 				if (daNote.isEnd)
@@ -134,7 +134,7 @@ class M_peace
 			var cang:Float = 0.125 + 0.25 * daNote.noteData;
 			if (Conductor.songPosition >= 67200)
 				cang += Conductor.songPosition / 1200;
-			daNote.z = 200 + 640 * FlxMath.fastSin(cang * Math.PI);
+			daNote.z = 200 + 640 * Math.sin(cang * Math.PI);
 			if (daNote.isSustainNote)
 			{
 				var len:Float = Conductor.stepCrochet;
@@ -203,8 +203,8 @@ class M_peace
 				daNote.renderer = new RenderPath(1, [
 					sdist,
 					edist,
-					640 + 300 * FlxMath.fastSin(ang / 180 * Math.PI),
-					360 - 300 * FlxMath.fastCos(ang / 180 * Math.PI),
+					640 + 300 * Math.sin(ang / 180 * Math.PI),
+					360 - 300 * Math.cos(ang / 180 * Math.PI),
 					daNote.width * 0.7,
 					ang,
 					300
@@ -220,8 +220,8 @@ class M_peace
 				daNote.angle = ang;
 
 				ang = ang + anglist[daNote.noteData];
-				daNote.x = 640 + FlxMath.fastSin(ang / 180 * Math.PI) * dis - daNote.width / 2;
-				daNote.y = 360 - FlxMath.fastCos(ang / 180 * Math.PI) * dis - daNote.height / 2;
+				daNote.x = 640 + Math.sin(ang / 180 * Math.PI) * dis - daNote.width / 2;
+				daNote.y = 360 - Math.cos(ang / 180 * Math.PI) * dis - daNote.height / 2;
 
 				if (dis < 0)
 					daNote.visible = false;
@@ -254,7 +254,7 @@ class M_peace
 						daNote.wy += (-x * x + 6 * x) * 50 / 3 * (FlxG.save.data.downscroll ? -1 : 1);
 						var ex = NoteObject.toWorld(1040, 360)[0];
 						daNote.wx = FlxMath.lerp(ex + 240, cx - 240, (Conductor.songPosition - 105300) / 300);
-						daNote.z = 200 / 0.7 + FlxMath.fastSin(ang / 180 * Math.PI) * (-100 + (Conductor.songPosition - 105300) / 3 * 2);
+						daNote.z = 200 / 0.7 + Math.sin(ang / 180 * Math.PI) * (-100 + (Conductor.songPosition - 105300) / 3 * 2);
 					}
 					else if (Conductor.songPosition >= 94800 && daNote.strumTime < 105300)
 					{
@@ -299,7 +299,7 @@ class M_peace
 						daNote.wy += (-x * x + 6 * x) * 50 / 3 * (FlxG.save.data.downscroll ? -1 : 1);
 						var ex = NoteObject.toWorld(240, 360)[0];
 						daNote.wx = FlxMath.lerp(ex + 240, cx - 240, (Conductor.songPosition - 110100) / 300);
-						daNote.z = 200 / 0.7 + FlxMath.fastSin(ang / 180 * Math.PI) * (-100 + (Conductor.songPosition - 110100) / 3 * 2);
+						daNote.z = 200 / 0.7 + Math.sin(ang / 180 * Math.PI) * (-100 + (Conductor.songPosition - 110100) / 3 * 2);
 					}
 					else if (Conductor.songPosition >= 100500 && daNote.strumTime < 110100)
 					{
@@ -310,7 +310,7 @@ class M_peace
 						daNote.wy += (-x * x + 6 * x) * 50 / 3 * (FlxG.save.data.downscroll ? -1 : 1);
 						var ex = NoteObject.toWorld(240, 360)[0];
 						daNote.wx = FlxMath.lerp(ex + 240, cx - 240, (Conductor.songPosition - 100500) / 300);
-						daNote.z = 200 / 0.7 + FlxMath.fastSin(ang / 180 * Math.PI) * (-100 + (Conductor.songPosition - 100500) / 3 * 2);
+						daNote.z = 200 / 0.7 + Math.sin(ang / 180 * Math.PI) * (-100 + (Conductor.songPosition - 100500) / 3 * 2);
 					}
 					else
 						daNote.visible = false;
@@ -379,9 +379,9 @@ class M_peace
 			}
 			if (adj)
 			{
-				daNote.wx = 640 + FlxMath.fastCos(ang / 180 * Math.PI) * (cx - 640);
+				daNote.wx = 640 + Math.cos(ang / 180 * Math.PI) * (cx - 640);
 				daNote.wx += dx;
-				daNote.z = 200 / 0.7 + FlxMath.fastSin(ang / 180 * Math.PI) * (daNote.mustPress ? 100 : -100);
+				daNote.z = 200 / 0.7 + Math.sin(ang / 180 * Math.PI) * (daNote.mustPress ? 100 : -100);
 			}
 			daNote.scaleW();
 			if (daNote.spec != 0)
@@ -419,7 +419,7 @@ class M_peace
 						if (Conductor.songPosition > daNote.strumTime - daNote.sustainLength * 300 / 4)
 							len = Conductor.songPosition - daNote.strumTime + daNote.sustainLength * 300 / 4;
 						len = (sum - len) / sum;
-						var diff = 100 * FlxMath.fastSin(((Conductor.songPosition + 150 - 150 * len) % 300) / 300 * Math.PI);
+						var diff = 100 * Math.sin(((Conductor.songPosition + 150 - 150 * len) % 300) / 300 * Math.PI);
 						if ((Conductor.songPosition % 300) / 300 >= (len + 1) / 2)
 							diff = 0;
 						switch (daNote.noteData)
@@ -436,7 +436,7 @@ class M_peace
 					}
 					else if (Conductor.songPosition % 300 <= 150)
 					{
-						var diff = 100 * FlxMath.fastCos((Conductor.songPosition % 150) / 300 * Math.PI);
+						var diff = 100 * Math.cos((Conductor.songPosition % 150) / 300 * Math.PI);
 						switch (daNote.noteData)
 						{
 							case 0:
@@ -515,8 +515,8 @@ class M_peace
 					|| Conductor.songPosition >= 129000) : ((Conductor.songPosition >= 119700 && daNote.strumTime < 126000)
 						|| Conductor.songPosition >= 129300)) : (daNote.strumTime - Conductor.songPosition <= 600);
 				daNote.wy = 360;
-				daNote.wx = 640 + 250 * FlxMath.fastCos(daNote.strumTime / 300 * Math.PI);
-				daNote.z = 200 / 0.7 - 100 * FlxMath.fastSin(daNote.strumTime / 300 * Math.PI);
+				daNote.wx = 640 + 250 * Math.cos(daNote.strumTime / 300 * Math.PI);
+				daNote.z = 200 / 0.7 - 100 * Math.sin(daNote.strumTime / 300 * Math.PI);
 				daNote.scaleW();
 			}
 		}
@@ -559,13 +559,13 @@ class M_peace
 			else
 			{
 				daNote.z = 250 - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2));
-				daNote.wx = 340 + FlxMath.fastCos(daNote.strumTime / 600 * Math.PI) * 200;
+				daNote.wx = 340 + Math.cos(daNote.strumTime / 600 * Math.PI) * 200;
 				daNote.wy = 400
-					+ FlxMath.fastSin(daNote.strumTime / 600 * Math.PI) * 200
+					+ Math.sin(daNote.strumTime / 600 * Math.PI) * 200
 					+ (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2));
 				if (daNote.spec == 2)
 				{
-					daNote.wx = 940 - FlxMath.fastCos(daNote.strumTime / 600 * Math.PI) * 200;
+					daNote.wx = 940 - Math.cos(daNote.strumTime / 600 * Math.PI) * 200;
 				}
 				if (daNote.isEnd)
 				{
@@ -607,9 +607,9 @@ class M_peace
 			{
 				var dis:Float = 300 + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)) / 2;
 
-				var x:Float = 640 + FlxMath.fastSin(anglist[daNote.noteData] / 180 * Math.PI) * dis - daNote.width * 0.35;
-				var y:Float = 360 - FlxMath.fastCos(anglist[daNote.noteData] / 180 * Math.PI) * dis - daNote.height * 0.35;
-				var z:Float = 200 + 360 * FlxMath.fastSin(Math.PI / 12);
+				var x:Float = 640 + Math.sin(anglist[daNote.noteData] / 180 * Math.PI) * dis - daNote.width * 0.35;
+				var y:Float = 360 - Math.cos(anglist[daNote.noteData] / 180 * Math.PI) * dis - daNote.height * 0.35;
+				var z:Float = 200 + 360 * Math.sin(Math.PI / 12);
 
 				var abc = NoteObject.multiTriangles(x, y, z, daNote.width * 0.7, daNote.height * 0.7, [0, -15, 0], [0, 0, 0], [ang, 0, -ang], [640, 640, 640],
 					[360, 360, 360], [z, z, z]);
@@ -648,8 +648,8 @@ class M_peace
 				var dis:Float = (daNote.strumTime - Conductor.songPosition) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)) / 4;
 				var ang:Float = (daNote.strumTime - Conductor.songPosition) / 600;
 
-				daNote.wx = 640 + FlxMath.fastCos(ang * Math.PI) * dis;
-				daNote.wy = 360 + FlxMath.fastSin(ang * Math.PI) * dis;
+				daNote.wx = 640 + Math.cos(ang * Math.PI) * dis;
+				daNote.wy = 360 + Math.sin(ang * Math.PI) * dis;
 				daNote.scaleW();
 			}
 		}
@@ -695,12 +695,12 @@ class M_peace
 				else
 					dastrum.alpha = 0.1;
 				dastrum.z = 250;
-				dastrum.wx = 640 + FlxMath.fastCos(Conductor.songPosition / 600 * Math.PI) * 500;
-				dastrum.wy = 400 + FlxMath.fastSin(Conductor.songPosition / 600 * Math.PI) * 200;
+				dastrum.wx = 640 + Math.cos(Conductor.songPosition / 600 * Math.PI) * 500;
+				dastrum.wy = 400 + Math.sin(Conductor.songPosition / 600 * Math.PI) * 200;
 				if (Conductor.songPosition >= 48000)
 				{
-					dastrum.wx = 640 + FlxMath.fastCos(Conductor.songPosition / 600 * Math.PI) * 500;
-					dastrum.wy = 400 + FlxMath.fastSin(Conductor.songPosition / 300 * Math.PI) * 200;
+					dastrum.wx = 640 + Math.cos(Conductor.songPosition / 600 * Math.PI) * 500;
+					dastrum.wy = 400 + Math.sin(Conductor.songPosition / 300 * Math.PI) * 200;
 				}
 				dastrum.scaleW();
 			}
@@ -713,7 +713,7 @@ class M_peace
 				var cang:Float = 0.125 + 0.25 * dastrum.ID;
 				if (Conductor.songPosition >= 67200)
 					cang += Conductor.songPosition / 1200;
-				dastrum.z = 200 + 640 * FlxMath.fastSin(cang * Math.PI);
+				dastrum.z = 200 + 640 * Math.sin(cang * Math.PI);
 				dastrum.renderer = new R_peace(2, [
 					2,
 					(dastrum.animation.curAnim.name == 'confirm' ? 1 : 0),
@@ -759,8 +759,8 @@ class M_peace
 				dastrum.angle = ang;
 
 				ang = ang + anglist[dastrum.ID];
-				dastrum.x = 640 + FlxMath.fastSin(ang / 180 * Math.PI) * r - dastrum.width / 2;
-				dastrum.y = 360 - FlxMath.fastCos(ang / 180 * Math.PI) * r - dastrum.height / 2;
+				dastrum.x = 640 + Math.sin(ang / 180 * Math.PI) * r - dastrum.width / 2;
+				dastrum.y = 360 - Math.cos(ang / 180 * Math.PI) * r - dastrum.height / 2;
 			}
 			else if (dastrum.spec == -1)
 			{
@@ -770,8 +770,8 @@ class M_peace
 					ang = Conductor.songPosition / 150 * 180;
 
 				dastrum.angle = ang;
-				dastrum.x = 640 + FlxMath.fastSin(ang / 180 * Math.PI) * r / 3 - dastrum.width / 2;
-				dastrum.y = 360 - FlxMath.fastCos(ang / 180 * Math.PI) * r / 3 - dastrum.height / 2;
+				dastrum.x = 640 + Math.sin(ang / 180 * Math.PI) * r / 3 - dastrum.width / 2;
+				dastrum.y = 360 - Math.cos(ang / 180 * Math.PI) * r / 3 - dastrum.height / 2;
 			}
 			else if (dastrum.spec == -2)
 			{
@@ -884,9 +884,9 @@ class M_peace
 				}
 				var cx = NoteObject.toWorld(dastrum.player == 1 ? 1040 : 240, 360)[0];
 				var dx = 160 * (dastrum.ID - 1.5);
-				dastrum.wx = 640 + FlxMath.fastCos(bang / 180 * Math.PI) * (cx - 640);
+				dastrum.wx = 640 + Math.cos(bang / 180 * Math.PI) * (cx - 640);
 				dastrum.wx += dx;
-				dastrum.z = 200 / 0.7 + FlxMath.fastSin(bang / 180 * Math.PI) * (dastrum.player == 1 ? 100 : -100);
+				dastrum.z = 200 / 0.7 + Math.sin(bang / 180 * Math.PI) * (dastrum.player == 1 ? 100 : -100);
 				dastrum.scaleW();
 			}
 
@@ -924,7 +924,7 @@ class M_peace
 				{
 					if (Conductor.songPosition % 300 <= 150)
 					{
-						var diff = 100 * FlxMath.fastCos((Conductor.songPosition % 150) / 300 * Math.PI);
+						var diff = 100 * Math.cos((Conductor.songPosition % 150) / 300 * Math.PI);
 						switch (dastrum.ID)
 						{
 							case 0:
@@ -957,8 +957,8 @@ class M_peace
 						dastrum.mustBeKilled = true;
 				}
 				dastrum.wy = 360;
-				dastrum.wx = 640 + 250 * FlxMath.fastCos(Conductor.songPosition / 300 * Math.PI);
-				dastrum.z = 200 / 0.7 - 100 * FlxMath.fastSin(Conductor.songPosition / 300 * Math.PI);
+				dastrum.wx = 640 + 250 * Math.cos(Conductor.songPosition / 300 * Math.PI);
+				dastrum.z = 200 / 0.7 - 100 * Math.sin(Conductor.songPosition / 300 * Math.PI);
 				dastrum.scaleW();
 			}
 		}
@@ -1003,11 +1003,11 @@ class M_peace
 				else
 					dastrum.alpha = 0.1;
 				dastrum.z = 250;
-				dastrum.wx = 340 + FlxMath.fastCos(Conductor.songPosition / 600 * Math.PI) * 200;
-				dastrum.wy = 400 + FlxMath.fastSin(Conductor.songPosition / 600 * Math.PI) * 200;
+				dastrum.wx = 340 + Math.cos(Conductor.songPosition / 600 * Math.PI) * 200;
+				dastrum.wy = 400 + Math.sin(Conductor.songPosition / 600 * Math.PI) * 200;
 				if (dastrum.spec == 5)
 				{
-					dastrum.wx = 940 - FlxMath.fastCos(Conductor.songPosition / 600 * Math.PI) * 200;
+					dastrum.wx = 940 - Math.cos(Conductor.songPosition / 600 * Math.PI) * 200;
 				}
 				dastrum.scaleW();
 			}
@@ -1030,11 +1030,11 @@ class M_peace
 
 			var dis:Float = 300;
 
-			var x:Float = 640 + FlxMath.fastSin(anglist[dastrum.ID] / 180 * Math.PI) * dis - dastrum.width * 0.35;
-			var y:Float = 360 - FlxMath.fastCos(anglist[dastrum.ID] / 180 * Math.PI) * dis - dastrum.height * 0.35;
+			var x:Float = 640 + Math.sin(anglist[dastrum.ID] / 180 * Math.PI) * dis - dastrum.width * 0.35;
+			var y:Float = 360 - Math.cos(anglist[dastrum.ID] / 180 * Math.PI) * dis - dastrum.height * 0.35;
 			var w = dastrum.width * 0.7;
 			var h = dastrum.height * 0.7;
-			var z:Float = 200 + 360 * FlxMath.fastSin(Math.PI / 12);
+			var z:Float = 200 + 360 * Math.sin(Math.PI / 12);
 
 			if (dastrum.animation.curAnim.name == 'confirm')
 			{
@@ -1260,12 +1260,12 @@ class R_peace extends RenderPath
 				var stime:Float = FlxMath.lerp(par[0], par[1], head);
 				var etime:Float = FlxMath.lerp(par[0], par[1], tail);
 
-				var y1 = 360 + FlxMath.fastSin((Conductor.songPosition + (par[4] + head) * Conductor.stepCrochet) / 1200 * Math.PI) * 200;
-				var x1 = 100 + par[3] * 360 + FlxMath.fastCos(stime / 1200 * Math.PI) * 100;
+				var y1 = 360 + Math.sin((Conductor.songPosition + (par[4] + head) * Conductor.stepCrochet) / 1200 * Math.PI) * 200;
+				var x1 = 100 + par[3] * 360 + Math.cos(stime / 1200 * Math.PI) * 100;
 				var z1 = (stime - Conductor.songPosition) * 2.5;
 
-				var y2 = 360 + FlxMath.fastSin((Conductor.songPosition + (par[4] + tail) * Conductor.stepCrochet) / 1200 * Math.PI) * 200;
-				var x2 = 100 + par[3] * 360 + FlxMath.fastCos(etime / 1200 * Math.PI) * 100;
+				var y2 = 360 + Math.sin((Conductor.songPosition + (par[4] + tail) * Conductor.stepCrochet) / 1200 * Math.PI) * 200;
+				var x2 = 100 + par[3] * 360 + Math.cos(etime / 1200 * Math.PI) * 100;
 				var z2 = (etime - Conductor.songPosition) * 2.5;
 
 				var p0:Array<Float> = NoteObject.toScreen(x1 - par[2], y1, z1);
@@ -1299,36 +1299,36 @@ class R_peace extends RenderPath
 				else
 				{
 					var z = 250 - (Conductor.songPosition - stime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2));
-					var x = 640 + FlxMath.fastCos(stime / 600 * Math.PI) * 500;
+					var x = 640 + Math.cos(stime / 600 * Math.PI) * 500;
 					var y = 400
-						+ FlxMath.fastSin(stime / 600 * Math.PI) * 200
+						+ Math.sin(stime / 600 * Math.PI) * 200
 						+ (Conductor.songPosition - stime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2));
 
 					var z2 = 250 - (Conductor.songPosition - etime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2));
-					var x2 = 640 + FlxMath.fastCos(etime / 600 * Math.PI) * 500;
+					var x2 = 640 + Math.cos(etime / 600 * Math.PI) * 500;
 					var y2 = 400
-						+ FlxMath.fastSin(stime / 600 * Math.PI) * 200
+						+ Math.sin(stime / 600 * Math.PI) * 200
 						+ (Conductor.songPosition - etime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2));
 
 					if (stime >= 134400)
 					{
-						x = 340 + FlxMath.fastCos(stime / 600 * Math.PI) * 200;
-						x2 = 340 + FlxMath.fastCos(etime / 600 * Math.PI) * 200;
+						x = 340 + Math.cos(stime / 600 * Math.PI) * 200;
+						x2 = 340 + Math.cos(etime / 600 * Math.PI) * 200;
 						if (par[4] == 2)
 						{
-							x = 940 - FlxMath.fastCos(stime / 600 * Math.PI) * 200;
-							x2 = 940 - FlxMath.fastCos(etime / 600 * Math.PI) * 200;
+							x = 940 - Math.cos(stime / 600 * Math.PI) * 200;
+							x2 = 940 - Math.cos(etime / 600 * Math.PI) * 200;
 						}
 					}
 					else if (stime >= 48000)
 					{
-						x = 640 + FlxMath.fastCos(stime / 600 * Math.PI) * 500;
+						x = 640 + Math.cos(stime / 600 * Math.PI) * 500;
 						y = 400
-							+ FlxMath.fastSin(stime / 300 * Math.PI) * 200
+							+ Math.sin(stime / 300 * Math.PI) * 200
 							+ (Conductor.songPosition - stime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2));
-						x2 = 640 + FlxMath.fastCos(etime / 600 * Math.PI) * 500;
+						x2 = 640 + Math.cos(etime / 600 * Math.PI) * 500;
 						y2 = 400
-							+ FlxMath.fastSin(etime / 300 * Math.PI) * 200
+							+ Math.sin(etime / 300 * Math.PI) * 200
 							+ (Conductor.songPosition - etime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2));
 					}
 					var p0:Array<Float> = NoteObject.toScreen(x - par[2], y, z);
@@ -1362,10 +1362,10 @@ class R_peace extends RenderPath
 						+ (Conductor.songPosition - par[1]) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)) * (FlxG.save.data.downscroll ? 1 : -1);
 					if (isSplash)
 						y = (FlxG.save.data.downscroll ? 720 : 0);
-					var x1 = 640 - 640 * FlxMath.fastCos(sang * Math.PI);
-					var x2 = 640 - 640 * FlxMath.fastCos(eang * Math.PI);
-					var z1 = 200 + 300 * FlxMath.fastSin(sang * Math.PI);
-					var z2 = 200 + 300 * FlxMath.fastSin(eang * Math.PI);
+					var x1 = 640 - 640 * Math.cos(sang * Math.PI);
+					var x2 = 640 - 640 * Math.cos(eang * Math.PI);
+					var z1 = 200 + 300 * Math.sin(sang * Math.PI);
+					var z2 = 200 + 300 * Math.sin(eang * Math.PI);
 
 					var p0:Array<Float> = NoteObject.toScreen(x1, y - hi / 2, z1);
 					var p1:Array<Float> = NoteObject.toScreen(x2, y - hi / 2, z2);
@@ -1397,10 +1397,10 @@ class R_peace extends RenderPath
 						if ((FlxG.save.data.downscroll && y2 > y1) || (!FlxG.save.data.downscroll && y2 < y1))
 							return [[0, 0, 0, 0, 0, 0, 0, 0], uvt];
 					}
-					var x1 = 640 - 640 * FlxMath.fastCos(sang * Math.PI);
-					var x2 = 640 - 640 * FlxMath.fastCos(eang * Math.PI);
-					var z1 = 200 + 300 * FlxMath.fastSin(sang * Math.PI);
-					var z2 = 200 + 300 * FlxMath.fastSin(eang * Math.PI);
+					var x1 = 640 - 640 * Math.cos(sang * Math.PI);
+					var x2 = 640 - 640 * Math.cos(eang * Math.PI);
+					var z1 = 200 + 300 * Math.sin(sang * Math.PI);
+					var z2 = 200 + 300 * Math.sin(eang * Math.PI);
 
 					var p0:Array<Float> = NoteObject.toScreen(x1, y1, z1);
 					var p1:Array<Float> = NoteObject.toScreen(x2, y1, z2);
@@ -1434,10 +1434,10 @@ class R_peace extends RenderPath
 						y += (57600 - Conductor.songPosition) * (FlxG.save.data.downscroll ? 2 : -2);
 					if (Conductor.songPosition >= 76800)
 						y += (Conductor.songPosition - 76800) * (FlxG.save.data.downscroll ? 2 : -2);
-					var x1 = 640 - 640 * FlxMath.fastCos(sang * Math.PI);
-					var x2 = 640 - 640 * FlxMath.fastCos(eang * Math.PI);
-					var z1 = 200 + 300 * FlxMath.fastSin(sang * Math.PI);
-					var z2 = 200 + 300 * FlxMath.fastSin(eang * Math.PI);
+					var x1 = 640 - 640 * Math.cos(sang * Math.PI);
+					var x2 = 640 - 640 * Math.cos(eang * Math.PI);
+					var z1 = 200 + 300 * Math.sin(sang * Math.PI);
+					var z2 = 200 + 300 * Math.sin(eang * Math.PI);
 
 					var p0:Array<Float> = NoteObject.toScreen(x1, y - hi / 2, z1);
 					var p1:Array<Float> = NoteObject.toScreen(x2, y - hi / 2, z2);
@@ -1476,8 +1476,8 @@ class R_peace extends RenderPath
 							slen = (sorder - (Conductor.songPosition - stime + sorder * 300 / 4) / (300 / 4)) / par[7];
 							elen = (eorder - (Conductor.songPosition - stime + sorder * 300 / 4) / (300 / 4)) / par[7];
 						}
-						var sdiff = 100 * FlxMath.fastSin(((Conductor.songPosition + 150 - 150 * slen) % 300) / 300 * Math.PI);
-						var ediff = 100 * FlxMath.fastSin(((Conductor.songPosition + 150 - 150 * elen) % 300) / 300 * Math.PI);
+						var sdiff = 100 * Math.sin(((Conductor.songPosition + 150 - 150 * slen) % 300) / 300 * Math.PI);
+						var ediff = 100 * Math.sin(((Conductor.songPosition + 150 - 150 * elen) % 300) / 300 * Math.PI);
 						if ((Conductor.songPosition % 300) / 300 >= (slen + 1) / 2)
 							sdiff = 0;
 						if ((Conductor.songPosition % 300) / 300 >= (elen + 1) / 2)
@@ -1500,7 +1500,7 @@ class R_peace extends RenderPath
 					}
 					else if (Conductor.songPosition % 300 <= 150)
 					{
-						var diff = 100 * FlxMath.fastCos((Conductor.songPosition % 150) / 300 * Math.PI);
+						var diff = 100 * Math.cos((Conductor.songPosition % 150) / 300 * Math.PI);
 						switch (par[3])
 						{
 							case 0:
@@ -1546,16 +1546,16 @@ class R_peace extends RenderPath
 					edis = 0;
 				}
 
-				var x1:Float = 640 - FlxMath.fastCos(par[3] / 180 * Math.PI) * par[2] / 2 + FlxMath.fastSin(par[3] / 180 * Math.PI) * sdis;
-				var y1:Float = 360 - FlxMath.fastSin(par[3] / 180 * Math.PI) * par[2] / 2 - FlxMath.fastCos(par[3] / 180 * Math.PI) * sdis;
-				var x2:Float = 640 + FlxMath.fastCos(par[3] / 180 * Math.PI) * par[2] / 2 + FlxMath.fastSin(par[3] / 180 * Math.PI) * sdis;
-				var y2:Float = 360 + FlxMath.fastSin(par[3] / 180 * Math.PI) * par[2] / 2 - FlxMath.fastCos(par[3] / 180 * Math.PI) * sdis;
-				var x3:Float = 640 - FlxMath.fastCos(par[3] / 180 * Math.PI) * par[2] / 2 + FlxMath.fastSin(par[3] / 180 * Math.PI) * edis;
-				var y3:Float = 360 - FlxMath.fastSin(par[3] / 180 * Math.PI) * par[2] / 2 - FlxMath.fastCos(par[3] / 180 * Math.PI) * edis;
-				var x4:Float = 640 + FlxMath.fastCos(par[3] / 180 * Math.PI) * par[2] / 2 + FlxMath.fastSin(par[3] / 180 * Math.PI) * edis;
-				var y4:Float = 360 + FlxMath.fastSin(par[3] / 180 * Math.PI) * par[2] / 2 - FlxMath.fastCos(par[3] / 180 * Math.PI) * edis;
+				var x1:Float = 640 - Math.cos(par[3] / 180 * Math.PI) * par[2] / 2 + Math.sin(par[3] / 180 * Math.PI) * sdis;
+				var y1:Float = 360 - Math.sin(par[3] / 180 * Math.PI) * par[2] / 2 - Math.cos(par[3] / 180 * Math.PI) * sdis;
+				var x2:Float = 640 + Math.cos(par[3] / 180 * Math.PI) * par[2] / 2 + Math.sin(par[3] / 180 * Math.PI) * sdis;
+				var y2:Float = 360 + Math.sin(par[3] / 180 * Math.PI) * par[2] / 2 - Math.cos(par[3] / 180 * Math.PI) * sdis;
+				var x3:Float = 640 - Math.cos(par[3] / 180 * Math.PI) * par[2] / 2 + Math.sin(par[3] / 180 * Math.PI) * edis;
+				var y3:Float = 360 - Math.sin(par[3] / 180 * Math.PI) * par[2] / 2 - Math.cos(par[3] / 180 * Math.PI) * edis;
+				var x4:Float = 640 + Math.cos(par[3] / 180 * Math.PI) * par[2] / 2 + Math.sin(par[3] / 180 * Math.PI) * edis;
+				var y4:Float = 360 + Math.sin(par[3] / 180 * Math.PI) * par[2] / 2 - Math.cos(par[3] / 180 * Math.PI) * edis;
 
-				var z:Float = 200 + 360 * FlxMath.fastSin(Math.PI / 12);
+				var z:Float = 200 + 360 * Math.sin(Math.PI / 12);
 
 				var p0 = NoteObject.multiWorldSpin(x1, y1, z, [0, -15, 0], [0, 0, 0], [ang, 0, -ang], [640, 640, 640], [360, 360, 360], [z, z, z])[0];
 				var p1 = NoteObject.multiWorldSpin(x2, y2, z, [0, -15, 0], [0, 0, 0], [ang, 0, -ang], [640, 640, 640], [360, 360, 360], [z, z, z])[0];
@@ -1577,14 +1577,14 @@ class R_peace extends RenderPath
 				var eang:Float = (etime - Conductor.songPosition) / 600;
 
 				// x+cos,y+sin
-				var x1:Float = 640 - FlxMath.fastSin(sang * Math.PI) * par[2] / 2 + FlxMath.fastCos(sang * Math.PI) * sdis;
-				var y1:Float = 360 + FlxMath.fastCos(sang * Math.PI) * par[2] / 2 + FlxMath.fastSin(sang * Math.PI) * sdis;
-				var x2:Float = 640 + FlxMath.fastSin(sang * Math.PI) * par[2] / 2 + FlxMath.fastCos(sang * Math.PI) * sdis;
-				var y2:Float = 360 - FlxMath.fastCos(sang * Math.PI) * par[2] / 2 + FlxMath.fastSin(sang * Math.PI) * sdis;
-				var x3:Float = 640 - FlxMath.fastSin(eang * Math.PI) * par[2] / 2 + FlxMath.fastCos(eang * Math.PI) * edis;
-				var y3:Float = 360 + FlxMath.fastCos(eang * Math.PI) * par[2] / 2 + FlxMath.fastSin(eang * Math.PI) * edis;
-				var x4:Float = 640 + FlxMath.fastSin(eang * Math.PI) * par[2] / 2 + FlxMath.fastCos(eang * Math.PI) * edis;
-				var y4:Float = 360 - FlxMath.fastCos(eang * Math.PI) * par[2] / 2 + FlxMath.fastSin(eang * Math.PI) * edis;
+				var x1:Float = 640 - Math.sin(sang * Math.PI) * par[2] / 2 + Math.cos(sang * Math.PI) * sdis;
+				var y1:Float = 360 + Math.cos(sang * Math.PI) * par[2] / 2 + Math.sin(sang * Math.PI) * sdis;
+				var x2:Float = 640 + Math.sin(sang * Math.PI) * par[2] / 2 + Math.cos(sang * Math.PI) * sdis;
+				var y2:Float = 360 - Math.cos(sang * Math.PI) * par[2] / 2 + Math.sin(sang * Math.PI) * sdis;
+				var x3:Float = 640 - Math.sin(eang * Math.PI) * par[2] / 2 + Math.cos(eang * Math.PI) * edis;
+				var y3:Float = 360 + Math.cos(eang * Math.PI) * par[2] / 2 + Math.sin(eang * Math.PI) * edis;
+				var x4:Float = 640 + Math.sin(eang * Math.PI) * par[2] / 2 + Math.cos(eang * Math.PI) * edis;
+				var y4:Float = 360 - Math.cos(eang * Math.PI) * par[2] / 2 + Math.sin(eang * Math.PI) * edis;
 
 				var p0:Array<Float> = NoteObject.toScreen(x1, y1, sz);
 				var p1:Array<Float> = NoteObject.toScreen(x2, y2, sz);

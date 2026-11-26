@@ -1,6 +1,6 @@
 package modcharts;
 
-import Song.SwagSong;
+import backend.data.Song.SwagSong;
 import Std;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -62,12 +62,12 @@ class M_destiny
 					y = 360;
 				else if (daNote.strumTime > 3178.8079470198672)
 					y = FlxMath.lerp(ylist[daNote.noteData], 360, (daNote.strumTime - 3178.8079470198672) / 1589.40397351);
-				daNote.z = 200 / 0.7 + FlxMath.fastSin((daNote.strumTime / 794.701986755 - 1 + daNote.noteData * 0.5) * Math.PI) * 50;
-				daNote.wx = 150 + FlxMath.fastCos((daNote.strumTime / 794.701986755 - 1 + daNote.noteData * 0.5) * Math.PI) * 270;
+				daNote.z = 200 / 0.7 + Math.sin((daNote.strumTime / 794.701986755 - 1 + daNote.noteData * 0.5) * Math.PI) * 50;
+				daNote.wx = 150 + Math.cos((daNote.strumTime / 794.701986755 - 1 + daNote.noteData * 0.5) * Math.PI) * 270;
 				if (daNote.strumTime > 11125.827814569537)
 				{
-					daNote.z = 200 / 0.7 + FlxMath.fastSin((daNote.strumTime / 794.701986755 * 2 - 1 + daNote.noteData * 0.5) * Math.PI) * 50;
-					daNote.wx = 150 + FlxMath.fastCos((daNote.strumTime / 794.701986755 * 2 - 1 + daNote.noteData * 0.5) * Math.PI) * 270;
+					daNote.z = 200 / 0.7 + Math.sin((daNote.strumTime / 794.701986755 * 2 - 1 + daNote.noteData * 0.5) * Math.PI) * 50;
+					daNote.wx = 150 + Math.cos((daNote.strumTime / 794.701986755 * 2 - 1 + daNote.noteData * 0.5) * Math.PI) * 270;
 				}
 				daNote.wy = y;
 				var x2:Float = NoteObject.toScreen(daNote.wx + Note.noteWidth[daNote.noteData] / 1.4, daNote.wy, daNote.z)[0];
@@ -190,8 +190,8 @@ class M_destiny
 			{
 				daNote.alpha = daNote.isSustainNote ? 0.48 : 0.8;
 			}
-			daNote.wx = 100 + 320 * daNote.noteData + FlxMath.fastSin((daNote.strumTime / 794.701986755 + daNote.noteData) * Math.PI) * 150;
-			daNote.z = 200 / 0.7 + FlxMath.fastCos((daNote.strumTime / 794.701986755 + daNote.noteData) * Math.PI) * 50;
+			daNote.wx = 100 + 320 * daNote.noteData + Math.sin((daNote.strumTime / 794.701986755 + daNote.noteData) * Math.PI) * 150;
+			daNote.z = 200 / 0.7 + Math.cos((daNote.strumTime / 794.701986755 + daNote.noteData) * Math.PI) * 50;
 			if (FlxG.save.data.downscroll)
 				daNote.wy = (670 + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
 			else
@@ -358,12 +358,12 @@ class M_destiny
 						daNote.alpha = 0;
 				}
 				var mst:Float = (time - 65165.56291390731) / 397.350993377;
-				daNote.wx = 640 + 300 * FlxMath.fastCos(time / 794.701986755 * Math.PI);
-				daNote.wy = 360 + 200 * FlxMath.fastSin(time / 794.701986755 * Math.PI);
+				daNote.wx = 640 + 300 * Math.cos(time / 794.701986755 * Math.PI);
+				daNote.wy = 360 + 200 * Math.sin(time / 794.701986755 * Math.PI);
 				if (mst >= 32)
 				{
 					daNote.wx = 190 + 300 * daNote.noteData;
-					daNote.wy = 360 + 400 * FlxMath.fastSin(time / 794.701986755 * Math.PI);
+					daNote.wy = 360 + 400 * Math.sin(time / 794.701986755 * Math.PI);
 				}
 				var group:Float = Math.floor(Math.floor(mst / 2) - st / 2);
 				if (daNote.spec == 0)
@@ -395,7 +395,7 @@ class M_destiny
 				daNote.z = 300;
 				if (Conductor.songPosition > 103311.25827814577)
 					daNote.z = 300
-						+ 300 * Math.abs(FlxMath.fastSin(((Conductor.songPosition +
+						+ 300 * Math.abs(Math.sin(((Conductor.songPosition +
 							daNote.sustainOrder * Conductor.stepCrochet) % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
 				var len:Float = Conductor.stepCrochet;
 				if (!daNote.animation.curAnim.name.endsWith('hold'))
@@ -425,11 +425,11 @@ class M_destiny
 				var x = 160 * (1.5 - daNote.noteData);
 				var y = (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed,
 					2)) * (FlxG.save.data.downscroll ? 1 : -1) * (daNote.mustPress ? 1 : -1);
-				daNote.wx = 640 - FlxMath.fastCos(ang) * x - FlxMath.fastSin(ang) * y;
-				daNote.wy = 360 - FlxMath.fastSin(ang) * x + FlxMath.fastCos(ang) * y;
+				daNote.wx = 640 - Math.cos(ang) * x - Math.sin(ang) * y;
+				daNote.wy = 360 - Math.sin(ang) * x + Math.cos(ang) * y;
 				daNote.z = 300;
 				if (Conductor.songPosition > 103311.25827814577)
-					daNote.z = 300 + 300 * Math.abs(FlxMath.fastSin((Conductor.songPosition % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
+					daNote.z = 300 + 300 * Math.abs(Math.sin((Conductor.songPosition % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
 				daNote.scaleW();
 			}
 		}
@@ -458,7 +458,7 @@ class M_destiny
 					ang += ((Conductor.songPosition % 794.701986755) - 694.701986755) / 800 * Math.PI;
 				if (Conductor.songPosition < 116026.49006622526)
 					ang = 0;
-				daNote.z = 200 / 0.7 - FlxMath.fastSin(ang) * (daNote.mustPress ? 100 : -100);
+				daNote.z = 200 / 0.7 - Math.sin(ang) * (daNote.mustPress ? 100 : -100);
 			}
 			else
 			{
@@ -472,8 +472,8 @@ class M_destiny
 					ang += ((Conductor.songPosition % 794.701986755) - 694.701986755) / 800 * Math.PI;
 				if (Conductor.songPosition < 116026.49006622526)
 					ang = 0;
-				daNote.z = 200 / 0.7 - FlxMath.fastSin(ang) * (daNote.mustPress ? 100 : -100);
-				daNote.wx = 640 + FlxMath.fastCos(ang) * (x - 640) + 160 * (daNote.noteData - 1.5);
+				daNote.z = 200 / 0.7 - Math.sin(ang) * (daNote.mustPress ? 100 : -100);
+				daNote.wx = 640 + Math.cos(ang) * (x - 640) + 160 * (daNote.noteData - 1.5);
 				if (daNote.isEnd)
 				{
 					daNote.offsetWhenDraw = false;
@@ -510,12 +510,12 @@ class M_destiny
 					y = 360;
 				else if (Conductor.songPosition > 3178.8079470198672)
 					y = FlxMath.lerp(ylist[dastrum.ID], 360, (Conductor.songPosition - 3178.8079470198672) / 1589.40397351);
-				dastrum.z = 200 / 0.7 + FlxMath.fastSin((Conductor.songPosition / 794.701986755 - 1 + dastrum.ID * 0.5) * Math.PI) * 50;
-				dastrum.wx = 150 + FlxMath.fastCos((Conductor.songPosition / 794.701986755 - 1 + dastrum.ID * 0.5) * Math.PI) * 270;
+				dastrum.z = 200 / 0.7 + Math.sin((Conductor.songPosition / 794.701986755 - 1 + dastrum.ID * 0.5) * Math.PI) * 50;
+				dastrum.wx = 150 + Math.cos((Conductor.songPosition / 794.701986755 - 1 + dastrum.ID * 0.5) * Math.PI) * 270;
 				if (Conductor.songPosition > 11125.827814569537)
 				{
-					dastrum.z = 200 / 0.7 + FlxMath.fastSin((Conductor.songPosition / 794.701986755 * 2 - 1 + dastrum.ID * 0.5) * Math.PI) * 50;
-					dastrum.wx = 150 + FlxMath.fastCos((Conductor.songPosition / 794.701986755 * 2 - 1 + dastrum.ID * 0.5) * Math.PI) * 270;
+					dastrum.z = 200 / 0.7 + Math.sin((Conductor.songPosition / 794.701986755 * 2 - 1 + dastrum.ID * 0.5) * Math.PI) * 50;
+					dastrum.wx = 150 + Math.cos((Conductor.songPosition / 794.701986755 * 2 - 1 + dastrum.ID * 0.5) * Math.PI) * 270;
 				}
 				dastrum.wy = y;
 				var x2:Float = NoteObject.toScreen(dastrum.wx + Note.noteWidth[dastrum.ID] / 1.4, dastrum.wy, dastrum.z)[0];
@@ -575,8 +575,8 @@ class M_destiny
 			if (dastrum.spec == 1)
 			{
 				dastrum.alpha += 0.05;
-				dastrum.wx = 100 + 320 * dastrum.ID + FlxMath.fastSin((Conductor.songPosition / 794.701986755 + dastrum.ID) * Math.PI) * 150;
-				dastrum.z = 200 / 0.7 + FlxMath.fastCos((Conductor.songPosition / 794.701986755 + dastrum.ID) * Math.PI) * 50;
+				dastrum.wx = 100 + 320 * dastrum.ID + Math.sin((Conductor.songPosition / 794.701986755 + dastrum.ID) * Math.PI) * 150;
+				dastrum.z = 200 / 0.7 + Math.cos((Conductor.songPosition / 794.701986755 + dastrum.ID) * Math.PI) * 50;
 				dastrum.scaleW();
 			}
 			else
@@ -590,10 +590,10 @@ class M_destiny
 		}
 		else if (Conductor.songPosition >= 39635.09933774834 && Conductor.songPosition < 39735.09933774834)
 		{
-			dastrum.wx = FlxMath.lerp(100 + 320 * dastrum.ID + FlxMath.fastSin(dastrum.ID * Math.PI) * 150, 640,
+			dastrum.wx = FlxMath.lerp(100 + 320 * dastrum.ID + Math.sin(dastrum.ID * Math.PI) * 150, 640,
 				(Conductor.songPosition - 39635.09933774834) / 100);
 			dastrum.wy = FlxMath.lerp(FlxG.save.data.downscroll ? 670 : 50, 360, (Conductor.songPosition - 39635.09933774834) / 100);
-			dastrum.z = FlxMath.lerp(200 / 0.7 + FlxMath.fastCos(dastrum.ID * Math.PI) * 50, 200 / 0.7, (Conductor.songPosition - 39635.09933774834) / 100);
+			dastrum.z = FlxMath.lerp(200 / 0.7 + Math.cos(dastrum.ID * Math.PI) * 50, 200 / 0.7, (Conductor.songPosition - 39635.09933774834) / 100);
 			dastrum.scaleW();
 		}
 		else if (Conductor.songPosition >= 39735.09933774834 && Conductor.songPosition < 65165.56291390731)
@@ -707,12 +707,12 @@ class M_destiny
 			if (Conductor.songPosition > 79470.19867549674)
 			{
 				dastrum.wx = 190 + 300 * dastrum.ID;
-				dastrum.wy = 360 + 400 * FlxMath.fastSin(Conductor.songPosition / 794.701986755 * Math.PI);
+				dastrum.wy = 360 + 400 * Math.sin(Conductor.songPosition / 794.701986755 * Math.PI);
 			}
 			else
 			{
-				dastrum.wx = 640 + 300 * FlxMath.fastCos(Conductor.songPosition / 794.701986755 * Math.PI);
-				dastrum.wy = 360 + 200 * FlxMath.fastSin(Conductor.songPosition / 794.701986755 * Math.PI);
+				dastrum.wx = 640 + 300 * Math.cos(Conductor.songPosition / 794.701986755 * Math.PI);
+				dastrum.wy = 360 + 200 * Math.sin(Conductor.songPosition / 794.701986755 * Math.PI);
 			}
 			dastrum.z = 200;
 			if (Conductor.songPosition > 69933.77483443712 && Conductor.songPosition < 71523.17880794706)
@@ -744,7 +744,7 @@ class M_destiny
 					dastrum.alpha = (Conductor.songPosition - 90596.02649006629) / 100;
 				dastrum.z = 300;
 				if (Conductor.songPosition > 103311.25827814577)
-					dastrum.z = 300 + 300 * Math.abs(FlxMath.fastSin((Conductor.songPosition % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
+					dastrum.z = 300 + 300 * Math.abs(Math.sin((Conductor.songPosition % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
 				if (dastrum.player == 1)
 				{
 					if (Conductor.songPosition < 90696.02649006629)
@@ -752,16 +752,16 @@ class M_destiny
 					var ang:Float = Math.floor((Conductor.songPosition - 90596.02649006629) / 794.701986755) * Math.PI / 8;
 					if (Conductor.songPosition % 794.701986755 > 694.701986755)
 						ang += ((Conductor.songPosition % 794.701986755) - 694.701986755) / 800 * Math.PI;
-					dastrum.wx = 640 + 160 * (dastrum.ID - 1.5) * FlxMath.fastCos(ang);
-					dastrum.wy = 360 + 160 * (dastrum.ID - 1.5) * FlxMath.fastSin(ang);
+					dastrum.wx = 640 + 160 * (dastrum.ID - 1.5) * Math.cos(ang);
+					dastrum.wy = 360 + 160 * (dastrum.ID - 1.5) * Math.sin(ang);
 					dastrum.scaleW();
 				}
 				else
 				{
 					dastrum.alpha *= 0.8;
 					var ang:Float = (Conductor.songPosition % 794.701986755) / 794.701986755;
-					dastrum.wx = 640 + 500 * FlxMath.fastSin(ang * 2 * Math.PI);
-					dastrum.wy = 360 - 500 * FlxMath.fastCos(ang * 2 * Math.PI);
+					dastrum.wx = 640 + 500 * Math.sin(ang * 2 * Math.PI);
+					dastrum.wy = 360 - 500 * Math.cos(ang * 2 * Math.PI);
 					dastrum.angle = ang * 360;
 					dastrum.scaleW();
 				}
@@ -789,8 +789,8 @@ class M_destiny
 				var ang:Float = Math.floor((Conductor.songPosition - 90596.02649006629) / 794.701986755) * Math.PI / 8;
 				if (Conductor.songPosition % 794.701986755 > 694.701986755)
 					ang += ((Conductor.songPosition % 794.701986755) - 694.701986755) / 800 * Math.PI;
-				dastrum.z = 200 / 0.7 - FlxMath.fastSin(ang) * (dastrum.player == 1 ? 100 : -100);
-				dastrum.wx = 640 + FlxMath.fastCos(ang) * (x - 640) + 160 * (dastrum.ID - 1.5);
+				dastrum.z = 200 / 0.7 - Math.sin(ang) * (dastrum.player == 1 ? 100 : -100);
+				dastrum.wx = 640 + Math.cos(ang) * (x - 640) + 160 * (dastrum.ID - 1.5);
 				dastrum.scaleW();
 			}
 			else if (dastrum.spec == -2)
@@ -812,8 +812,8 @@ class M_destiny
 				dastrum.alpha *= 0.6;
 				var ang:Float = (Conductor.songPosition % 16.5562913907) / 16.5562913907;
 				ang = Math.floor(ang * 48) / 48;
-				dastrum.x = 640 + 150 * FlxMath.fastSin(ang * 2 * Math.PI) - dastrum.width / 2;
-				dastrum.y = 360 - 150 * FlxMath.fastCos(ang * 2 * Math.PI) - dastrum.height / 2;
+				dastrum.x = 640 + 150 * Math.sin(ang * 2 * Math.PI) - dastrum.width / 2;
+				dastrum.y = 360 - 150 * Math.cos(ang * 2 * Math.PI) - dastrum.height / 2;
 				dastrum.angle = ang * 360;
 			}
 			else
@@ -823,15 +823,15 @@ class M_destiny
 					var ang:Float = Math.floor((Conductor.songPosition - 90596.02649006629) / 794.701986755) * Math.PI / 8;
 					if (Conductor.songPosition % 794.701986755 > 694.701986755)
 						ang += ((Conductor.songPosition % 794.701986755) - 694.701986755) / 800 * Math.PI;
-					dastrum.wx = 640 + 160 * (dastrum.ID - 1.5) * FlxMath.fastCos(ang);
-					dastrum.wy = 360 + 160 * (dastrum.ID - 1.5) * FlxMath.fastSin(ang);
+					dastrum.wx = 640 + 160 * (dastrum.ID - 1.5) * Math.cos(ang);
+					dastrum.wy = 360 + 160 * (dastrum.ID - 1.5) * Math.sin(ang);
 					dastrum.scaleW();
 				}
 				else
 				{
 					var ang:Float = (Conductor.songPosition % 794.701986755) / 794.701986755;
-					dastrum.wx = 640 + 500 * FlxMath.fastSin(ang * 2 * Math.PI);
-					dastrum.wy = 360 - 500 * FlxMath.fastCos(ang * 2 * Math.PI);
+					dastrum.wx = 640 + 500 * Math.sin(ang * 2 * Math.PI);
+					dastrum.wy = 360 - 500 * Math.cos(ang * 2 * Math.PI);
 					dastrum.angle = ang * 360;
 					dastrum.scaleW();
 				}
@@ -962,12 +962,12 @@ class M_destiny
 				daNote.strumTime = 0;
 				var time:Float = times[daNote.spec];
 				var mst:Float = (time - 65165.56291390731) / 397.350993377;
-				daNote.wx = 640 + 300 * FlxMath.fastCos(time / 794.701986755 * Math.PI);
-				daNote.wy = 360 + 200 * FlxMath.fastSin(time / 794.701986755 * Math.PI);
+				daNote.wx = 640 + 300 * Math.cos(time / 794.701986755 * Math.PI);
+				daNote.wy = 360 + 200 * Math.sin(time / 794.701986755 * Math.PI);
 				if (mst >= 32)
 				{
 					daNote.wx = 190 + 300 * datas[daNote.spec];
-					daNote.wy = 360 + 400 * FlxMath.fastSin(time / 794.701986755 * Math.PI);
+					daNote.wy = 360 + 400 * Math.sin(time / 794.701986755 * Math.PI);
 				}
 				var group:Float = Math.floor(Math.floor(mst / 2) - st / 2);
 				if ((st > 12 && st < 16) || (st > 28 && st < 32) || (st > 40 && st < 48) || (st > 56 && st < 64) || st < 0)
@@ -1087,20 +1087,20 @@ class R_destiny extends RenderPath
 				else if (etime > 3178.8079470198672)
 					y2 = FlxMath.lerp(ylist[Std.int(par[2])], 360, (etime - 3178.8079470198672) / 1589.40397351);
 
-				var z1:Float = 200 / 0.7 + FlxMath.fastSin((stime / 794.701986755 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 50;
-				var x1:Float = 150 + FlxMath.fastCos((stime / 794.701986755 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 270;
+				var z1:Float = 200 / 0.7 + Math.sin((stime / 794.701986755 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 50;
+				var x1:Float = 150 + Math.cos((stime / 794.701986755 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 270;
 				if (stime > 11125.827814569537)
 				{
-					z1 = 200 / 0.7 + FlxMath.fastSin((stime / 794.701986755 * 2 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 50;
-					x1 = 150 + FlxMath.fastCos((stime / 794.701986755 * 2 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 270;
+					z1 = 200 / 0.7 + Math.sin((stime / 794.701986755 * 2 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 50;
+					x1 = 150 + Math.cos((stime / 794.701986755 * 2 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 270;
 				}
 
-				var z2:Float = 200 / 0.7 + FlxMath.fastSin((etime / 794.701986755 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 50;
-				var x2:Float = 150 + FlxMath.fastCos((etime / 794.701986755 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 270;
+				var z2:Float = 200 / 0.7 + Math.sin((etime / 794.701986755 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 50;
+				var x2:Float = 150 + Math.cos((etime / 794.701986755 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 270;
 				if (etime > 11125.827814569537)
 				{
-					z2 = 200 / 0.7 + FlxMath.fastSin((etime / 794.701986755 * 2 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 50;
-					x2 = 150 + FlxMath.fastCos((etime / 794.701986755 * 2 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 270;
+					z2 = 200 / 0.7 + Math.sin((etime / 794.701986755 * 2 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 50;
+					x2 = 150 + Math.cos((etime / 794.701986755 * 2 - 1 + Std.int(par[2]) * 0.5) * Math.PI) * 270;
 				}
 
 				var p0:Array<Float> = NoteObject.toScreen(x1, y - par[3] / 2, z1);
@@ -1123,13 +1123,13 @@ class R_destiny extends RenderPath
 				var stime:Float = FlxMath.lerp(par[0], par[1], head);
 				var etime:Float = FlxMath.lerp(par[0], par[1], tail);
 
-				var wx:Float = 100 + 320 * par[2] + FlxMath.fastSin((stime / 794.701986755 + par[2]) * Math.PI) * 150;
-				var z:Float = 200 / 0.7 + FlxMath.fastCos((stime / 794.701986755 + par[2]) * Math.PI) * 50;
+				var wx:Float = 100 + 320 * par[2] + Math.sin((stime / 794.701986755 + par[2]) * Math.PI) * 150;
+				var z:Float = 200 / 0.7 + Math.cos((stime / 794.701986755 + par[2]) * Math.PI) * 50;
 				var wy:Float = (50 - (Conductor.songPosition - stime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
 				if (FlxG.save.data.downscroll)
 					wy = (670 + (Conductor.songPosition - stime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
-				var wx2:Float = 100 + 320 * par[2] + FlxMath.fastSin((etime / 794.701986755 + par[2]) * Math.PI) * 150;
-				var z2:Float = 200 / 0.7 + FlxMath.fastCos((etime / 794.701986755 + par[2]) * Math.PI) * 50;
+				var wx2:Float = 100 + 320 * par[2] + Math.sin((etime / 794.701986755 + par[2]) * Math.PI) * 150;
+				var z2:Float = 200 / 0.7 + Math.cos((etime / 794.701986755 + par[2]) * Math.PI) * 50;
 				var wy2:Float = (50 - (Conductor.songPosition - etime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
 				if (FlxG.save.data.downscroll)
 					wy2 = (670 + (Conductor.songPosition - etime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed, 2)));
@@ -1149,22 +1149,22 @@ class R_destiny extends RenderPath
 				var etime:Float = FlxMath.lerp(par[0], par[1], tail);
 
 				var mst1:Float = (stime - 65165.56291390731) / 397.350993377;
-				var x1:Float = 640 + 300 * FlxMath.fastCos(stime / 794.701986755 * Math.PI);
-				var y1:Float = 360 + 200 * FlxMath.fastSin(stime / 794.701986755 * Math.PI);
+				var x1:Float = 640 + 300 * Math.cos(stime / 794.701986755 * Math.PI);
+				var y1:Float = 360 + 200 * Math.sin(stime / 794.701986755 * Math.PI);
 				var group1:Float = Math.floor(Math.floor(mst1 / 2) - st / 2);
 				group1 += (mst1 / 2) % 1;
 
 				var mst2:Float = (etime - 65165.56291390731) / 397.350993377;
-				var x2:Float = 640 + 300 * FlxMath.fastCos(etime / 794.701986755 * Math.PI);
-				var y2:Float = 360 + 200 * FlxMath.fastSin(etime / 794.701986755 * Math.PI);
+				var x2:Float = 640 + 300 * Math.cos(etime / 794.701986755 * Math.PI);
+				var y2:Float = 360 + 200 * Math.sin(etime / 794.701986755 * Math.PI);
 				var group2:Float = Math.floor(Math.floor(mst2 / 2) - st / 2);
 				group2 += (mst2 / 2) % 1;
 				if (mst1 >= 32)
 				{
 					x1 = 190 + 300 * par[3];
-					y1 = 360 + 400 * FlxMath.fastSin(stime / 794.701986755 * Math.PI);
+					y1 = 360 + 400 * Math.sin(stime / 794.701986755 * Math.PI);
 					x2 = 190 + 300 * par[3];
-					y2 = 360 + 400 * FlxMath.fastSin(etime / 794.701986755 * Math.PI);
+					y2 = 360 + 400 * Math.sin(etime / 794.701986755 * Math.PI);
 				}
 
 				var z1:Float = 0;
@@ -1208,24 +1208,24 @@ class R_destiny extends RenderPath
 					{
 						var abb = (Conductor.songPosition - stime + par[4] * Conductor.stepCrochet) / Conductor.stepCrochet;
 						if (abb > par[4] + head)
-							z1 = 300 + 300 * Math.abs(FlxMath.fastSin((Conductor.songPosition % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
+							z1 = 300 + 300 * Math.abs(Math.sin((Conductor.songPosition % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
 						else
 							z1 = 300
-								+ 300 * Math.abs(FlxMath.fastSin(((Conductor.songPosition - (par[4] +
+								+ 300 * Math.abs(Math.sin(((Conductor.songPosition - (par[4] +
 									head - abb) * 100) % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
 						if (abb > par[4] + tail)
-							z2 = 300 + 300 * Math.abs(FlxMath.fastSin((Conductor.songPosition % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
+							z2 = 300 + 300 * Math.abs(Math.sin((Conductor.songPosition % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
 						else
 							z2 = 300
-								+ 300 * Math.abs(FlxMath.fastSin(((Conductor.songPosition - (par[4] +
+								+ 300 * Math.abs(Math.sin(((Conductor.songPosition - (par[4] +
 									tail - abb) * 100) % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
 					}
 					else
 					{
 						z1 = 300
-							+ 300 * Math.abs(FlxMath.fastSin(((Conductor.songPosition - (par[4] + head) * 100) % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
+							+ 300 * Math.abs(Math.sin(((Conductor.songPosition - (par[4] + head) * 100) % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
 						z2 = 300
-							+ 300 * Math.abs(FlxMath.fastSin(((Conductor.songPosition - (par[4] + tail) * 100) % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
+							+ 300 * Math.abs(Math.sin(((Conductor.songPosition - (par[4] + tail) * 100) % 1589.40397351) / 1589.40397351 * 2 * Math.PI));
 					}
 				}
 
@@ -1240,14 +1240,14 @@ class R_destiny extends RenderPath
 					2)) * (FlxG.save.data.downscroll ? 1 : -1) * (par[5] == 1 ? 1 : -1);
 				var y02 = (Conductor.songPosition - etime) * (0.45 * FlxMath.roundDecimal(PlayState.SONG.speed,
 					2)) * (FlxG.save.data.downscroll ? 1 : -1) * (par[5] == 1 ? 1 : -1);
-				var x0 = 640 - FlxMath.fastCos(ang) * x01 - FlxMath.fastSin(ang) * y01;
-				var y0 = 360 - FlxMath.fastSin(ang) * x01 + FlxMath.fastCos(ang) * y01;
-				var x1 = 640 - FlxMath.fastCos(ang) * x02 - FlxMath.fastSin(ang) * y01;
-				var y1 = 360 - FlxMath.fastSin(ang) * x02 + FlxMath.fastCos(ang) * y01;
-				var x2 = 640 - FlxMath.fastCos(ang) * x01 - FlxMath.fastSin(ang) * y02;
-				var y2 = 360 - FlxMath.fastSin(ang) * x01 + FlxMath.fastCos(ang) * y02;
-				var x3 = 640 - FlxMath.fastCos(ang) * x02 - FlxMath.fastSin(ang) * y02;
-				var y3 = 360 - FlxMath.fastSin(ang) * x02 + FlxMath.fastCos(ang) * y02;
+				var x0 = 640 - Math.cos(ang) * x01 - Math.sin(ang) * y01;
+				var y0 = 360 - Math.sin(ang) * x01 + Math.cos(ang) * y01;
+				var x1 = 640 - Math.cos(ang) * x02 - Math.sin(ang) * y01;
+				var y1 = 360 - Math.sin(ang) * x02 + Math.cos(ang) * y01;
+				var x2 = 640 - Math.cos(ang) * x01 - Math.sin(ang) * y02;
+				var y2 = 360 - Math.sin(ang) * x01 + Math.cos(ang) * y02;
+				var x3 = 640 - Math.cos(ang) * x02 - Math.sin(ang) * y02;
+				var y3 = 360 - Math.sin(ang) * x02 + Math.cos(ang) * y02;
 
 				var p0:Array<Float> = NoteObject.toScreen(x0, y0, z1);
 				var p1:Array<Float> = NoteObject.toScreen(x1, y1, z1);
@@ -1273,8 +1273,8 @@ class R_destiny extends RenderPath
 					ang += ((Conductor.songPosition % 794.701986755) - 694.701986755) / 800 * Math.PI;
 				if (Conductor.songPosition < 116026.49006622526)
 					ang = 0;
-				var z = 200 / 0.7 - FlxMath.fastSin(ang) * (par[4] == 1 ? 100 : -100);
-				x = 640 + FlxMath.fastCos(ang) * (x - 640) + 160 * (par[3] - 1.5);
+				var z = 200 / 0.7 - Math.sin(ang) * (par[4] == 1 ? 100 : -100);
+				x = 640 + Math.cos(ang) * (x - 640) + 160 * (par[3] - 1.5);
 
 				var p0:Array<Float> = NoteObject.toScreen(x - par[2] / 2, y1, z);
 				var p1:Array<Float> = NoteObject.toScreen(x + par[2] / 2, y1, z);

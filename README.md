@@ -1,3 +1,5 @@
+# !!This mod is reworked, re-organized, and recoded with actual libraries updated.!!
+
 # Friday Night Funkin
 
 This is the repository for Friday Night Funkin, a game originally made for Ludum Dare 47 "Stuck In a Loop".
