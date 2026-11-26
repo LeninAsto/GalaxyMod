@@ -117,6 +117,7 @@ class PlayState extends MusicBeatState
 
 	private var healthBarBG:FlxSprite;
 	private var healthBar:FlxBar;
+	private var displayHealth:Float = 1;
 
 	private var generatedMusic:Bool = false;
 	private var startingSong:Bool = false;
@@ -647,14 +648,14 @@ class PlayState extends MusicBeatState
 			healthBarBG.y = FlxG.height * 0.1;
 
 		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
-			'health', 0, 2);
+			'displayHealth', 0, 2);
 		healthBar.scrollFactor.set();
-		healthBar.createFilledBar(0xFFFF0000, SONG.player1.startsWith("bf") ? 0xFF31B0D1 : 0xFF66FF33);
+		healthBar.createFilledBar(0xFFFF0000, 0xFF66FF33);
 		// healthBar
 		add(healthBar);
 
-		scoreTxt = new FlxText(0, healthBarBG.y + 40, FlxG.width, "", 20);
-		scoreTxt.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER);
+		scoreTxt = new FlxText(healthBarBG.x + healthBarBG.width - 190, healthBarBG.y + 30, 0, "", 20);
+		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT);
 		scoreTxt.scrollFactor.set();
 		scoreTxt.color = 0xFFffffff;
 		scoreTxt.borderStyle = OUTLINE;
@@ -1771,8 +1772,7 @@ class PlayState extends MusicBeatState
 				scoreTxt.color = 0xFFffff00;
 			else
 				scoreTxt.color = 0xFFffffff;
-			scoreTxt.text = Language.translate("Score:") + " " + Math.round(songScore) + " | " + Language.translate("Misses:") + " " + misses
-				+ " | " + Language.translate("Rating:") + " " + (total > 0 ? acc + "%" : "?");
+			scoreTxt.text = Language.translate("Score:") + Math.round(songScore);
 
 			if (practice && health > 1)
 				health = 1;
@@ -1822,16 +1822,20 @@ class PlayState extends MusicBeatState
 				progressBar.updateHitbox();
 			}
 
-			iconP1.setGraphicSize(Std.int(FlxMath.lerp(150, iconP1.width, 0.50)));
-			iconP2.setGraphicSize(Std.int(FlxMath.lerp(150, iconP2.width, 0.50)));
+			displayHealth = FlxMath.lerp(displayHealth, FlxMath.bound(health, 0, 2), 1 - Math.exp(-elapsed * 9));
+			var iconScale = FlxMath.lerp(1, iconP1.scale.x, Math.exp(-elapsed * 9));
+			iconP1.scale.set(iconScale, iconScale);
+			iconScale = FlxMath.lerp(1, iconP2.scale.x, Math.exp(-elapsed * 9));
+			iconP2.scale.set(iconScale, iconScale);
 
 			iconP1.updateHitbox();
 			iconP2.updateHitbox();
 
 			var iconOffset:Int = 26;
 
-			iconP1.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01) - iconOffset);
-			iconP2.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (iconP2.width - iconOffset);
+			var barCenter = healthBar.x + healthBar.width * (1 - healthBar.percent / 100);
+			iconP1.x = barCenter + (150 * iconP1.scale.x - 150) / 2 - iconOffset;
+			iconP2.x = barCenter - (150 * iconP2.scale.x) / 2 - iconOffset * 2;
 
 			if (health > 2)
 				health = 2;
@@ -3577,8 +3581,8 @@ class PlayState extends MusicBeatState
 			camHUD.zoom += 0.03;
 		}
 
-		iconP1.setGraphicSize(Std.int(iconP1.width + 30));
-		iconP2.setGraphicSize(Std.int(iconP2.width + 30));
+		iconP1.scale.set(1.2, 1.2);
+		iconP2.scale.set(1.2, 1.2);
 
 		iconP1.updateHitbox();
 		iconP2.updateHitbox();

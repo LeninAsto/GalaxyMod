@@ -59,6 +59,8 @@ class Alphabet extends FlxSpriteGroup
 	var yScale:Float;
 
 	public var sumwidth:Float = 0;
+	public var visualBaseline(get, never):Float;
+	inline function get_visualBaseline():Float return y + (isBold ? 70 : 110) * yScale;
 	public var children:Array<Alphabet> = [];
 	public var checkbox:FlxSprite;
 

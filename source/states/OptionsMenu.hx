@@ -1,460 +1,294 @@
 package states;
 
-import backend.input.Controls.Control;
 import options.Options;
-import flash.text.TextField;
-import flixel.FlxBasic;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.api.FlxGameJolt;
-import flixel.addons.display.FlxGridOverlay;
-import flixel.addons.transition.FlxTransitionableState;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.input.gamepad.FlxGamepad;
-import flixel.input.keyboard.FlxKey;
 import flixel.math.FlxMath;
 import flixel.text.FlxText;
-import flixel.tweens.FlxEase;
-import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
-import lime.utils.Assets;
-import openfl.Lib;
 
 class OptionsMenu extends MusicBeatState
 {
 	public static var instance:OptionsMenu;
-
-	var selector:FlxText;
-	var curSelected:Int = 0;
-
-	var options:Array<OptionCategory> = [];
-
 	public var acceptInput:Bool = true;
 
-	private var grpControls:FlxTypedGroup<Alphabet>;
-	private var grpChildren:FlxTypedGroup<FlxBasic>;
-	var currentSelectedCat:OptionCategory;
-
-	var holdt:Array<Float> = [0, 0];
+	var categories:Array<OptionCategory> = [];
+	var currentCategory:OptionCategory;
+	var selected:Int = 0;
+	var categorySelection:Int = 0;
+	var inCategory:Bool = false;
+	var rows:FlxTypedGroup<Alphabet>;
+	var decorations:FlxTypedGroup<FlxSprite>;
+	var values:Array<FlxText> = [];
+	var checks:Array<FlxSprite> = [];
+	var leftSelector:Alphabet;
+	var rightSelector:Alphabet;
+	var hint:FlxText;
 	var displayedLanguage:Dynamic;
-	var selectorLeft:Alphabet;
-	var selectorRight:Alphabet;
+	var holdTime:Float = 0;
 
 	override function load()
 	{
-		options.push(new OptionCategory("Preferences", [
-			new DownscrollOption("Toggle making the notes scroll down rather than up."),
-			new SplashOption("enble/disable notesplashes when hitting sick."),
-			new ProgressOption("Actully words here will not be shown"),
-			new LangOption("Language, will be applied to tittle, UI, dialogue, etc"),
-			new MouseOption("The skin of the mouse"),
-			new FPSOption("Actully words here will not be shown"),
-			new ShowFPSOption("Actully words here will not be shown")
-		]));
-		LoadingState.progress = 25;
-		options.push(new OptionCategory("Controls", [new DFJKOption(controls), new UIKeyOption(controls)]));
-		LoadingState.progress += 25;
-		options.push(new OptionCategory("Account", [new AccountOption("account")]));
+		categories = [
+			new OptionCategory("Preferences", [
+				new DownscrollOption(""), new SplashOption(""), new ProgressOption(""),
+				new LangOption(""), new MouseOption(""), new FPSOption(""), new ShowFPSOption("")
+			]),
+			new OptionCategory("Controls", [new DFJKOption(controls), new UIKeyOption(controls)]),
+			new OptionCategory("Account", [new AccountOption("")]),
+			new OptionCategory("Exit", [])
+		];
 		if (FlxGameJolt.initialized)
 		{
-			options[2].addOption(new DataOption("bruh"));
-			options[2].addOption(new AutoSyncOption("bruh"));
+			categories[2].addOption(new DataOption(""));
+			categories[2].addOption(new AutoSyncOption(""));
 		}
-		LoadingState.progress += 25;
-		options.push(new OptionCategory("Exit", []));
-		LoadingState.progress += 25;
+		LoadingState.progress = 100;
 		super.load();
 	}
 
 	override function create()
 	{
-		// clean();
 		instance = this;
 		displayedLanguage = FlxG.save.data.lang;
-		var menuBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menuDesat"));
+		var bg = new FlxSprite().loadGraphic(Paths.image("menuDesat"));
+		bg.color = 0xFFea71fd;
+		bg.setGraphicSize(Std.int(bg.width * 1.1));
+		bg.updateHitbox();
+		bg.screenCenter();
+		bg.antialiasing = FlxG.save.data.antialiasing;
+		add(bg);
 
-		menuBG.color = 0xFFea71fd;
-		menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));
-		menuBG.updateHitbox();
-		menuBG.screenCenter();
-		menuBG.antialiasing = FlxG.save.data.antialiasing;
-		add(menuBG);
-
-		grpControls = new FlxTypedGroup<Alphabet>();
-		grpChildren = new FlxTypedGroup<FlxBasic>();
-		add(grpControls);
-		add(grpChildren);
-
-		for (i in 0...options.length)
-		{
-			var controlLabel:Alphabet = new Alphabet(50, (100 * i) + (FlxG.height * 0.48), Language.translate(options[i].getName()), true, false, true);
-			controlLabel.isOption = true;
-			controlLabel.diagonalOption = true;
-			controlLabel.targetY = i;
-			controlLabel.x = (FlxG.width - controlLabel.sumwidth) / 2;
-			grpControls.add(controlLabel);
-			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
-		}
-
-		selectorLeft = new Alphabet(0, 0, '>', true);
-		selectorRight = new Alphabet(0, 0, '<', true);
-		add(selectorLeft);
-		add(selectorRight);
-		changeSelection();
-
+		rows = new FlxTypedGroup<Alphabet>();
+		decorations = new FlxTypedGroup<FlxSprite>();
+		add(rows);
+		add(decorations);
+		leftSelector = new Alphabet(0, 0, ">", true);
+		rightSelector = new Alphabet(0, 0, "<", true);
+		add(leftSelector);
+		add(rightSelector);
+		var bottom = new FlxSprite(0, FlxG.height - 30).makeGraphic(FlxG.width, 30, FlxColor.BLACK);
+		bottom.alpha = 0.6;
+		add(bottom);
+		hint = new FlxText(10, FlxG.height - 26, FlxG.width - 20, "", 16);
+		hint.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER);
+		add(hint);
+		showCategories();
 		super.create();
 	}
 
-	var isCat:Bool = false;
+	function clearRows():Void
+	{
+		for (row in rows.members) if (row != null) row.destroy();
+		for (decoration in decorations.members) if (decoration != null) decoration.destroy();
+		rows.clear();
+		decorations.clear();
+		values = [];
+		checks = [];
+	}
+
+	function showCategories():Void
+	{
+		clearRows();
+		inCategory = false;
+		selected = categorySelection;
+		for (i in 0...categories.length)
+		{
+			var row = new Alphabet(0, 0, Language.translate(categories[i].getName()), true);
+			row.x = (FlxG.width - row.sumwidth) / 2;
+			row.y = FlxG.height / 2 + (i - (categories.length - 1) / 2) * 92 - 35;
+			rows.add(row);
+		}
+		hint.text = Language.translate("Use arrows to select, ENTER to play, ESC to return");
+		changeSelection();
+	}
+
+	function showCategory(category:OptionCategory):Void
+	{
+		clearRows();
+		currentCategory = category;
+		inCategory = true;
+		selected = 0;
+		for (i in 0...category.getOptions().length)
+		{
+			var option = category.getOptions()[i];
+			var row = new Alphabet(100, FlxG.height * 0.48 + i * 100, option.getDisplay(), true, false, false, 0.75, 0.75);
+			row.isOption = true;
+			rows.add(row);
+			var value = new FlxText(750, 0, FlxG.width - 820, "", 24);
+			value.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, RIGHT);
+			decorations.add(value);
+			values.push(value);
+			var check:FlxSprite = null;
+			if (option.hascheckbox)
+			{
+				check = new FlxSprite(FlxG.width - 150, 0);
+				check.frames = Paths.getSparrowAtlas("checkbox");
+				check.animation.addByPrefix("none", "checkbox0", 24, false);
+				check.animation.addByPrefix("check", "checkbox anim0", 24, false);
+				check.animation.addByPrefix("uncheck", "checkbox anim reverse", 24, false);
+				check.animation.addByPrefix("finish", "checkbox finish", 24, false);
+				check.animation.play(option.updateCheck() ? "finish" : "none");
+				check.setGraphicSize(0, 62);
+				check.updateHitbox();
+				check.antialiasing = true;
+				decorations.add(check);
+			}
+			checks.push(check);
+			refreshOption(i);
+		}
+		hint.text = Language.translate("Use arrows to change values, ENTER to select, ESC to return");
+		changeSelection();
+	}
+
+	function refreshOption(index:Int):Void
+	{
+		var option = currentCategory.getOptions()[index];
+		rows.members[index].reType(option.getDisplay(), 0.75, 0.75);
+		values[index].text = option.getDisplay2().join("  ");
+	}
+
+	function changeSelection(change:Int = 0):Void
+	{
+		if (rows.length == 0) return;
+		selected = FlxMath.wrap(selected + change, 0, rows.length - 1);
+		for (i in 0...rows.length)
+		{
+			var row = rows.members[i];
+			row.alpha = i == selected ? 1 : 0.6;
+			if (inCategory)
+			{
+				row.targetY = i - selected;
+				values[i].alpha = row.alpha;
+				if (checks[i] != null) checks[i].alpha = row.alpha;
+			}
+		}
+		holdTime = 0;
+		if (change != 0) FlxG.sound.play(Paths.sound("scrollMenu"), 0.4);
+	}
+
+	function adjustOption(direction:Int):Void
+	{
+		var option = currentCategory.getOptions()[selected];
+		if (!option.getAccept()) return;
+		if (direction < 0 ? option.left() : option.right()) refreshOption(selected);
+	}
 
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		selectorLeft.visible = selectorRight.visible = !isCat && grpControls.length > 0;
-		if (selectorLeft.visible)
+		if (displayedLanguage != FlxG.save.data.lang)
 		{
-			var selected = grpControls.members[curSelected];
-			selectorLeft.x = selected.x - selectorLeft.sumwidth - 20;
-			selectorRight.x = selected.x + selected.sumwidth + 20;
-			selectorLeft.y = selectorRight.y = selected.y;
+			displayedLanguage = FlxG.save.data.lang;
+			if (inCategory)
+			{
+				for (i in 0...rows.length) refreshOption(i);
+				hint.text = Language.translate("Use arrows to change values, ENTER to select, ESC to return");
+			}
+			else showCategories();
 		}
-        if (displayedLanguage != FlxG.save.data.lang)
-        {
-            displayedLanguage = FlxG.save.data.lang;
-            refreshLanguageLabels();
-        }
-
-		if (acceptInput)
+		leftSelector.visible = rightSelector.visible = !inCategory && rows.length > 0;
+		if (!inCategory && rows.length > 0)
 		{
-			if (controls.BACK && !isCat)
+			var row = rows.members[selected];
+			leftSelector.setPosition(row.x - leftSelector.sumwidth - 20, row.y);
+			rightSelector.setPosition(row.x + row.sumwidth + 20, row.y);
+		}
+		if (inCategory)
+		{
+			for (i in 0...rows.length)
+			{
+				values[i].y = rows.members[i].y + 15;
+				if (checks[i] != null) checks[i].y = rows.members[i].y - 5;
+			}
+		}
+		if (!acceptInput) return;
+		if (controls.BACK)
+		{
+			if (inCategory) showCategories();
+			else
 			{
 				MainMenuState.optioned = true;
 				MainMenuState.storied = true;
 				LoadingState.loadAndSwitchState(() -> new MainMenuState(), false, 1);
 			}
-			else if (controls.BACK)
+			return;
+		}
+		if (controls.UP_UI || FlxG.mouse.wheel > 0) changeSelection(-1);
+		if (controls.DOWN_UI || FlxG.mouse.wheel < 0) changeSelection(1);
+		if (inCategory)
+		{
+			if (controls.LEFT_UI) adjustOption(-1);
+			else if (controls.RIGHT_UI) adjustOption(1);
+			if (controls.LEFT_UI_H || controls.RIGHT_UI_H)
 			{
-				isCat = false;
-				grpControls.clear();
-				grpChildren.clear();
-				for (i in 0...options.length)
+				holdTime += elapsed;
+				if (holdTime >= 0.53)
 				{
-					var controlLabel:Alphabet = new Alphabet(50, (100 * i) + (FlxG.height * 0.48), Language.translate(options[i].getName()), true, false);
-					controlLabel.isOption = true;
-					controlLabel.diagonalOption = true;
-					controlLabel.targetY = i;
-					controlLabel.x = (FlxG.width - controlLabel.sumwidth) / 2;
-					grpControls.add(controlLabel);
-					// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
-				}
-
-				curSelected = 0;
-
-				changeSelection(curSelected);
-			}
-
-			if (controls.UP_UI || FlxG.mouse.wheel > 0)
-				changeSelection(-1);
-			if (controls.DOWN_UI || FlxG.mouse.wheel < 0)
-				changeSelection(1);
-
-			if (isCat)
-			{
-				if (currentSelectedCat.getOptions()[curSelected].getAccept())
-				{
-					if (controls.RIGHT_UI)
-					{
-						if (currentSelectedCat.getOptions()[curSelected].right())
-						{
-							grpControls.members[curSelected].reType(currentSelectedCat.getOptions()[curSelected].getDisplay());
-							for (i in 0...grpControls.members[curSelected].children.length)
-								grpControls.members[curSelected].children[i].reType(currentSelectedCat.getOptions()[curSelected].getDisplay2()[i]);
-							trace(currentSelectedCat.getOptions()[curSelected].getDisplay());
-						}
-					}
-					if (controls.LEFT_UI)
-					{
-						if (currentSelectedCat.getOptions()[curSelected].left())
-						{
-							grpControls.members[curSelected].reType(currentSelectedCat.getOptions()[curSelected].getDisplay());
-							for (i in 0...grpControls.members[curSelected].children.length)
-								grpControls.members[curSelected].children[i].reType(currentSelectedCat.getOptions()[curSelected].getDisplay2()[i]);
-							trace(currentSelectedCat.getOptions()[curSelected].getDisplay());
-						}
-					}
-					if (controls.LEFT_UI_H)
-					{
-						holdt[0] += elapsed;
-						if (holdt[0] >= 0.53)
-						{
-							if (currentSelectedCat.getOptions()[curSelected].left())
-							{
-								grpControls.members[curSelected].reType(currentSelectedCat.getOptions()[curSelected].getDisplay());
-								for (i in 0...grpControls.members[curSelected].children.length)
-									grpControls.members[curSelected].children[i].reType(currentSelectedCat.getOptions()[curSelected].getDisplay2()[i]);
-							}
-							holdt[0] = 0.5;
-						}
-					}
-					else
-						holdt[0] = 0;
-					if (controls.RIGHT_UI_H)
-					{
-						holdt[1] += elapsed;
-						if (holdt[1] >= 0.53)
-						{
-							if (currentSelectedCat.getOptions()[curSelected].right())
-							{
-								grpControls.members[curSelected].reType(currentSelectedCat.getOptions()[curSelected].getDisplay());
-								for (i in 0...grpControls.members[curSelected].children.length)
-									grpControls.members[curSelected].children[i].reType(currentSelectedCat.getOptions()[curSelected].getDisplay2()[i]);
-							}
-							holdt[1] = 0.5;
-						}
-					}
-					else
-						holdt[1] = 0;
+					adjustOption(controls.LEFT_UI_H ? -1 : 1);
+					holdTime = 0.48;
 				}
 			}
-
-			var bruh:Int = 0;
-			var brighter:Int = -1;
-			var enter:Bool = false;
-			for (item in grpControls.members)
+			else holdTime = 0;
+		}
+		var accept = controls.ACCEPT;
+		if (MusicBeatState.mouseA && FlxG.mouse.justPressed)
+		{
+			for (i in 0...rows.length)
 			{
-				if (FlxG.mouse.viewX > item.x
-					&& FlxG.mouse.viewX < item.x + item.width
-					&& FlxG.mouse.viewY > item.y
-					&& FlxG.mouse.viewY < item.y + item.height
-					&& MusicBeatState.mouseA)
+				var row = rows.members[i];
+				if (FlxG.mouse.viewX >= row.x && FlxG.mouse.viewX < row.x + row.width
+					&& FlxG.mouse.viewY >= row.y && FlxG.mouse.viewY < row.y + row.height)
 				{
-					brighter = bruh;
-					if (FlxG.mouse.justPressed)
-					{
-						if (curSelected == bruh)
-							enter = true;
-						else
-							changeSelection(bruh - curSelected);
-					}
+					if (selected == i) accept = true;
+					else changeSelection(i - selected);
+					break;
 				}
-				bruh += 1;
-			}
-			var bruh = 0;
-			for (item in grpControls.members)
-			{
-				if (item.alpha != 1 && bruh == brighter)
-				{
-					item.alpha = 0.8;
-					for (i in 0...item.children.length)
-						item.children[i].alpha = 0.8;
-				}
-				else if (item.alpha != 1)
-				{
-					item.alpha = 0.6;
-					for (i in 0...item.children.length)
-						item.children[i].alpha = 0.6;
-				}
-				bruh += 1;
-			}
-
-			if (controls.ACCEPT || enter)
-			{
-				if (isCat)
-				{
-					if (currentSelectedCat.getOptions()[curSelected].press())
-					{
-						grpControls.members[curSelected].reType(currentSelectedCat.getOptions()[curSelected].getDisplay());
-						if (currentSelectedCat.getOptions()[curSelected].hascheckbox)
-							grpControls.members[curSelected].checkbox.animation.play(currentSelectedCat.getOptions()[curSelected].updateCheck() ? "check" : "uncheck");
-						for (i in 0...grpControls.members[curSelected].children.length)
-							grpControls.members[curSelected].children[i].reType(currentSelectedCat.getOptions()[curSelected].getDisplay2()[i]);
-						trace(currentSelectedCat.getOptions()[curSelected].getDisplay());
-					}
-				}
-				else
-				{
-					currentSelectedCat = options[curSelected];
-					isCat = true;
-					grpControls.clear();
-					grpChildren.clear();
-					if (currentSelectedCat.getName() == "Exit")
-					{
-						MainMenuState.optioned = true;
-						MainMenuState.storied = true;
-						FlxTransitionableState.skipNextTransIn = true;
-						FlxG.switchState(() -> new MainMenuState());
-					}
-					else
-					{
-						for (i in 0...currentSelectedCat.getOptions().length)
-						{
-							var ox:Float = currentSelectedCat.getOptions()[i].hascheckbox ? 130 : 50;
-							var controlLabel:Alphabet = new Alphabet(ox, (100 * i) + (FlxG.height * 0.48), currentSelectedCat.getOptions()[i].getDisplay(),
-								true, false);
-							controlLabel.isOption = true;
-							controlLabel.targetY = i;
-							grpControls.add(controlLabel);
-							if (currentSelectedCat.getOptions()[i].hascheckbox)
-							{
-								var cb = new FlxSprite(25, (100 * i) + (FlxG.height * 0.48) - 15);
-								cb.frames = Paths.getSparrowAtlas('checkbox');
-								cb.animation.addByPrefix('none', 'checkbox0', 24, false);
-								cb.animation.addByPrefix('check', 'checkbox anim0', 24, false);
-								cb.animation.addByPrefix('uncheck', 'checkbox anim reverse', 24, false);
-								cb.animation.addByPrefix('finish', 'checkbox finish', 24, false);
-								cb.animation.play("none");
-								cb.antialiasing = true;
-								cb.setGraphicSize(0, 70);
-								cb.updateHitbox();
-								cb.animation.play(currentSelectedCat.getOptions()[i].updateCheck() ? "finish" : "none");
-								grpChildren.add(cb);
-								controlLabel.checkbox = cb;
-							}
-							var sx = controlLabel.x + controlLabel.sumwidth + 60;
-							for (j in 0...currentSelectedCat.getOptions()[i].getDisplay2().length)
-							{
-								var child:Alphabet = new Alphabet(sx, (100 * i) + (FlxG.height * 0.48), currentSelectedCat.getOptions()[i].getDisplay2()[j],
-									false, false);
-								child.isOption = true;
-								child.targetY = i;
-								grpChildren.add(child);
-								controlLabel.children.push(child);
-								sx += child.sumwidth + 60;
-							}
-							// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
-						}
-						curSelected = 0;
-					}
-				}
-
-				changeSelection();
 			}
 		}
+		if (accept)
+		{
+			if (inCategory)
+			{
+				var option = currentCategory.getOptions()[selected];
+				if (option.press())
+				{
+					refreshOption(selected);
+					if (option.hascheckbox && checks[selected] != null)
+						checks[selected].animation.play(option.updateCheck() ? "check" : "uncheck");
+				}
+			}
+			else if (categories[selected].getName() == "Exit")
+			{
+				MainMenuState.optioned = true;
+				MainMenuState.storied = true;
+				LoadingState.loadAndSwitchState(() -> new MainMenuState(), false, 1);
+			}
+			else
+			{
+				categorySelection = selected;
+				showCategory(categories[selected]);
+			}
+		}
+	}
+
+	public function updateAccount():Void
+	{
+		if (categories[2].getOptions().length == 1)
+		{
+			categories[2].addOption(new DataOption(""));
+			categories[2].addOption(new AutoSyncOption(""));
+		}
+		showCategory(categories[2]);
+		add(new Welcome());
+	}
+
+	override function destroy()
+	{
 		FlxG.save.flush();
-	}
-
-	var isSettingControl:Bool = false;
-
-	public function updateAccount()
-	{
-		options[2].addOption(new DataOption("bruh"));
-		options[2].addOption(new AutoSyncOption("bruh"));
-
-		currentSelectedCat = options[2];
-		isCat = true;
-		grpControls.clear();
-		grpChildren.clear();
-		for (i in 0...currentSelectedCat.getOptions().length)
-		{
-			var ox:Float = currentSelectedCat.getOptions()[i].hascheckbox ? 130 : 50;
-			var controlLabel:Alphabet = new Alphabet(ox, (100 * i) + (FlxG.height * 0.48), currentSelectedCat.getOptions()[i].getDisplay(), true, false);
-			controlLabel.isOption = true;
-			controlLabel.targetY = i;
-			grpControls.add(controlLabel);
-			if (currentSelectedCat.getOptions()[i].hascheckbox)
-			{
-				var cb = new FlxSprite(25, (100 * i) + (FlxG.height * 0.48) - 15);
-				cb.frames = Paths.getSparrowAtlas('checkbox');
-				cb.animation.addByPrefix('none', 'checkbox0', 24, false);
-				cb.animation.addByPrefix('check', 'checkbox anim0', 24, false);
-				cb.animation.addByPrefix('uncheck', 'checkbox anim reverse', 24, false);
-				cb.animation.addByPrefix('finish', 'checkbox finish', 24, false);
-				cb.animation.play("none");
-				cb.antialiasing = true;
-				cb.setGraphicSize(0, 70);
-				cb.updateHitbox();
-				cb.animation.play(currentSelectedCat.getOptions()[i].updateCheck() ? "finish" : "none");
-				grpChildren.add(cb);
-				controlLabel.checkbox = cb;
-			}
-			var sx = controlLabel.x + controlLabel.sumwidth + 60;
-			for (j in 0...currentSelectedCat.getOptions()[i].getDisplay2().length)
-			{
-				var child:Alphabet = new Alphabet(sx, (100 * i) + (FlxG.height * 0.48), currentSelectedCat.getOptions()[i].getDisplay2()[j], false, false);
-				child.isOption = true;
-				child.targetY = i;
-				grpChildren.add(child);
-				controlLabel.children.push(child);
-				sx += child.sumwidth + 60;
-			}
-			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
-		}
-		curSelected = 0;
-
-		var welcome = new Welcome();
-		add(welcome);
-	}
-
-    function refreshLanguageLabels():Void
-    {
-        for (i in 0...grpControls.length)
-        {
-            var label = grpControls.members[i];
-            if (label == null) continue;
-            if (isCat)
-            {
-                var option = currentSelectedCat.getOptions()[i];
-                label.reType(option.getDisplay());
-                var values = option.getDisplay2();
-                var childX = label.x + label.sumwidth + 60;
-                for (j in 0...label.children.length)
-                {
-                    var child = label.children[j];
-                    if (j < values.length) child.reType(values[j]);
-                    child.x = childX;
-                    childX += child.sumwidth + 60;
-                }
-            }
-            else
-            {
-                label.reType(Language.translate(options[i].getName()));
-                label.x = (FlxG.width - label.sumwidth) / 2;
-            }
-        }
-    }
-
-	function changeSelection(change:Int = 0)
-	{
-		#if !switch
-		// NGio.logEvent("Fresh");
-		#end
-
-		holdt = [0, 0];
-
-		FlxG.sound.play(Paths.sound("scrollMenu"), 0.4);
-
-		curSelected += change;
-
-		if (curSelected < 0)
-			curSelected = grpControls.length - 1;
-		if (curSelected >= grpControls.length)
-			curSelected = 0;
-
-		// selector.y = (70 * curSelected) + 30;
-
-		var bullShit:Int = 0;
-
-		for (item in grpControls.members)
-		{
-			item.targetY = bullShit - curSelected;
-
-			item.alpha = 0.6;
-			for (i in 0...item.children.length)
-			{
-				item.children[i].targetY = bullShit - curSelected;
-				item.children[i].alpha = 0.6;
-			}
-
-			bullShit++;
-			// item.setGraphicSize(Std.int(item.width * 0.8));
-
-			if (item.targetY == 0)
-			{
-				item.alpha = 1;
-				for (i in 0...item.children.length)
-					item.children[i].alpha = 1;
-				// item.setGraphicSize(Std.int(item.width));
-			}
-		}
+		if (instance == this) instance = null;
+		super.destroy();
 	}
 }

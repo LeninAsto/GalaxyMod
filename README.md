@@ -1,4 +1,4 @@
-# !!This mod is reworked, re-organized, and recoded with actual libraries updated.!!
+# !!This mod fork is reworked, re-organized, and recoded with actual libraries updated.!!
 
 # Friday Night Funkin
 

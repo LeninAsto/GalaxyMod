@@ -20,6 +20,8 @@ class Language
         "PERSONAL BEST:" => "MEJOR PUNTAJE:", "Accuracy:" => "Precisión:", "Combo:" => "Combo:", "Score:" => "Puntaje:", "Misses:" => "Fallos:", "Rating:" => "Precisión:",
         "EASY" => "FÁCIL", "NORMAL" => "NORMAL", "HARD" => "DIFÍCIL", "TRUE" => "VERDADERO",
         "Tracks" => "Canciones", "WEEK SCORE" => "PUNTAJE SEMANAL",
+        "Author:" => "Autor:",
+        "Use arrows to change values, ENTER to select, ESC to return" => "Usa las flechas para cambiar, ENTER para elegir y ESC para volver",
         "Use arrows to select, ENTER to play, ESC to return" => "Usa las flechas para elegir, ENTER para jugar y ESC para volver"
     ];
 

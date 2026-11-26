@@ -252,7 +252,8 @@ class CreditState extends MusicBeatState
 
 		for (i in 0...texts.members.length)
 		{
-			icons.members[i].y = texts.members[i].y - 5;
+			icons.members[i].x = texts.members[i].x + texts.members[i].sumwidth + 10;
+			icons.members[i].y = texts.members[i].visualBaseline - icons.members[i].height;
 			icons.members[i].alpha = texts.members[i].alpha;
 		}
 	}

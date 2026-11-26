@@ -36,6 +36,17 @@ jobs:
           git -C .ci-deps/flixel-addons checkout 58c25298bc55b5c50af3a2670515c7efa14239f5
           git -C .ci-deps/flixel-addons apply "$env:GITHUB_WORKSPACE/.github/patches/flixel-addons.patch"
           haxelib dev flixel-addons "$env:GITHUB_WORKSPACE/.ci-deps/flixel-addons"
+      - name: Make Lime native dependencies available
+        shell: pwsh
+        run: |
+          $PSNativeCommandUseErrorActionPreference = $true
+          $limeDirectory = (haxelib libpath lime).Trim()
+          $limeNativeDirectory = Join-Path $limeDirectory 'ndll/Windows64'
+          if (!(Test-Path (Join-Path $limeNativeDirectory 'lime.ndll')) -or
+              !(Test-Path (Join-Path $limeNativeDirectory 'OpenAL32.dll'))) {
+            throw "Lime's Windows native libraries are missing from $limeNativeDirectory"
+          }
+          $limeNativeDirectory | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Build
         run: haxelib run lime build windows
       - name: Upload Windows build
