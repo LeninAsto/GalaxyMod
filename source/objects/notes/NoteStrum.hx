@@ -31,19 +31,12 @@ class NoteStrum extends NoteObject
 
 	public var type = "null";
 
-	private static var alphas:Map<String, Map<Int, Map<String, Map<Int, Array<Float>>>>> = new Map();
-	private static var indexes:Map<String, Map<Int, Map<String, Map<Int, Array<Int>>>>> = new Map();
-	private static var glist:Array<FlxGraphic> = [];
 
 	public var renderer:RenderPath;
 
 	public static function refresh()
 	{
-		for (i in glist)
-			i.destroy();
-		alphas = new Map();
-		indexes = new Map();
-		glist = [];
+		NoteObject.clearPathGraphics();
 	}
 
 	public function new(x:Float, y:Float, player:Int, num:Int, ?type:String = "null", ?spec:Int = 0)
@@ -225,31 +218,7 @@ class NoteStrum extends NoteObject
 		switch (rendermode)
 		{
 			case 2:
-				if (renderer == null || alpha <= 0 || !visible || !active)
-					return;
-				var inc:Vector<Int> = new Vector(6, true, [0, 1, 2, 1, 3, 2]);
-				var gdata:FlxGraphic = mapData();
-				var segmentCursor:Float = 1 - renderer.pathRatio;
-				while (segmentCursor + 0.1 < 1)
-				{
-					for (camera in cameras)
-					{
-						if (!camera.visible || !camera.exists)
-						{
-							continue;
-						}
-						var start:Float = segmentCursor;
-						var end:Float = segmentCursor + 0.1;
-						var lists:Array<Array<Float>> = renderer.start(start, end);
-						var v:Vector<Float> = new Vector(8, true, lists[0]);
-						var u:Vector<Float> = new Vector(lists[1].length, true, lists[1]);
-						if (end > 1)
-							end = 1;
-						getScreenPosition(_point, camera).subtract(offset);
-						camera.drawTriangles(gdata, v, inc, u, null, _point, blend, false, antialiasing);
-						segmentCursor = end;
-					}
-				}
+				drawPath(renderer);
 			case 1:
 				if (verticles == null || uvtData == null || alpha <= 0)
 					return;
@@ -262,7 +231,7 @@ class NoteStrum extends NoteObject
 						continue;
 					}
 					getScreenPosition(_point, camera).subtract(offset);
-					camera.drawTriangles(gdata, verticles, inc, uvtData, null, _point, blend, false, antialiasing);
+					camera.drawTriangles(gdata, verticles, inc, uvtData, null, _point, blend, false, antialiasing, colorTransform);
 				}
 			default:
 				inited = false;
@@ -270,74 +239,4 @@ class NoteStrum extends NoteObject
 		}
 	}
 
-	function mapData():FlxGraphic
-	{
-		if (gpix == null || alpha != oalp || !animation.curAnim.finished || oanim != animation.curAnim.name)
-		{
-			if (!alphas.exists(type))
-			{
-				alphas.set(type, new Map());
-				indexes.set(type, new Map());
-			}
-			if (!alphas.get(type).exists(ID))
-			{
-				alphas.get(type).set(ID, new Map());
-				indexes.get(type).set(ID, new Map());
-			}
-			if (!alphas.get(type).get(ID).exists(animation.curAnim.name))
-			{
-				alphas.get(type).get(ID).set(animation.curAnim.name, new Map());
-				indexes.get(type).get(ID).set(animation.curAnim.name, new Map());
-			}
-			if (!alphas.get(type)
-				.get(ID)
-				.get(animation.curAnim.name)
-				.exists(animation.curAnim.curFrame))
-			{
-				alphas.get(type)
-					.get(ID)
-					.get(animation.curAnim.name)
-					.set(animation.curAnim.curFrame, []);
-				indexes.get(type)
-					.get(ID)
-					.get(animation.curAnim.name)
-					.set(animation.curAnim.curFrame, []);
-			}
-			if (!alphas.get(type)
-				.get(ID)
-				.get(animation.curAnim.name)
-				.get(animation.curAnim.curFrame)
-				.contains(alpha))
-			{
-				var pix:FlxGraphic = FlxGraphic.fromFrame(frame, true);
-				var nalp:Array<Float> = alphas.get(type).get(ID).get(animation.curAnim.name).get(animation.curAnim.curFrame);
-				var nindex:Array<Int> = indexes.get(type).get(ID).get(animation.curAnim.name).get(animation.curAnim.curFrame);
-				pix.bitmap.colorTransform(pix.bitmap.rect, colorTransform);
-				glist.push(pix);
-				nalp.push(alpha);
-				nindex.push(glist.length - 1);
-				alphas.get(type)
-					.get(ID)
-					.get(animation.curAnim.name)
-					.set(animation.curAnim.curFrame, nalp);
-				indexes.get(type)
-					.get(ID)
-					.get(animation.curAnim.name)
-					.set(animation.curAnim.curFrame, nindex);
-			}
-			var dex = alphas.get(type)
-				.get(ID)
-				.get(animation.curAnim.name)
-				.get(animation.curAnim.curFrame)
-				.indexOf(alpha);
-			gpix = glist[
-				indexes.get(type)
-					.get(ID)
-					.get(animation.curAnim.name)
-					.get(animation.curAnim.curFrame)[dex]];
-			oalp = alpha;
-			oanim = animation.curAnim.name;
-		}
-		return gpix;
-	}
 }

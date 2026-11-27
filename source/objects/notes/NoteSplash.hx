@@ -18,19 +18,12 @@ class NoteSplash extends NoteObject
 
 	public var type = "null";
 
-	private static var alphas:Map<String, Map<String, Map<Int, Array<Float>>>> = new Map();
-	private static var indexes:Map<String, Map<String, Map<Int, Array<Int>>>> = new Map();
-	private static var glist:Array<FlxGraphic> = [];
 
 	public var renderer:RenderPath;
 
 	public static function refresh()
 	{
-		for (i in glist)
-			i.destroy();
-		alphas = new Map();
-		indexes = new Map();
-		glist = [];
+		NoteObject.clearPathGraphics();
 	}
 
 	public function new(daNote:Note, note:Int)
@@ -120,29 +113,7 @@ class NoteSplash extends NoteObject
 		switch (rendermode)
 		{
 			case 2:
-				var inc:Vector<Int> = new Vector(6, true, [0, 1, 2, 1, 3, 2]);
-				var gdata:FlxGraphic = mapData();
-				var segmentCursor:Float = 1 - renderer.pathRatio;
-				while (segmentCursor + 0.1 < 1)
-				{
-					for (camera in cameras)
-					{
-						if (!camera.visible || !camera.exists)
-						{
-							continue;
-						}
-						var start:Float = segmentCursor;
-						var end:Float = segmentCursor + 0.1;
-						var lists:Array<Array<Float>> = renderer.start(start, end);
-						var v:Vector<Float> = new Vector(8, true, lists[0]);
-						var u:Vector<Float> = new Vector(lists[1].length, true, lists[1]);
-						if (end > 1)
-							end = 1;
-						getScreenPosition(_point, camera).subtract(offset);
-						camera.drawTriangles(gdata, v, inc, u, null, _point, blend, false, antialiasing);
-						segmentCursor = end;
-					}
-				}
+				drawPath(renderer);
 			case 1:
 				if (verticles == null || uvtData == null)
 					return;
@@ -155,7 +126,7 @@ class NoteSplash extends NoteObject
 						continue;
 					}
 					getScreenPosition(_point, camera).subtract(offset);
-					camera.drawTriangles(gdata, verticles, inc, uvtData, null, _point, blend, false, antialiasing);
+					camera.drawTriangles(gdata, verticles, inc, uvtData, null, _point, blend, false, antialiasing, colorTransform);
 				}
 			default:
 				super.draw();
@@ -173,50 +144,4 @@ class NoteSplash extends NoteObject
 		super.update(elapsed);
 	}
 
-	function mapData():FlxGraphic
-	{
-		if (gpix == null || alpha != oalp || !animation.curAnim.finished || oanim != animation.curAnim.name)
-		{
-			if (!alphas.exists(type))
-			{
-				alphas.set(type, new Map());
-				indexes.set(type, new Map());
-			}
-			if (!alphas.get(type).exists(animation.curAnim.name))
-			{
-				alphas.get(type).set(animation.curAnim.name, new Map());
-				indexes.get(type).set(animation.curAnim.name, new Map());
-			}
-			if (!alphas.get(type).get(animation.curAnim.name).exists(animation.curAnim.curFrame))
-			{
-				alphas.get(type).get(animation.curAnim.name).set(animation.curAnim.curFrame, []);
-				indexes.get(type).get(animation.curAnim.name).set(animation.curAnim.curFrame, []);
-			}
-			if (!alphas.get(type)
-				.get(animation.curAnim.name)
-				.get(animation.curAnim.curFrame)
-				.contains(alpha))
-			{
-				var pix:FlxGraphic = FlxGraphic.fromFrame(frame, true);
-				var nalp:Array<Float> = alphas.get(type).get(animation.curAnim.name).get(animation.curAnim.curFrame);
-				var nindex:Array<Int> = indexes.get(type).get(animation.curAnim.name).get(animation.curAnim.curFrame);
-				pix.bitmap.colorTransform(pix.bitmap.rect, colorTransform);
-				glist.push(pix);
-				nalp.push(alpha);
-				nindex.push(glist.length - 1);
-				alphas.get(type).get(animation.curAnim.name).set(animation.curAnim.curFrame, nalp);
-				indexes.get(type).get(animation.curAnim.name).set(animation.curAnim.curFrame, nindex);
-			}
-			var dex = alphas.get(type)
-				.get(animation.curAnim.name)
-				.get(animation.curAnim.curFrame)
-				.indexOf(alpha);
-			gpix = glist[
-				indexes.get(type).get(animation.curAnim.name).get(animation.curAnim.curFrame)[dex]
-			];
-			oalp = alpha;
-			oanim = animation.curAnim.name;
-		}
-		return gpix;
-	}
 }

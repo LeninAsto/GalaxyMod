@@ -173,7 +173,7 @@ class M_peace
 			{
 				var dood:Bool = Conductor.songPosition - note.strumTime > 1000;
 				if (dood)
-					PlayState.playstate.destroyObject(note.clones[0]);
+					removeNoteClones(note);
 				return dood;
 			}
 			else
@@ -195,10 +195,17 @@ class M_peace
 			&& (note.strumTime < 134400 || (note.strumTime < 134500 && note.mustPress))
 			&& note.spec == 0)
 		{
-			PlayState.playstate.destroyObject(note.clones[0]);
+			if (!note.isSustainNote) removeNoteClones(note);
 		}
 		else if (note.strumTime >= 172800 && !note.mustPress)
 			PlayState.playstate.changeHealth(-0.023);
+	}
+
+	public static function removeNoteClones(note:Note):Void
+	{
+		for (clone in note.clones)
+			if (clone != null && clone.exists) PlayState.playstate.destroyObject(clone);
+		note.clones.resize(0);
 	}
 
 	public static function cloneNote(note:Note)
@@ -792,7 +799,9 @@ class M_peace
 						note.width,
 						note.noteData,
 						note.mustPress ? 1 : 0,
-						note.z + 1600
+						note.z + 1600,
+						note.sustainOrder,
+						note.sustainLength
 					]);
 					note.clones[0].renderer.pathRatio = note.renderer.pathRatio;
 					note.clones[0].pathrender();
@@ -1382,7 +1391,7 @@ class R_peace extends RenderPath
 					var z2 = 250 - (Conductor.songPosition - etime) * (ModchartMath.scrollSpeed());
 					var x2 = 640 + Math.cos(etime / 600 * Math.PI) * 500;
 					var y2 = 400
-						+ Math.sin(stime / 600 * Math.PI) * 200
+						+ Math.sin(etime / 600 * Math.PI) * 200
 						+ (Conductor.songPosition - etime) * (ModchartMath.scrollSpeed());
 
 					if (stime >= 134400)
@@ -1530,9 +1539,11 @@ class R_peace extends RenderPath
 				var sorder:Float = parameters[6] + head;
 				var eorder:Float = parameters[6] + tail;
 
-				var x:Float = NoteObject.toWorld((parameters[4] == 1 ? PlayMoving.defaultPlayerReceptorX[Std.int(parameters[3])] : PlayMoving.defaultOpponentReceptorX[Std.int(parameters[3])])
-					+ Note.noteWidth[Std.int(parameters[3])] / 2, 360)[0];
-				var y:Float = NoteObject.toWorld(640, (FlxG.save.data.downscroll ? 550 : 50) + Note.noteHeight[Std.int(parameters[3])] / 2)[1];
+				var lane = Std.int(parameters[3]);
+				var screenX = (parameters[4] == 1 ? PlayMoving.defaultPlayerReceptorX[lane] : PlayMoving.defaultOpponentReceptorX[lane])
+					+ Note.noteWidth[lane] / 2;
+				var x:Float = (screenX - 640) / 0.7 + 640;
+				var y:Float = ((FlxG.save.data.downscroll ? 550 : 50) + Note.noteHeight[lane] / 2 - 360) / 0.7 + 360;
 				var y1:Float = y
 					+ (Conductor.songPosition - stime) * (ModchartMath.scrollSpeed()) / (FlxG.save.data.downscroll ? 0.7 : -0.7);
 				var y2:Float = y
@@ -1594,14 +1605,16 @@ class R_peace extends RenderPath
 					}
 				}
 
-				var p0:Array<Float> = NoteObject.toScreen(x1 - parameters[2] / 2, y1, parameters[5]);
-				var p1:Array<Float> = NoteObject.toScreen(x1 + parameters[2] / 2, y1, parameters[5]);
-				var p2:Array<Float> = NoteObject.toScreen(x2 - parameters[2] / 2, y2, parameters[5]);
-				var p3:Array<Float> = NoteObject.toScreen(x2 + parameters[2] / 2, y2, parameters[5]);
-
 				if (parameters[5] < 0)
 					return [[0, 0, 0, 0, 0, 0, 0, 0], uvt];
-				return [[p0[0], p0[1], p1[0], p1[1], p2[0], p2[1], p3[0], p3[1]], uvt];
+				var projection = 200 / parameters[5];
+				var halfWidth = parameters[2] / 2;
+				return [[
+					640 + (x1 - halfWidth - 640) * projection, 360 + (y1 - 360) * projection,
+					640 + (x1 + halfWidth - 640) * projection, 360 + (y1 - 360) * projection,
+					640 + (x2 - halfWidth - 640) * projection, 360 + (y2 - 360) * projection,
+					640 + (x2 + halfWidth - 640) * projection, 360 + (y2 - 360) * projection
+				], uvt];
 			case 4: // lol [stime,etime,width,ang]
 				var ang:Float = (Conductor.songPosition / 2400) * 360;
 

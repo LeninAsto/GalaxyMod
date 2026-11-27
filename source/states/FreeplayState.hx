@@ -38,7 +38,7 @@ class FreeplayState extends MusicBeatState
 	override function load()
 	{
 		var debugUnlocks = false;
-		#if debug
+		#if nomorelocks
 		debugUnlocks = true;
 		#end
 		for (song in CoolUtil.coolTextFile(Paths.txt("freeplaySonglist")))

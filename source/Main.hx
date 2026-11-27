@@ -57,6 +57,9 @@ class Main extends Sprite
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 		}
 
+		#if (sys && desktop)
+		backend.CrashHandler.install();
+		#end
 		setupGame();
 	}
 

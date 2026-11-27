@@ -105,6 +105,7 @@ class PlayMoving
 				else
 					note.y = (strumLine.y - (Conductor.songPosition - note.strumTime) * (ModchartMath.scrollSpeed()));
 		}
+		note.positionUpdated = true;
 	}
 
 	public static function updateReceptorPosition(receptor:NoteStrum, strumLine:FlxSprite)
@@ -161,6 +162,12 @@ class PlayMoving
 		}
 	}
 
+	public static function onNoteRemoved(note:Note):Void
+	{
+		if (note.clones.length > 0)
+			M_peace.removeNoteClones(note);
+	}
+
 	public static function applyNoteShape(note:Note, strumLine:FlxSprite, camHUD:FlxCamera):Void
 	{
 		if (PlayState.SONG.song.toLowerCase() == "newton" && PlayState.storyDifficulty != 0)
@@ -170,10 +177,17 @@ class PlayMoving
 		}
 		if (note.isSustainNote && note.rendermode == 0)
 		{
-			if (updateSustainDirection(note, strumLine) == 1)
+			var direction = updateSustainDirection(note, strumLine);
+			if (direction == 1)
 			{
 				if (note.animation.curAnim.name.endsWith('end'))
 					note.y += note.height;
+			}
+			if (direction == 1 || direction == 2)
+			{
+				alignSustainEnd(note, direction == 1);
+				clipVerticalSustain(note, getSustainClipPosition(note, strumLine) + Note.swagWidth / 2, direction == 1);
+				return;
 			}
 			note.clipRect = null;
 		}
@@ -206,6 +220,53 @@ class PlayMoving
 			}
 			note.clipRect = sustainClipRect;
 		}
+	}
+
+	static function alignSustainEnd(note:Note, downscroll:Bool):Void
+	{
+		if (note.animation.curAnim == null || !note.animation.curAnim.name.endsWith('end')) return;
+		var previous = note.prevNote;
+		if (previous == null || previous == note || !previous.isSustainNote) return;
+
+		if (previous.alive && previous.exists && previous.positionUpdated && previous.rendermode == 0
+			&& Math.abs(previous.angle - note.angle) < 0.01)
+		{
+			var gap = downscroll ? previous.y - (note.y + note.height) : note.y - (previous.y + previous.height);
+			note.sustainEndJoinOffset = gap > 0 && gap <= Math.max(previous.height, note.height)
+				? (downscroll ? gap : -gap) : 0;
+		}
+		else if (previous.alive && previous.exists && previous.positionUpdated)
+			note.sustainEndJoinOffset = 0;
+		note.y += note.sustainEndJoinOffset;
+	}
+
+	static function clipVerticalSustain(note:Note, center:Float, downscroll:Bool):Void
+	{
+		var canClip = !note.mustPress || note.wasGoodHit || (note.prevNote != null && note.prevNote.wasGoodHit && !note.canBeHit);
+		if (!canClip || note.scale.y <= 0 || note.scale.x <= 0)
+		{
+			note.clipRect = null;
+			return;
+		}
+
+		var crossed = downscroll
+			? note.y - note.offset.y * note.scale.y + note.height >= center
+			: note.y + note.offset.y * note.scale.y <= center;
+		if (!crossed)
+		{
+			note.clipRect = null;
+			return;
+		}
+
+		var rect = note.clipRect;
+		if (rect == null) rect = new FlxRect();
+		var frameHeight = note.frameHeight;
+		var clipAmount = FlxMath.bound((center - note.y) / note.scale.y, 0, frameHeight);
+		if (downscroll)
+			rect.set(0, frameHeight - clipAmount, note.frameWidth, clipAmount);
+		else
+			rect.set(0, clipAmount, note.frameWidth, frameHeight - clipAmount);
+		note.clipRect = rect;
 	}
 
 	inline static public function shouldHideNote(note:Note):Bool

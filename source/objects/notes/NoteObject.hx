@@ -12,6 +12,7 @@ import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.util.FlxColor;
 import modcharts.RenderPath;
 import openfl.Vector;
+import haxe.ds.ObjectMap;
 
 using StringTools;
 
@@ -21,6 +22,50 @@ import polymod.format.ParseRules.TargetSignatureElement;
 
 class NoteObject extends FlxSprite
 {
+	static var pathGraphics:ObjectMap<FlxFrame, FlxGraphic> = new ObjectMap();
+	static var pathIndices:Vector<Int> = new Vector(6, true, [0, 1, 2, 1, 3, 2]);
+	static var pathVertices:Vector<Float> = new Vector(8, true);
+	static var pathUV:Vector<Float> = new Vector(8, true);
+	static var pathUVPerspective:Vector<Float> = new Vector(12, true);
+
+	public static function clearPathGraphics():Void
+	{
+		for (graphic in pathGraphics) graphic.destroy();
+		pathGraphics = new ObjectMap();
+	}
+
+	function mapData():FlxGraphic
+	{
+		var graphic = pathGraphics.get(frame);
+		if (graphic == null)
+		{
+			graphic = FlxGraphic.fromFrame(frame, true);
+			pathGraphics.set(frame, graphic);
+		}
+		return graphic;
+	}
+
+	function drawPath(path:RenderPath):Void
+	{
+		if (path == null || alpha <= 0 || !visible || !active) return;
+		var graphic = mapData();
+		var cursor = 1 - FlxMath.bound(path.pathRatio, 0, 1);
+		while (cursor < 1)
+		{
+			var end = Math.min(cursor + 0.1, 1);
+			var data = path.start(cursor, end);
+			var uv = data[1].length == 12 ? pathUVPerspective : pathUV;
+			for (i in 0...8) pathVertices[i] = data[0][i];
+			for (i in 0...uv.length) uv[i] = data[1][i];
+			for (camera in cameras)
+			{
+				if (!camera.visible || !camera.exists) continue;
+				getScreenPosition(_point, camera).subtract(offset);
+				camera.drawTriangles(graphic, pathVertices, pathIndices, uv, null, _point, blend, false, antialiasing, colorTransform);
+			}
+			cursor = end;
+		}
+	}
 	public var z:Float = 200 / 0.7;
 	public var wx:Float;
 	public var wy:Float;

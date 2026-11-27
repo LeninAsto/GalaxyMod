@@ -5,6 +5,7 @@ import backend.integration.Discord.DiscordClient;
 #end
 import backend.data.Section.SwagSection;
 import backend.data.Song.SwagSong;
+import modcharts.ModchartMath;
 import shaders.WiggleEffect.WiggleEffectType;
 import flixel.FlxBasic;
 import flixel.FlxCamera;
@@ -204,6 +205,7 @@ class PlayState extends MusicBeatState
 	public static var daPixelZoom:Float = 6;
 
 	var inCutscene:Bool = false;
+	var previousAutoPause:Bool;
 
 	#if desktop
 	// Discord RPC variables
@@ -218,6 +220,7 @@ class PlayState extends MusicBeatState
 
 	override public function create()
 	{
+		previousAutoPause = FlxG.autoPause;
 		playstate = this;
 		if (SONG.song.toLowerCase() == "senpai" || SONG.song.toLowerCase() == "roses" || SONG.song.toLowerCase() == "thorns")
 			daPixelZoom = 6;
@@ -856,8 +859,17 @@ class PlayState extends MusicBeatState
 		super.create();
 	}
 
+	override function destroy():Void
+	{
+		FlxG.autoPause = previousAutoPause;
+		super.destroy();
+	}
+
 	function schoolIntro(?dialogueBox:DialogueBox, numbbb:Int = 0):Void
 	{
+		#if windows
+		FlxG.autoPause = true;
+		#end
 		var black:FlxSprite = new FlxSprite(-100, -100).makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.BLACK);
 		black.scrollFactor.set();
 		add(black);
@@ -1071,6 +1083,7 @@ class PlayState extends MusicBeatState
 
 	function startCountdown():Void
 	{
+		FlxG.autoPause = previousAutoPause;
 		switch (SONG.song.toLowerCase())
 		{
 			case "familanna":
@@ -1528,10 +1541,10 @@ class PlayState extends MusicBeatState
 			if (FlxG.sound.music != null)
 			{
 				FlxG.sound.music.pause();
-				vocals.pause();
+				if (vocals != null) vocals.pause();
 			}
 
-			if (!startTimer.finished)
+			if (startTimer != null && !startTimer.finished)
 				startTimer.active = false;
 		}
 
@@ -1547,12 +1560,12 @@ class PlayState extends MusicBeatState
 				resyncVocals();
 			}
 
-			if (!startTimer.finished)
+			if (startTimer != null && !startTimer.finished)
 				startTimer.active = true;
 			paused = false;
 
 			#if desktop
-			if (startTimer.finished)
+			if (startTimer != null && startTimer.finished)
 			{
 				DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC, true, songLength - Conductor.songPosition);
 			}
@@ -1586,7 +1599,7 @@ class PlayState extends MusicBeatState
 	}*/
 	override public function onFocusLost():Void
 	{
-		if (songPlaying && health > 0 && !paused && canPause)
+		if (startedCountdown && !inCutscene && songPlaying && health > 0 && !paused && canPause)
 		{
 			persistentUpdate = false;
 			persistentDraw = true;
@@ -1634,6 +1647,9 @@ class PlayState extends MusicBeatState
 
 	override public function update(elapsed:Float)
 	{
+		#if (sys && desktop)
+		backend.CrashHandler.checkpoint();
+		#end
 		#if !debug
 		perfectMode = false;
 		#end
@@ -1828,14 +1844,11 @@ class PlayState extends MusicBeatState
 			iconScale = FlxMath.lerp(1, iconP2.scale.x, Math.exp(-elapsed * 9));
 			iconP2.scale.set(iconScale, iconScale);
 
-			iconP1.updateHitbox();
-			iconP2.updateHitbox();
-
 			var iconOffset:Int = 26;
 
 			var barCenter = healthBar.x + healthBar.width * (1 - healthBar.percent / 100);
-			iconP1.x = barCenter + (150 * iconP1.scale.x - 150) / 2 - iconOffset;
-			iconP2.x = barCenter - (150 * iconP2.scale.x) / 2 - iconOffset * 2;
+			iconP1.x = barCenter - iconOffset;
+			iconP2.x = barCenter - iconP2.frameWidth / 2 - iconOffset * 2;
 
 			if (health > 2)
 				health = 2;
@@ -2054,7 +2067,7 @@ class PlayState extends MusicBeatState
 
 					PlayMoving.applyNoteShape(daNote, strumLine, camHUD);
 
-					if ((!daNote.mustPress || daNote.isLastSustain) && daNote.wasGoodHit)
+					if ((!daNote.mustPress || daNote.isLastSustain) && daNote.wasGoodHit && !daNote.played)
 					{
 						if (SONG.song != 'Tutorial')
 							camZooming = true;
@@ -2088,10 +2101,25 @@ class PlayState extends MusicBeatState
 							vocals.volume = 1;
 
 						PlayMoving.onGoodNoteHit(daNote);
-						daNote.kill();
-						notes.remove(daNote, true);
-						noteAndStrum.remove(daNote, true);
-						daNote.destroy();
+						daNote.played = true;
+						if (!daNote.isSustainNote || daNote.rendermode == 1)
+						{
+							removeGameplayNote(daNote);
+							return;
+						}
+					}
+
+					if (daNote.isSustainNote && daNote.wasGoodHit && daNote.rendermode != 1)
+					{
+						var fullyClipped = daNote.rendermode == 2
+							? daNote.renderer != null && daNote.renderer.pathRatio <= 0
+							: daNote.clipRect != null && daNote.clipRect.height <= 0;
+						var maxVisibleTime = Math.max(350, daNote.height / Math.max(0.01, ModchartMath.scrollSpeed()) + 150);
+						if (fullyClipped || Conductor.songPosition - daNote.strumTime > maxVisibleTime)
+						{
+							removeGameplayNote(daNote);
+							return;
+						}
 					}
 
 					// WIP interpolation shit? Need to fix the pause issue
@@ -2315,6 +2343,9 @@ class PlayState extends MusicBeatState
 
 	function endSong():Void
 	{
+		#if windows
+		FlxG.autoPause = true;
+		#end
 		canPause = false;
 		FlxG.sound.music.volume = 0;
 		vocals.volume = 0;
@@ -3049,14 +3080,22 @@ class PlayState extends MusicBeatState
 			});
 
 			note.wasGoodHit = true;
+			note.played = true;
 			vocals.volume = 1;
 
 			PlayMoving.onGoodNoteHit(note);
-			note.kill();
-			notes.remove(note, true);
-			noteAndStrum.remove(note, true);
-			note.destroy();
+			if (!note.isSustainNote || note.rendermode == 1)
+				removeGameplayNote(note);
 		}
+	}
+
+	function removeGameplayNote(note:Note):Void
+	{
+		PlayMoving.onNoteRemoved(note);
+		note.kill();
+		notes.remove(note, true);
+		noteAndStrum.remove(note, true);
+		note.destroy();
 	}
 
 	var fastCarCanDrive:Bool = true;
@@ -3584,8 +3623,6 @@ class PlayState extends MusicBeatState
 		iconP1.scale.set(1.2, 1.2);
 		iconP2.scale.set(1.2, 1.2);
 
-		iconP1.updateHitbox();
-		iconP2.updateHitbox();
 
 		if (curBeat % gfSpeed == 0 && (gf.animation.curAnim.name != "sad" || gf.animation.curAnim.looped))
 		{
